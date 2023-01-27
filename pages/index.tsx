@@ -78,11 +78,22 @@ const Service = () => {
   // * Web3Modal Ethereum Client
   const ethereumClient = new EthereumClient(wagmiClient, chains);
 
-  function selectAvatar(element: {
-    metadata: { realbits: { avatar_url: React.SetStateAction<string> } };
+  function selectAvatarFunc(element: {
+    metadata: {
+      realbits: {
+        glb_url: React.SetStateAction<string>;
+        vrm_url: React.SetStateAction<string>;
+      };
+    };
   }) {
-    // console.log("selectAvatar metadata: ", element.metadata);
-    setAvatarUrl(element.metadata.realbits.avatar_url);
+    console.log("call selectAvatarFunc()");
+    console.log("element.metadata: ", element.metadata);
+    console.log(
+      "element.metadata.realbits.vrm_url: ",
+      element.metadata.realbits.vrm_url
+    );
+
+    setAvatarUrl(element.metadata.realbits.vrm_url);
   }
 
   return (
@@ -91,7 +102,7 @@ const Service = () => {
       {/* //* RentContent component.                                         */}
       {/* //*----------------------------------------------------------------*/}
       <RentContent
-        selectAvatarFunc={selectAvatar}
+        selectAvatarFunc={selectAvatarFunc}
         rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
         blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
         testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
