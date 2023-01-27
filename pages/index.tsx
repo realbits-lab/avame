@@ -84,6 +84,7 @@ const Service = () => {
       {/* //* Fab menu button.                                               */}
       {/* //*----------------------------------------------------------------*/}
       <ButtonMenu
+        useFab={true}
         startScreenStreamFuncRef={startScreenStreamFuncRef}
         stopScreenStreamFuncRef={stopScreenStreamFuncRef}
         takePictureFuncRef={takePictureFuncRef}
