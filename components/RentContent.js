@@ -1,9 +1,13 @@
 import React from "react";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { RentMarket } from "rent-market";
+import {
+  Web3Button,
+  Web3NetworkSwitch,
+  useWeb3ModalNetwork,
+} from "@web3modal/react";
+import { useAccount, useEnsName } from "wagmi";
+import { My, Market, RentMarket } from "rent-market";
 import "../node_modules/react-resizable/css/styles.css";
-import My from "./My";
-import Market from "./Market";
 import {
   RBDialog,
   RBSnackbar,
@@ -22,6 +26,12 @@ const RentContent = ({
   openMarketFuncRef,
   rentMarketRef,
 }) => {
+  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
+  console.log("selectedChain: ", selectedChain);
+  const { address, isConnected } = useAccount();
+  console.log("address: ", address);
+  console.log("isConnected: ", isConnected);
+
   //* --------------------------------------------------------------------------
   //* Dialog open/close status.
   //* --------------------------------------------------------------------------
@@ -53,8 +63,8 @@ const RentContent = ({
   //* --------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
-  const writeToastMessage = React.useMemo(() => {
-    return writeToastMessageLoadable?.state === "hasValue"
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
       ? writeToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -62,13 +72,12 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   const readToastMessageLoadable = useRecoilValueLoadable(
     readToastMessageState
   );
-  const readToastMessage = React.useMemo(() => {
-    return readToastMessageLoadable?.state === "hasValue"
+  const readToastMessage =
+    readToastMessageLoadable?.state === "hasValue"
       ? readToastMessageLoadable.contents
       : {
           snackbarSeverity: AlertSeverity.info,
@@ -76,7 +85,6 @@ const RentContent = ({
           snackbarTime: new Date(),
           snackbarOpen: true,
         };
-  });
 
   //* --------------------------------------------------------------------------
   //* Initialize data.
@@ -185,6 +193,7 @@ const RentContent = ({
           inputServiceAddress={serviceAddress}
           inputRegisterNFTArray={registerNFTArray}
           inputBlockchainNetwork={blockchainNetwork}
+          setWriteToastMessage={setWriteToastMessage}
         />
       </RBDialog>
 
@@ -207,6 +216,9 @@ const RentContent = ({
           inputMyRegisteredNFTArray={myRegisteredNFTArray}
           inputMyRentNFTArray={myRentNFTArray}
           inputBlockchainNetwork={blockchainNetwork}
+          setWriteToastMessage={setWriteToastMessage}
+          web3modalSelectedChain={selectedChain}
+          wagmiIsConnected={address}
         />
       </RBDialog>
 

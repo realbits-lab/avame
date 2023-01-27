@@ -1,17 +1,15 @@
 import React from "react";
 import Draggable from "react-draggable";
-import {
-  Paper,
-  Dialog,
-  DialogContent,
-  Portal,
-  Link,
-  Snackbar,
-  Alert as MuiAlert,
-} from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Portal from "@mui/material/Portal";
+import Link from "@mui/material/Link";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { Resizable } from "react-resizable";
 import { atom, selector } from "recoil";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, v1 } from "uuid";
 
 import BootstrapDialogTitle, { Transition } from "./BootstrapDialogTitle";
 
@@ -547,94 +545,11 @@ export const getErrorDescription = ({ errorString }) => {
   return errorCode[errorString];
 };
 
-export const getChainName = ({ chainId }) => {
-  // https://github.com/DefiLlama/chainlist/blob/main/constants/chainIds.js
-  const chainIds = {
-    0: "kardia",
-    1: "ethereum",
-    5: "goerli",
-    6: "kotti",
-    8: "ubiq",
-    10: "optimism",
-    19: "songbird",
-    20: "elastos",
-    25: "cronos",
-    30: "rsk",
-    40: "telos",
-    50: "xdc",
-    52: "csc",
-    55: "zyx",
-    56: "binance",
-    57: "syscoin",
-    60: "gochain",
-    61: "ethereumclassic",
-    66: "okexchain",
-    70: "hoo",
-    82: "meter",
-    87: "nova network",
-    88: "tomochain",
-    100: "xdai",
-    106: "velas",
-    108: "thundercore",
-    122: "fuse",
-    128: "heco",
-    137: "polygon",
-    200: "xdaiarb",
-    246: "energyweb",
-    250: "fantom",
-    269: "hpb",
-    288: "boba",
-    321: "kucoin",
-    336: "shiden",
-    361: "theta",
-    416: "sx",
-    534: "candle",
-    592: "astar",
-    820: "callisto",
-    888: "wanchain",
-    1088: "metis",
-    1231: "ultron",
-    1284: "moonbeam",
-    1285: "moonriver",
-    1337: "localhost",
-    2000: "dogechain",
-    2020: "ronin",
-    2222: "kava",
-    4689: "iotex",
-    5050: "xlc",
-    5551: "nahmii",
-    6969: "tombchain",
-    8217: "klaytn",
-    9001: "evmos",
-    10000: "smartbch",
-    31337: "localhost",
-    32659: "fusion",
-    42161: "arbitrum",
-    42170: "arb-nova",
-    42220: "celo",
-    42262: "oasis",
-    43114: "avalanche",
-    47805: "rei",
-    55555: "reichain",
-    71402: "godwoken",
-    80001: "mumbai",
-    333999: "polis",
-    888888: "vision",
-    1313161554: "aurora",
-    1666600000: "harmony",
-    11297108109: "palm",
-    836542336838601: "curio",
-  };
-
-  // console.log("chainId: ", chainId);
-  return chainIds[Number(chainId)];
-};
-
 // https://levelup.gitconnected.com/how-to-check-for-an-object-in-javascript-object-null-check-3b2632330296
 export const isObject = (value) => typeof value === "object" && value !== null;
 
 export const writeToastMessageState = atom({
-  key: "writeToastMessageState",
+  key: `writeToastMessageState/${v1()}`,
   snackbarSeverity: AlertSeverity.info,
   snackbarMessage: "",
   // snackbarTime: new Date(),
@@ -643,7 +558,7 @@ export const writeToastMessageState = atom({
 });
 
 export const readToastMessageState = selector({
-  key: "readToastMessageState",
+  key: `readToastMessageState/${v1()}`,
   get: ({ get }) => {
     const toastMessageState = get(writeToastMessageState);
     return toastMessageState;

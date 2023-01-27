@@ -1,8 +1,17 @@
 import React from "react";
+import {
+  EthereumClient,
+  modalConnectors,
+  walletConnectProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal } from "@web3modal/react";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
+import { getChainName } from "rent-market";
 
 const Service = () => {
   //*---------------------------------------------------------------------------
@@ -33,6 +42,41 @@ const Service = () => {
   const setBackgroundScreenFuncRef = React.useRef();
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
+
+  let chains: any[] = [];
+  if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "matic"
+  ) {
+    chains = [polygon];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "maticmum"
+  ) {
+    chains = [polygonMumbai];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "localhost"
+  ) {
+    chains = [localhost];
+  } else {
+    chains = [];
+  }
+
+  // * Wagmi client
+  const { provider } = configureChains(chains, [
+    walletConnectProvider({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    }),
+  ]);
+  const wagmiClient = createClient({
+    autoConnect: true,
+    connectors: modalConnectors({ appName: "web3Modal", chains }),
+    provider,
+  });
+
+  // * Web3Modal Ethereum Client
+  const ethereumClient = new EthereumClient(wagmiClient, chains);
 
   function selectAvatar(element: {
     metadata: { realbits: { avatar_url: React.SetStateAction<string> } };
