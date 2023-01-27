@@ -17,9 +17,9 @@ const Twitter = ({
   inputImageUrl,
   inputSetShowTwitterDialog,
 }) => {
-  //----------------------------------------------------------------------------
-  // Variables.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Variables.
+  //*---------------------------------------------------------------------------
   const TWITTER_DIALOG_WIDTH = 500;
   const TWITTER_DIALOG_HEIGHT = 400;
   const uploadDomainRef = React.useRef("");
@@ -94,7 +94,7 @@ const Twitter = ({
     }
   }, [showTwitterDialog, inputImageUrl, videoFile]);
 
-  const uploadImage = ({ url }) => {
+  function uploadImage({ url }) {
     const UPLOAD_URL = `${uploadDomainRef.current}/upload_image`;
     // console.log("url: ", url);
 
@@ -123,9 +123,9 @@ const Twitter = ({
             throw error;
           });
       });
-  };
+  }
 
-  const uploadVideo = () => {
+  function uploadVideo() {
     // console.log("call uploadVideo()");
     // console.log("videoFile: ", videoFile);
 
@@ -146,7 +146,7 @@ const Twitter = ({
       .catch((error) => {
         throw error;
       });
-  };
+  }
 
   // TODO: Set position of twitter dialog
   // TODO: Set size of twitter dialog.
@@ -163,15 +163,15 @@ const Twitter = ({
         inputTop={5}
       >
         <Card>
-          {/*----------------------------------------------------------------*/}
-          {/* Show image or video snapshot.                                  */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show image or video snapshot.                               */}
+          {/*//*-------------------------------------------------------------*/}
           {ImageCardMedia}
           {VideoCardMedia}
 
-          {/*----------------------------------------------------------------*/}
-          {/* Show text input.                                               */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show text input.                                            */}
+          {/*//*-------------------------------------------------------------*/}
           <CardContent>
             <TextField
               fullWidth
@@ -185,24 +185,28 @@ const Twitter = ({
             />
           </CardContent>
 
-          {/*----------------------------------------------------------------*/}
-          {/* Show upload button.                                            */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show upload button.                                         */}
+          {/*//*-------------------------------------------------------------*/}
           <CardActions disableSpacing>
             {uploadTwitterEnabled === true ? (
               <IconButton
                 aria-label="twitter"
-                onClick={async () => {
-                  const response = await axios.get(
-                    `${twitterLoginUrl.current}?path=${uploadedFilePath}&twitterText=${twitterText}`
-                  );
-                  console.log("response: ", response);
+                onClick={async function () {
+                  try {
+                    const response = await axios.get(
+                      `${twitterLoginUrl.current}?path=${uploadedFilePath}&twitterText=${twitterText}`
+                    );
+                    console.log("response: ", response);
 
-                  if (response.status === 200) {
-                    window.open(response.data.url);
-                  } else {
-                    // TODO: Handle response error.
-                    console.error(response);
+                    if (response.status === 200) {
+                      window.open(response.data.url);
+                    } else {
+                      // TODO: Handle response error.
+                      console.error(response);
+                    }
+                  } catch (error) {
+                    throw error;
                   }
 
                   setUploadTwitterEnabled(false);
