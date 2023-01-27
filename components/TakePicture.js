@@ -205,7 +205,7 @@ const TakePicture = ({
                   return;
                 }
 
-                // Show twitter dialog for uploading image.
+                //* Show twitter dialog for uploading image.
                 setShowTwitterDialog(true);
               }}
             >
@@ -215,9 +215,9 @@ const TakePicture = ({
         </Card>
       </RBDialog>
 
-      {/*--------------------------------------------------------------------*/}
-      {/* Show twitter dialog.                                               */}
-      {/*--------------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show twitter dialog.                                            */}
+      {/*//*-----------------------------------------------------------------*/}
       <Twitter
         inputImageUrl={imageDataUrl}
         showTwitterDialog={showTwitterDialog}

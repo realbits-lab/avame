@@ -3,8 +3,8 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { TwitterApi } from "twitter-api-v2";
 
 const sessionOptions = {
-  password: process.env.NEXT_PUBLIC_SECRET_COOKIE_PASSWORD,
-  cookieName: "realbits-service",
+  password: process.env.NEXT_PUBLIC_COOKIE_PASSWORD,
+  cookieName: "avame",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
   },
