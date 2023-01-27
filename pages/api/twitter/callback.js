@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { withIronSessionApiRoute } from "iron-session/next";
 import { TwitterApi } from "twitter-api-v2";
 
@@ -11,16 +10,16 @@ const sessionOptions = {
 };
 
 async function handler(req, res) {
-  // * -----------------------------------------------------------------------
-  // * Extract tokens from query string
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Extract tokens from query string
+  //*-------------------------------------------------------------------------
   const { oauth_token, oauth_verifier } = req.query;
   console.log("oauth_token: ", oauth_token);
   console.log("oauth_verifier: ", oauth_verifier);
 
-  // * -----------------------------------------------------------------------
-  // * Get the saved oauth_token_secret from session
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Get the saved oauth_token_secret from session
+  //*-------------------------------------------------------------------------
   const { oauth_token_secret, twitterText } = req.session;
   console.log("twitterText: ", twitterText);
   console.log("oauth_token_secret: ", oauth_token_secret);
@@ -32,10 +31,10 @@ async function handler(req, res) {
       .json({ error: "You denied the app or your session expired." });
   }
 
-  // * -----------------------------------------------------------------------
-  // * Obtain the persistent tokens.
-  // * Create a client from temporary tokens.
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Obtain the persistent tokens.
+  //* Create a client from temporary tokens.
+  //*-------------------------------------------------------------------------
   const client = new TwitterApi({
     appKey: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_KEY,
     appSecret: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_SECRET,
@@ -43,18 +42,18 @@ async function handler(req, res) {
     accessSecret: oauth_token_secret,
   });
 
-  // * -----------------------------------------------------------------------
-  // * Login twitter.
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Login twitter.
+  //*-------------------------------------------------------------------------
   const {
     client: loggedClient,
     accessToken,
     accessSecret,
   } = await client.login(oauth_verifier);
 
-  // * -----------------------------------------------------------------------
-  // * Upload media to twitter.
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Upload media to twitter.
+  //*-------------------------------------------------------------------------
   let tweetResponse;
   try {
     console.log("req.session.path: ", req.session.path);
@@ -76,9 +75,9 @@ async function handler(req, res) {
     return;
   }
 
-  // * -----------------------------------------------------------------------
-  // * Get tweet url.
-  // * -----------------------------------------------------------------------
+  //*-------------------------------------------------------------------------
+  //* Get tweet url.
+  //*-------------------------------------------------------------------------
   let tweetUrl;
   try {
     const startIndex = tweetResponse.display_text_range[1];
@@ -97,11 +96,11 @@ async function handler(req, res) {
   res.status(200).send(buildResponsePage({ tweetUrl }));
 }
 
-const buildResponsePage = ({ tweetUrl }) => {
+function buildResponsePage({ tweetUrl }) {
   // TODO: Design upload landing page.
   return `<html>Upload done<br/> \
     <a href="${tweetUrl}">tweet link</a><br/> \
     <button onClick="javascript:window.close('','_parent','');">Close window</button></html>`;
-};
+}
 
 export default withIronSessionApiRoute(handler, sessionOptions);

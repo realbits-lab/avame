@@ -11,48 +11,47 @@ const sessionOptions = {
 };
 
 async function handler(req, res) {
-  // * -------------------------------------------------------------------------
-  // * Set for OAuth1.0a.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Set for OAuth1.0a.
+  //*---------------------------------------------------------------------------
   const twitterApiClient = new TwitterApi({
     appKey: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_KEY,
     appSecret: process.env.NEXT_PUBLIC_TWITTER_CONSUMER_SECRET,
   });
 
-  // * -------------------------------------------------------------------------
-  // * Get twitter auth link.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Get twitter auth link.
+  //*---------------------------------------------------------------------------
   const twitterAuthLink = await twitterApiClient.generateAuthLink(
-    // TODO: Set production setting.
-    "http://localhost:3000/api/twitter/callback",
+    process.env.NEXT_PUBLIC_TWITTER_CALLBACK_URL,
     {
       linkMode: "authorize",
     }
   );
   console.log("twitterAuthLink: ", twitterAuthLink);
 
-  // * -------------------------------------------------------------------------
-  // * Save oauth_token and oauth_token_secret in req.session.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Save oauth_token and oauth_token_secret in req.session.
+  //*---------------------------------------------------------------------------
   req.session.oauth_token = twitterAuthLink.oauth_token;
   req.session.oauth_token_secret = twitterAuthLink.oauth_token_secret;
 
-  // * -------------------------------------------------------------------------
-  // * Save path and twitter text in req.session.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Save path and twitter text in req.session.
+  //*---------------------------------------------------------------------------
   console.log("req.query.path: ", req.query.path);
   console.log("req.query.twitterText: ", req.query.twitterText);
   req.session.path = req.query.path;
   req.session.twitterText = req.query.twitterText;
 
-  // * -------------------------------------------------------------------------
-  // * Save at a session.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Save at a session.
+  //*---------------------------------------------------------------------------
   await req.session.save();
 
-  // * -------------------------------------------------------------------------
-  // * Send a twitter auth link url for twitter OAuth1.0a authentication.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Send a twitter auth link url for twitter OAuth1.0a authentication.
+  //*---------------------------------------------------------------------------
   res.status(200).json({ url: twitterAuthLink.url });
 }
 
