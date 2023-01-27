@@ -1,16 +1,14 @@
 import React from "react";
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import DownloadIcon from "@mui/icons-material/Download";
 import TwitterIcon from "@mui/icons-material/Twitter";
-import { AlertSeverity } from "rent-market";
-import { RBDialog, RBSnackbar, isUserAllowed } from "./RealBitsUtil";
+import { AlertSeverity, RBSnackbar, isUserAllowed } from "rent-market";
+import { RBDialog } from "./RealBitsUtil";
 import Twitter from "./Twitter";
 
 const TakePicture = ({
@@ -167,7 +165,7 @@ const TakePicture = ({
                   rentMarket: rentMarketRef.current,
                 });
 
-								// User does not have right to upload image to twitter.
+                // User does not have right to upload image to twitter.
                 // TODOO: Test for a short time.
                 // if (response === false) {
                 //   setSnackbarValue({
@@ -179,7 +177,7 @@ const TakePicture = ({
                 //   return;
                 // }
 
-								// Show twitter dialog for uploading image.
+                // Show twitter dialog for uploading image.
                 setShowTwitterDialog(true);
               }}
             >

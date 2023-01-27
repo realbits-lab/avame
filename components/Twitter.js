@@ -8,7 +8,6 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import UploadIcon from "@mui/icons-material/Upload";
-
 import { RBDialog } from "./RealBitsUtil";
 
 // TODO: Check the double uploading.

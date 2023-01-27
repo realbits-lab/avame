@@ -4,8 +4,8 @@ import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
 import loadable from "@loadable/component";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { ScreenPosition, Z_INDEX, humanFileSize } from "./RealBitsUtil";
-import dynamic from "next/dynamic";
+import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
+import { humanFileSize } from "rent-market";
 
 const Stats = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),

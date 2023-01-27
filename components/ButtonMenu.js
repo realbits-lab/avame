@@ -20,9 +20,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import {
   humanFileSize,
   RBSnackbar,
-  isUserAllowed,
   AlertSeverity,
-} from "./RealBitsUtil";
+  isUserAllowed,
+} from "rent-market";
 
 const LightTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
