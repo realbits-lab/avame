@@ -53,13 +53,14 @@ const ButtonMenu = ({
   //* Variables.
   //*---------------------------------------------------------------------------
   const fabActions = [
-    { icon: <FaceIcon color="secondary" />, name: "My" },
-    { icon: <SaveIcon color="secondary" />, name: "Market" },
+    { icon: <FaceIcon color="primary" />, name: "My" },
+    { icon: <SaveIcon color="primary" />, name: "Market" },
     // { icon: <ScreenShareIcon color="secondary" />, name: "Screen" },
     // { icon: <OndemandVideoIcon color="secondary" />, name: "Video" },
-    { icon: <CameraAltIcon color="secondary" />, name: "Image" },
+    { icon: <CameraAltIcon color="primary" />, name: "Image" },
   ];
-  const [openSpeedDial, setOpenSpeedDial] = React.useState(false);
+  //* TODO: For testing, set default status to true.
+  const [openSpeedDial, setOpenSpeedDial] = React.useState(true);
   const [isRecording, setIsRecording] = React.useState(false);
   const [isScreenShare, setIsScreenShare] = React.useState(false);
   const [recordSize, setRecordSize] = React.useState(0);
