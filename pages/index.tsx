@@ -2,21 +2,22 @@ import React from "react";
 import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
+import ButtonMenu from "../components/ButtonMenu";
 
 const Service = () => {
-  // * -------------------------------------------------------------------------
-  // * Constant variables.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Constant variables.
+  //*---------------------------------------------------------------------------
   const [avatarUrl, setAvatarUrl] = React.useState("default.vrm");
 
-  // * -------------------------------------------------------------------------
-  // * Variable references.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Variable references.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
 
-  // * -------------------------------------------------------------------------
-  // * Function references.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Function references.
+  //*---------------------------------------------------------------------------
   const getImageDataUrl = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
   const setTransformAvatarFuncRef = React.useRef();
@@ -42,9 +43,9 @@ const Service = () => {
 
   return (
     <>
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * RentContent component.                                        */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* RentContent component.                                         */}
+      {/* //*----------------------------------------------------------------*/}
       <RentContent
         selectAvatarFunc={selectAvatar}
         rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
@@ -56,9 +57,9 @@ const Service = () => {
         rentMarketRef={rentMarketRef}
       />
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * AvatarView component.                                         */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* AvatarView component.                                          */}
+      {/* //*----------------------------------------------------------------*/}
       <AvatarView
         gltfDataUrl={avatarUrl}
         getImageDataUrlFunc={getImageDataUrl}
@@ -70,12 +71,29 @@ const Service = () => {
         setTransformAvatarFunc={setTransformAvatarFuncRef}
       />
 
-      {/* // * --------------------------------------------------------------*/}
-      {/* // * TakePicture component.                                        */}
-      {/* // * --------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //*TakePicture component.                                          */}
+      {/* //*----------------------------------------------------------------*/}
       <TakePicture
         getImageDataUrlFunc={getImageDataUrl}
         takePictureFuncRef={takePictureFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
+
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* Fab menu button.                                               */}
+      {/* //*----------------------------------------------------------------*/}
+      <ButtonMenu
+        startScreenStreamFuncRef={startScreenStreamFuncRef}
+        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+        takePictureFuncRef={takePictureFuncRef}
+        startRecordingFuncRef={startRecordingFuncRef}
+        stopRecordingFuncRef={stopRecordingFuncRef}
+        getRecordStatusFuncRef={getRecordStatusFuncRef}
+        requestDataFuncRef={requestDataFuncRef}
+        openMyFuncRef={openMyFuncRef}
+        openMarketFuncRef={openMarketFuncRef}
+        stopScreenEventFuncRef={stopScreenEventFuncRef}
         rentMarketRef={rentMarketRef}
       />
     </>
