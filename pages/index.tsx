@@ -1,57 +1,32 @@
 import React from "react";
-
+import {
+  EthereumClient,
+  modalConnectors,
+  walletConnectProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal } from "@web3modal/react";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import AvatarView from "../components/AvatarView";
+import TakePicture from "../components/TakePicture";
+import RentContent from "../components/RentContent";
+import ButtonMenu from "../components/ButtonMenu";
+import { getChainName } from "rent-market";
 
 const Service = () => {
-  //----------------------------------------------------------------------------
-  // Constant variables.
-  //----------------------------------------------------------------------------
-  // "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
+  //*---------------------------------------------------------------------------
+  //* Constant variables.
+  //*---------------------------------------------------------------------------
   const [avatarUrl, setAvatarUrl] = React.useState("default.vrm");
 
-  let RENT_MARKET_ADDRESS;
-  let TEST_NFT_ADDRESS;
-  let SERVICE_ADDRESS;
-  let BLOCKCHAIN_NETWORK;
-  // service url : https://realbits-snapshot.s3.ap-northeast-2.amazonaws.com/realbits-snapshot.json
-
-  // Sample collection data.
-  // collectionAddress: 0xE5C46238c2Cf9CD7A36a51274f04958A59daB161
-  // collectionUri: https://js-nft.s3.ap-northeast-2.amazonaws.com/collection.json
-
-  // console.log("App process.env.NETWORK: ", process.env.NETWORK);
-  switch (process.env.NETWORK) {
-    case "localhost":
-    default:
-      RENT_MARKET_ADDRESS = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
-      TEST_NFT_ADDRESS = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
-      SERVICE_ADDRESS = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
-      BLOCKCHAIN_NETWORK = "0x539";
-      break;
-
-    case "matic":
-      RENT_MARKET_ADDRESS = "0x90f20cB6A0665B12c4f2B62796Ff183bF192F55c";
-      TEST_NFT_ADDRESS = "0x82087ff39e079c44b98c3abd053f734b351d5b20";
-      SERVICE_ADDRESS = "0x3851dacd8fA9F3eB64D69151A3597F33E5960A2F";
-      BLOCKCHAIN_NETWORK = "0x137";
-      break;
-
-    case "maticmum":
-      RENT_MARKET_ADDRESS = "0x1b5054C7931b18Ec8E0d5e5F5D0cBD845F3485b8";
-      TEST_NFT_ADDRESS = "0x82087ff39e079c44b98c3abd053f734b351d5b20";
-      SERVICE_ADDRESS = "0x3851dacd8fA9F3eB64D69151A3597F33E5960A2F";
-      BLOCKCHAIN_NETWORK = "0x13881";
-      break;
-  }
-
-  //----------------------------------------------------------------------------
-  // Variable references.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Variable references.
+  //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
 
-  //----------------------------------------------------------------------------
-  // Function references.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Function references.
+  //*---------------------------------------------------------------------------
   const getImageDataUrl = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
   const setTransformAvatarFuncRef = React.useRef();
@@ -68,21 +43,78 @@ const Service = () => {
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
 
-  //----------------------------------------------------------------------------
-  // Function.
-  //----------------------------------------------------------------------------
-  const selectAvatar = (element: {
-    metadata: { realbits: { avatar_url: React.SetStateAction<string> } };
-  }) => {
-    // console.log("selectAvatar metadata: ", element.metadata);
-    setAvatarUrl(element.metadata.realbits.avatar_url);
-  };
+  let chains: any[] = [];
+  if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "matic"
+  ) {
+    chains = [polygon];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "maticmum"
+  ) {
+    chains = [polygonMumbai];
+  } else if (
+    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
+    "localhost"
+  ) {
+    chains = [localhost];
+  } else {
+    chains = [];
+  }
+
+  // * Wagmi client
+  const { provider } = configureChains(chains, [
+    walletConnectProvider({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    }),
+  ]);
+  const wagmiClient = createClient({
+    autoConnect: true,
+    connectors: modalConnectors({ appName: "web3Modal", chains }),
+    provider,
+  });
+
+  // * Web3Modal Ethereum Client
+  const ethereumClient = new EthereumClient(wagmiClient, chains);
+
+  function selectAvatarFunc(element: {
+    metadata: {
+      realbits: {
+        glb_url: React.SetStateAction<string>;
+        vrm_url: React.SetStateAction<string>;
+      };
+    };
+  }) {
+    console.log("call selectAvatarFunc()");
+    console.log("element.metadata: ", element.metadata);
+    console.log(
+      "element.metadata.realbits.vrm_url: ",
+      element.metadata.realbits.vrm_url
+    );
+
+    setAvatarUrl(element.metadata.realbits.vrm_url);
+  }
 
   return (
     <>
-      {/*------------------------------------------------------------------*/}
-      {/* AvatarView component.                                            */}
-      {/*------------------------------------------------------------------*/}
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* RentContent component.                                         */}
+      {/* //*----------------------------------------------------------------*/}
+      <RentContent
+        selectAvatarFunc={selectAvatarFunc}
+        rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
+        blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+        testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+        serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+        openMyFuncRef={openMyFuncRef}
+        openMarketFuncRef={openMarketFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
+
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* AvatarView component.                                          */}
+      {/* //*----------------------------------------------------------------*/}
       <AvatarView
         gltfDataUrl={avatarUrl}
         getImageDataUrlFunc={getImageDataUrl}
@@ -92,6 +124,33 @@ const Service = () => {
         // VideoChat -> AvatarView call for changing avatar canvas position.
         // ScreenView -> AvatarView call for changing avatar canvas position.
         setTransformAvatarFunc={setTransformAvatarFuncRef}
+      />
+
+      {/* //*----------------------------------------------------------------*/}
+      {/* //*TakePicture component.                                          */}
+      {/* //*----------------------------------------------------------------*/}
+      <TakePicture
+        getImageDataUrlFunc={getImageDataUrl}
+        takePictureFuncRef={takePictureFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
+
+      {/* //*----------------------------------------------------------------*/}
+      {/* //* Fab menu button.                                               */}
+      {/* //*----------------------------------------------------------------*/}
+      <ButtonMenu
+        useFab={true}
+        startScreenStreamFuncRef={startScreenStreamFuncRef}
+        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+        takePictureFuncRef={takePictureFuncRef}
+        startRecordingFuncRef={startRecordingFuncRef}
+        stopRecordingFuncRef={stopRecordingFuncRef}
+        getRecordStatusFuncRef={getRecordStatusFuncRef}
+        requestDataFuncRef={requestDataFuncRef}
+        openMyFuncRef={openMyFuncRef}
+        openMarketFuncRef={openMarketFuncRef}
+        stopScreenEventFuncRef={stopScreenEventFuncRef}
+        rentMarketRef={rentMarketRef}
       />
     </>
   );

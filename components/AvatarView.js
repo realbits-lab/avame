@@ -4,8 +4,8 @@ import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
 import loadable from "@loadable/component";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { ScreenPosition, Z_INDEX, humanFileSize } from "./RealBitsUtil";
-import dynamic from "next/dynamic";
+import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
+import { humanFileSize } from "rent-market";
 
 const Stats = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
@@ -974,8 +974,8 @@ function AvatarView({
         borderColor="secondary.main"
         hidden={!showGuideCanvas}
         sx={{
-          right: 0,
-          bottom: 0,
+          top: 0,
+          left: 0,
           zIndex: Z_INDEX.dialog,
           position: "absolute",
           display: "flex",
