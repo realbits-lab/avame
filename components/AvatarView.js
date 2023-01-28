@@ -42,7 +42,6 @@ function AvatarView({
   //* Mesh transfomation data.
   //* - rotation, position, and scale
   //*---------------------------------------------------------------------------
-  const TOTAL_MORPH_COUNT = 42;
   const INTERVAL_FRAME_COUNT = 30;
   const [showAvatarView, setShowAvatarView] = React.useState(true);
 
@@ -51,14 +50,11 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
-  const isIdleStatus = React.useRef(false);
   const idleStatusTimer = React.useRef();
   const deltaRef = React.useRef(0);
   const avatarScale = React.useRef(0);
-  const FACE_DETECT_THRESHOLD = React.useRef(0.5);
   const INTERVAL = React.useRef(1 / INTERVAL_FRAME_COUNT);
   const clock = React.useRef();
-  const avatarInfluence = React.useRef(new Float32Array(TOTAL_MORPH_COUNT));
   const avatarQuartenionArray = React.useRef(new Float32Array(4));
   const avatarPosition = React.useRef(new Float32Array(3));
   const alterCoreLib = React.useRef();
@@ -77,7 +73,7 @@ function AvatarView({
   const orbitControlsRef = React.useRef();
   const ORBIT_CONTROL_ENABLE_DUMPING = true;
   const ORBIT_CONTROL_MIN_DISTANCE = 0.1;
-  const ORBIT_CONTROL_MAX_DISTANCE = 1000;
+  const ORBIT_CONTROL_MAX_DISTANCE = 100;
   const ORBIT_CONTROL_MIN_AZIMUTH_ANGLE = -Math.PI / 2;
   const ORBIT_CONTROL_MAX_AZIMUTH_ANGLE = Math.PI / 2;
   const ORBIT_CONTROL_MAX_POLAR_ANGLE = Math.PI / 1.8;
@@ -89,8 +85,8 @@ function AvatarView({
   const orbitCameraRef = React.useRef();
   const currentOrbitCameraTypeRef = React.useRef(CameraType.perspective);
   const currentOrbitCameraPositionXRef = React.useRef(0);
-  const currentOrbitCameraPositionYRef = React.useRef(1.4);
-  const currentOrbitCameraPositionZRef = React.useRef(5.0);
+  const currentOrbitCameraPositionYRef = React.useRef(0.6);
+  const currentOrbitCameraPositionZRef = React.useRef(0);
 
   //* Guide canvas element.
   const [showGuideCanvas, setShowGuideCanvas] = React.useState(true);
@@ -135,7 +131,6 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
   //*---------------------------------------------------------------------------
-  const morphMeshArray = React.useRef([]);
   const meshArray = React.useRef([]);
   const avatarCanvas = React.useRef(null);
   const currentAvatarDataUrl = React.useRef();
@@ -294,12 +289,6 @@ function AvatarView({
         avatarCanvas.current.style.height = "100%";
         avatarCanvas.current.style.right = "0px";
         avatarCanvas.current.style.top = "0px";
-
-        orbitCameraRef.current.position.set(
-          currentOrbitCameraPositionXRef.current,
-          currentOrbitCameraPositionYRef.current,
-          currentOrbitCameraPositionZRef.current
-        );
         break;
 
       case canvasPosition === ScreenPosition.rightTop &&
@@ -311,12 +300,6 @@ function AvatarView({
         avatarCanvas.current.style.right = "20px";
         avatarCanvas.current.style.top = "20px";
         avatarCanvas.current.style.boxShadow = "10px 10px 20px 1px grey";
-
-        orbitCameraRef.current.position.set(
-          currentOrbitCameraPositionXRef.current,
-          currentOrbitCameraPositionYRef.current,
-          currentOrbitCameraPositionZRef.current
-        );
         break;
     }
   }
@@ -387,12 +370,6 @@ function AvatarView({
         `Non available camera type: ${currentOrbitCameraTypeRef.current}`
       );
     }
-
-    orbitCameraRef.current.position.set(
-      currentOrbitCameraPositionXRef.current,
-      currentOrbitCameraPositionYRef.current,
-      currentOrbitCameraPositionZRef.current
-    );
 
     //* Make sceneRef instance.
     sceneRef.current = new THREE.Scene();
@@ -474,7 +451,7 @@ function AvatarView({
     sceneRef.current.environment =
       pmremGenerator.fromScene(environment).texture;
 
-    //* Make control instance.
+    // //* Make control instance.
     orbitControlsRef.current = new STDLIB.OrbitControls(
       orbitCameraRef.current,
       rendererRef.current.domElement
@@ -491,13 +468,13 @@ function AvatarView({
     orbitControlsRef.current.maxAzimuthAngle = ORBIT_CONTROL_MAX_AZIMUTH_ANGLE;
     orbitControlsRef.current.maxPolarAngle = ORBIT_CONTROL_MAX_POLAR_ANGLE;
     orbitControlsRef.current.target.set(
-      0,
+      currentOrbitCameraPositionXRef.current,
       currentOrbitCameraPositionYRef.current,
-      0
+      currentOrbitCameraPositionZRef.current
     );
 
-    //* Update orbit control.
-    orbitControlsRef.current.update();
+    // //* Update orbit control.
+    // orbitControlsRef.current.update();
   }
 
   //*---------------------------------------------------------------------------
@@ -507,7 +484,6 @@ function AvatarView({
   function loadMesh({ gltf }) {
     //* Find the default mesh in scene children.
     meshArray.current = [];
-    morphMeshArray.current = [];
 
     // console.log("gltf.scene: ", gltf.scene);
     // console.log("gltf.scene.children: ", gltf.scene.children);
@@ -524,17 +500,6 @@ function AvatarView({
 
         // Add mesh to meshArray variable for transformation.
         meshArray.current.push(gltf.scene.children[i]);
-
-        // Add face's children meshes to morphMeshArray variable for blend shape.
-        if (gltf.scene.children[i].name === HEAD_MESH_NAME) {
-          for (let j = 0; j < gltf.scene.children[i].children.length; j++) {
-            // console.log(
-            //   `Add gltf.scene.children[${i}].children[${j}].name to morphMeshArray: `,
-            //   gltf.scene.children[i].children[j].name
-            // );
-            morphMeshArray.current.push(gltf.scene.children[i].children[j]);
-          }
-        }
       }
     }
 
@@ -650,29 +615,19 @@ function AvatarView({
       const camera = gltf.cameras[0];
       console.log("camera: ", camera);
 
-      orbitCameraRef.current.ratio = 1;
-      // orbitCameraRef.current.fov = camera.fov;
-      orbitCameraRef.current.fov = 40;
-      console.log("orbitCameraRef.current.fov: ", orbitCameraRef.current.fov);
-      // orbitCameraRef.current.near = camera.near;
-      orbitCameraRef.current.near = 0.1;
-      console.log("orbitCameraRef.current.near: ", orbitCameraRef.current.near);
-      // orbitCameraRef.current.far = camera.far;
-      orbitCameraRef.current.far = 100;
-      console.log("orbitCameraRef.current.far: ", orbitCameraRef.current.far);
+      orbitCameraRef.current.ratio = camera.aspect;
+      orbitCameraRef.current.fov = camera.fov;
+      orbitCameraRef.current.near = camera.near;
+      orbitCameraRef.current.far = camera.far;
       orbitCameraRef.current.position.set(
         camera.position.x,
-        // camera.position.y,
-        -5,
-        camera.position.z
+        camera.position.y,
+        -1 * camera.position.z
       );
-      console.log(
-        "orbitCameraRef.current.position: ",
-        orbitCameraRef.current.position
-      );
-      camera.quaternion;
-      camera.rotation;
-      camera.up;
+      // console.log("orbitCameraRef.current.fov: ", orbitCameraRef.current.fov);
+      // console.log("orbitCameraRef.current.near: ", orbitCameraRef.current.near);
+      // console.log("orbitCameraRef.current.far: ", orbitCameraRef.current.far);
+
       orbitCameraRef.current.updateProjectionMatrix();
     }
   }
@@ -724,94 +679,16 @@ function AvatarView({
   function renderAvatar() {
     // console.log("call renderAvatar()");
 
-    //* Set avatar idle status transformation.
-    if (isIdleStatus.current) {
-      transformIdleAvatar();
-    }
-
-    //* Render avatar and update control.
-    if (morphMeshArray.current.length > 0) {
-      // 2-1. Set avatar influence.
-      morphMeshArray.current.forEach((meshElement) => {
-        if (meshElement.hasOwnProperty("morphTargetInfluences")) {
-          for (let i = 0; i < TOTAL_MORPH_COUNT; i++) {
-            meshElement.morphTargetInfluences[i] = avatarInfluence.current[i];
-          }
-        }
-      });
-    }
-
-    //* Set avatar quartenion.
-    // console.log("meshArray.current: ", meshArray.current);
-    // console.log("avatarQuartenionArray.current: ", avatarQuartenionArray.current);
-    if (avatarQuartenionArray.current) {
-      meshArray.current.forEach((element) => {
-        element.quaternion.fromArray(avatarQuartenionArray.current);
-      });
-    }
-
-    //* Set avatar position.
-    // console.log("avatarPosition.current: ", avatarPosition.current);
-    meshArray.current.forEach((element) => {
-      element.position.set(
-        avatarPosition.current[0],
-        avatarPosition.current[1],
-        avatarPosition.current[2]
-      );
-    });
-
-    //* Set avatar scale.
-    // console.log("avatarScale.current: ", avatarScale.current);
-    if (avatarScale.current) {
-      meshArray.current.forEach((element) => {
-        element.scale.set(
-          avatarScale.current,
-          avatarScale.current,
-          avatarScale.current
-        );
-      });
-    }
-
+    //* Update vrm.
     if (currentVrmRef.current) {
       currentVrmRef.current.update(deltaRef.current);
     }
 
-    //* Render scene and camera.
+    //* Update scene and camera.
     rendererRef.current.render(sceneRef.current, orbitCameraRef.current);
 
     //* Update control.
     orbitControlsRef.current.update();
-  }
-
-  //*---------------------------------------------------------------------------
-  //* Transform function when idle time (no face detection).
-  //*---------------------------------------------------------------------------
-  function transformIdleAvatar() {
-    console.log("call transformIdleAvatar()");
-
-    //* Calculate the elapsed time of idle status.
-    const elapsedIdleTime = idleStatusTimer.current.tick().elapsed;
-    // console.log("elapsedIdleTime: ", elapsedIdleTime);
-    const smile = 0.5 + 0.5 * Math.sin(elapsedIdleTime * 0.5);
-
-    //* Set avatar influence.
-    for (let i = 0; i < TOTAL_MORPH_COUNT; i++) {
-      avatarInfluence.current[i] = 0;
-    }
-    // mouthSmile_L
-    avatarInfluence.current[23] = smile;
-    // mouthSmile_R
-    avatarInfluence.current[24] = smile;
-
-    //* Set avatar quartenion.
-    const rotationData = alterCoreLib.current.Quaternion.fromRotation(
-      0.3 * Math.sin(elapsedIdleTime * 0.5),
-      alterCoreLib.current.Vec3.xAxis
-    )["_elements"];
-    avatarQuartenionArray.current[0] = rotationData[0];
-    avatarQuartenionArray.current[1] = rotationData[1];
-    avatarQuartenionArray.current[2] = rotationData[2];
-    avatarQuartenionArray.current[3] = rotationData[3];
   }
 
   // Z-index
