@@ -1,6 +1,4 @@
 import React from "react";
-import Draggable from "react-draggable";
-import Paper from "@mui/material/Paper";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -9,7 +7,6 @@ import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { Resizable } from "react-resizable";
 import { atom, selector } from "recoil";
 import { v4 as uuidv4, v1 } from "uuid";
 import { AlertSeverity } from "rent-market";
@@ -46,17 +43,6 @@ function BootstrapDialogTitle(props) {
     </DialogTitle>
   );
 }
-
-export const PaperComponent = (props) => {
-  return (
-    <Draggable
-      handle="#draggable-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...props} />
-    </Draggable>
-  );
-};
 
 export const ScreenPosition = {
   center: "center",
