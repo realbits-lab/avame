@@ -7,6 +7,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import { Resizable } from "react-resizable";
 import { atom, selector } from "recoil";
 import { v4 as uuidv4, v1 } from "uuid";
@@ -85,6 +87,9 @@ export const RBDialog = ({
   children,
   inputFullScreen,
 }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   const DEFAULT_WIDTH = 600;
   const DEFAULT_HEIGHT = 400;
 
@@ -94,7 +99,6 @@ export const RBDialog = ({
   const [openRBDialog, setOpenRBDialog] = React.useState(false);
   const [rbDialogWidth, setRBDialogWidth] = React.useState(0);
   const [rbDialogHeight, setRBDialogHeight] = React.useState(0);
-  const [fullScreen, setFullScreen] = React.useState(false);
   const [title, setTitle] = React.useState(0);
   const [left, setLeft] = React.useState(0);
   const [right, setRight] = React.useState(0);
@@ -118,7 +122,6 @@ export const RBDialog = ({
     setRight(inputRight);
     setTop(inputTop);
     setBottom(inputBottom);
-    setFullScreen(inputFullScreen);
   }, [
     inputOpenRBDialog,
     inputSetOpenRBDialogFunc,
@@ -141,18 +144,13 @@ export const RBDialog = ({
         try {
           inputSetOpenRBDialogFunc(false);
         } catch (error) {
-          console.error(error);
+          throw error;
         }
       }}
       TransitionComponent={transitionComponent}
       keepMounted={keepMounted}
-      // PaperComponent={PaperComponent}
-      aria-labelledby="draggable-dialog-title"
-      aria-describedby="alert-dialog-slide-description"
       scroll="paper"
       fullScreen={fullScreen}
-      fullWidth
-      maxWidth="xl"
       PaperProps={{
         style: {
           backgroundColor: "transparent",
