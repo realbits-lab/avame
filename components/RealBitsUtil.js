@@ -7,7 +7,7 @@ import { Resizable } from "react-resizable";
 import { atom, selector } from "recoil";
 import { v4 as uuidv4, v1 } from "uuid";
 import { AlertSeverity } from "rent-market";
-import BootstrapDialogTitle, { Transition } from "./BootstrapDialogTitle";
+import BootstrapDialogTitle from "./BootstrapDialogTitle";
 
 export const PaperComponent = (props) => {
   return (
@@ -143,7 +143,9 @@ export const RBDialog = ({
       >
         <>
           <BootstrapDialogTitle
-            onClose={() => {
+            onClose={function () {
+              console.log("call onClose()");
+
               try {
                 inputSetOpenRBDialogFunc(false);
               } catch (error) {

@@ -20,6 +20,9 @@ const RentContent = ({
   openMarketFuncRef,
   rentMarketRef,
 }) => {
+  //* --------------------------------------------------------------------------
+  //* Web3 hook variables.
+  //* --------------------------------------------------------------------------
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
   // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
@@ -27,16 +30,8 @@ const RentContent = ({
   // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
-  //* Dialog open/close status.
-  //* --------------------------------------------------------------------------
-  // https://tkdodo.eu/blog/putting-props-to-use-state
-  const [openMyDialog, setOpenMyDialog] = React.useState(false);
-  const [openMarketDialog, setOpenMarketDialog] = React.useState(false);
-  const [windowWidth, setWindowWidth] = React.useState();
-  const [windowHeight, setWindowHeight] = React.useState();
-
-  //* --------------------------------------------------------------------------
   //* Rent market variables.
+  //* If undefined, it would be a loading status.
   //* --------------------------------------------------------------------------
   const rentMarket = React.useRef();
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
@@ -47,13 +42,19 @@ const RentContent = ({
   const [serviceArray, setServiceArray] = React.useState([]);
   const [tokenArray, setTokenArray] = React.useState([]);
   const [inputRentMarket, setInputRentMarket] = React.useState();
-
-  //* If undefined, it'd loading status.
   const [registerNFTArray, setRegisterNFTArray] = React.useState();
   const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
   //* --------------------------------------------------------------------------
-  //* Handle toast message.
+  //* Dialog variables.
+  //* --------------------------------------------------------------------------
+  const [openMyDialog, setOpenMyDialog] = React.useState(false);
+  const [openMarketDialog, setOpenMarketDialog] = React.useState(false);
+  const [windowWidth, setWindowWidth] = React.useState();
+  const [windowHeight, setWindowHeight] = React.useState();
+
+  //* --------------------------------------------------------------------------
+  //* Snackbar variables.
   //* --------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
@@ -80,13 +81,10 @@ const RentContent = ({
           snackbarOpen: true,
         };
 
-  //* --------------------------------------------------------------------------
-  //* Initialize data.
-  //* --------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect() with condition");
+    // console.log("call useEffect()");
 
-    const initRentMarket = async () => {
+    async function initRentMarket() {
       // console.log("rentMarketAddress: ", rentMarketAddress);
       rentMarket.current = new RentMarket({
         rentMarketAddress,
@@ -105,7 +103,7 @@ const RentContent = ({
       }
       rentMarketRef.current = rentMarket.current;
       // console.log("rentMarketRef.current: ", rentMarketRef.current);
-    };
+    }
 
     setWindowWidth(window.innerWidth);
     setWindowHeight(window.innerHeight);
@@ -130,7 +128,7 @@ const RentContent = ({
     openMarketFuncRef,
   ]);
 
-  const onEventFunc = (message) => {
+  function onEventFunc(message) {
     // Set data.
     // console.log("call onEventFunc()");
 
@@ -155,24 +153,22 @@ const RentContent = ({
       // console.log("message: ", message);
       // TODO: Show toast message.
     }
-  };
+  }
 
-  const openMy = () => {
+  function openMy() {
     // console.log("call openMy()");
     setOpenMyDialog(true);
-  };
+  }
 
-  const openMarket = () => {
+  function openMarket() {
     setOpenMarketDialog(true);
-  };
-
-  // console.log("Build RentContent component.");
+  }
 
   return (
     <div>
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show market content list.                                      */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//*  Show market content list.                                      */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBDialog
         inputOpenRBDialog={openMarketDialog}
         inputSetOpenRBDialogFunc={setOpenMarketDialog}
@@ -191,9 +187,9 @@ const RentContent = ({
         />
       </RBDialog>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show my content list.                                          */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show my content list.                                           */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBDialog
         inputOpenRBDialog={openMyDialog}
         inputSetOpenRBDialogFunc={setOpenMyDialog}
@@ -216,9 +212,9 @@ const RentContent = ({
         />
       </RBDialog>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Toast message.                                                 */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Toast message.                                                  */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
         message={readToastMessage.snackbarMessage}

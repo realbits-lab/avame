@@ -270,7 +270,7 @@ function AvatarView({
   function getImageDataUrl() {
     //* Make a temporary canvas for a static size.
     const resizedCanvas = document.createElement("canvas");
-    console.log("resizedCanvas: ", resizedCanvas);
+    // console.log("resizedCanvas: ", resizedCanvas);
     resizedCanvas.width = IMAGE_SNAPSHOT_WIDTH;
     resizedCanvas.height =
       (resizedCanvas.width * (window.innerHeight || IMAGE_SNAPSHOT_WIDTH)) /
@@ -296,7 +296,7 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeContent(url) {
-    console.log("initializeContent function url: ", url);
+    // console.log("initializeContent function url: ", url);
 
     makeContentInstance();
     await loadGLTF(url);
@@ -547,12 +547,12 @@ function AvatarView({
   }
 
   function adjustCamera({ gltf }) {
-    console.log("call adjustCamera()");
-    console.log("gltf: ", gltf);
+    // console.log("call adjustCamera()");
+    // console.log("gltf: ", gltf);
 
     if (gltf.cameras.length > 0) {
       const camera = gltf.cameras[0];
-      console.log("camera: ", camera);
+      // console.log("camera: ", camera);
 
       orbitCameraRef.current.ratio = camera.aspect;
       orbitCameraRef.current.fov = camera.fov;
