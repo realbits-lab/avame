@@ -137,9 +137,6 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   const morphMeshArray = React.useRef([]);
   const meshArray = React.useRef([]);
-  const AVATAR_SCALE = React.useRef(5);
-  const AVATAR_MOVE_POSITION = React.useRef([0, 0, 0]);
-  const AVATAR_POSITION_SCALE = React.useRef(2);
   const avatarCanvas = React.useRef(null);
   const currentAvatarDataUrl = React.useRef();
   const guideCanvasRef = React.useRef();
@@ -206,13 +203,13 @@ function AvatarView({
       screenVideoStreamRef.current.srcObject !== undefined &&
       screenVideoStreamRef.current.srcObject !== null
     ) {
-      // Set background with stream.
+      //* Set background with stream.
       // console.log("Set background with video.");
       const textureVideoBackground = new THREE.VideoTexture(
         screenVideoStreamRef.current
       );
 
-      // If video stream is local camera, flip Y axis as mirror.
+      //* If video stream is local camera, flip Y axis as mirror.
       if (screenVideoStreamRef.current.id === "localCameraStreamVideo") {
         textureVideoBackground.wrapS = THREE.RepeatWrapping;
         textureVideoBackground.repeat.x = -1;
@@ -303,14 +300,6 @@ function AvatarView({
           currentOrbitCameraPositionYRef.current,
           currentOrbitCameraPositionZRef.current
         );
-        setAvatarScale({
-          // For perspective camera.
-          // scale: 5,
-          // positionScale: (CAMERA_NEAR + CAMERA_Z_POSITION) * 2,
-          scale: 1,
-          positionScale: 1,
-          position: [0, 0, 0],
-        });
         break;
 
       case canvasPosition === ScreenPosition.rightTop &&
@@ -328,14 +317,6 @@ function AvatarView({
           currentOrbitCameraPositionYRef.current,
           currentOrbitCameraPositionZRef.current
         );
-        setAvatarScale({
-          // For perspective camera.
-          // scale: 5,
-          // positionScale: (CAMERA_NEAR + CAMERA_Z_POSITION) * 2,
-          scale: 1,
-          positionScale: 1,
-          position: [0, 0, 0],
-        });
         break;
     }
   }
@@ -360,6 +341,7 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   async function initializeContent(url) {
     console.log("initializeContent function url: ", url);
+
     makeContentInstance();
     await loadGLTF(url);
   }
@@ -522,8 +504,8 @@ function AvatarView({
   //* Load gltf.
   //*---------------------------------------------------------------------------
   // TODO: Remove meshArray later.
-  function loadMesh(gltf) {
-    // 1. Find the default mesh in scene children.
+  function loadMesh({ gltf }) {
+    //* Find the default mesh in scene children.
     meshArray.current = [];
     morphMeshArray.current = [];
 
@@ -556,12 +538,12 @@ function AvatarView({
       }
     }
 
-    // 2. Add the found mesh to scene.
+    //* Add the found mesh to scene.
     meshArray.current.forEach((element) => {
       sceneRef.current.add(element);
     });
 
-    // 3. Set animation loop.
+    //* Set animation loop.
     rendererRef.current.setAnimationLoop(() => {
       deltaRef.current += clock.current.getDelta();
       // console.log("deltaRef.current: ", deltaRef.current);
@@ -570,7 +552,7 @@ function AvatarView({
         renderAvatar();
         deltaRef.current = deltaRef.current % INTERVAL.current;
 
-        // Update stat.
+        //* Update stat.
         // statsLib.current.update();
       }
     });
@@ -637,7 +619,9 @@ function AvatarView({
 
         // Keep gltf data to loadedGltfData variable.
         loadedGltftData.current = gltf;
-        loadMesh(loadedGltftData.current);
+        loadMesh({ gltf: loadedGltftData.current });
+        adjustCamera({ gltf: loadedGltftData.current });
+
         // console.log("Loading hidden when gltf loaidng finished.");
         setShowGltfLoadingProgress("hidden");
       },
@@ -656,6 +640,41 @@ function AvatarView({
         setShowGltfLoadingProgress("hidden");
       }
     );
+  }
+
+  function adjustCamera({ gltf }) {
+    console.log("call adjustCamera()");
+    console.log("gltf: ", gltf);
+
+    if (gltf.cameras.length > 0) {
+      const camera = gltf.cameras[0];
+      console.log("camera: ", camera);
+
+      orbitCameraRef.current.ratio = 1;
+      // orbitCameraRef.current.fov = camera.fov;
+      orbitCameraRef.current.fov = 40;
+      console.log("orbitCameraRef.current.fov: ", orbitCameraRef.current.fov);
+      // orbitCameraRef.current.near = camera.near;
+      orbitCameraRef.current.near = 0.1;
+      console.log("orbitCameraRef.current.near: ", orbitCameraRef.current.near);
+      // orbitCameraRef.current.far = camera.far;
+      orbitCameraRef.current.far = 100;
+      console.log("orbitCameraRef.current.far: ", orbitCameraRef.current.far);
+      orbitCameraRef.current.position.set(
+        camera.position.x,
+        // camera.position.y,
+        -5,
+        camera.position.z
+      );
+      console.log(
+        "orbitCameraRef.current.position: ",
+        orbitCameraRef.current.position
+      );
+      camera.quaternion;
+      camera.rotation;
+      camera.up;
+      orbitCameraRef.current.updateProjectionMatrix();
+    }
   }
 
   //*---------------------------------------------------------------------------
@@ -762,16 +781,6 @@ function AvatarView({
 
     //* Update control.
     orbitControlsRef.current.update();
-  }
-
-  function setAvatarScale({
-    scale = 5,
-    positionScale = 2,
-    position = [0, 0, 0],
-  }) {
-    AVATAR_SCALE.current = scale;
-    AVATAR_POSITION_SCALE.current = positionScale;
-    AVATAR_MOVE_POSITION.current = position;
   }
 
   //*---------------------------------------------------------------------------
