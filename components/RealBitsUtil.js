@@ -3,11 +3,47 @@ import Draggable from "react-draggable";
 import Paper from "@mui/material/Paper";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import Slide from "@mui/material/Slide";
+import CloseIcon from "@mui/icons-material/Close";
 import { Resizable } from "react-resizable";
 import { atom, selector } from "recoil";
 import { v4 as uuidv4, v1 } from "uuid";
 import { AlertSeverity } from "rent-market";
-import BootstrapDialogTitle from "./BootstrapDialogTitle";
+
+export const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+function BootstrapDialogTitle(props) {
+  const { children, onClose, ...other } = props;
+  console.log("onClose: ", onClose);
+
+  return (
+    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton
+          aria-label="close"
+          onClick={function () {
+            console.log("call onClick()");
+
+            onClose();
+          }}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+}
 
 export const PaperComponent = (props) => {
   return (
