@@ -63,33 +63,17 @@ export const RBDialog = ({
   inputSetOpenRBDialogFunc,
   transitionComponent,
   keepMounted,
-  inputRBDialogWidth,
-  inputRBDialogHeight,
   inputTitle,
-  inputLeft,
-  inputRight,
-  inputTop,
-  inputBottom,
   children,
-  inputFullScreen,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-
-  const DEFAULT_WIDTH = 600;
-  const DEFAULT_HEIGHT = 400;
 
   // console.log("call RBDialog");
   // console.log("inputOpenRBDialog: ", inputOpenRBDialog);
   // console.log("inputTitle: ", inputTitle);
   const [openRBDialog, setOpenRBDialog] = React.useState(false);
-  const [rbDialogWidth, setRBDialogWidth] = React.useState(0);
-  const [rbDialogHeight, setRBDialogHeight] = React.useState(0);
   const [title, setTitle] = React.useState(0);
-  const [left, setLeft] = React.useState(0);
-  const [right, setRight] = React.useState(0);
-  const [bottom, setBottom] = React.useState(0);
-  const [top, setTop] = React.useState(0);
 
   React.useEffect(() => {
     // console.log("call React.useEffect()");
@@ -101,25 +85,13 @@ export const RBDialog = ({
     // console.log("inputRBDialogHeight: ", inputRBDialogHeight);
 
     setOpenRBDialog(inputOpenRBDialog);
-    setRBDialogWidth(inputRBDialogWidth);
-    setRBDialogHeight(inputRBDialogHeight);
     setTitle(inputTitle);
-    setLeft(inputLeft);
-    setRight(inputRight);
-    setTop(inputTop);
-    setBottom(inputBottom);
   }, [
     inputOpenRBDialog,
     inputSetOpenRBDialogFunc,
     transitionComponent,
     keepMounted,
-    inputRBDialogWidth,
-    inputRBDialogHeight,
     inputTitle,
-    inputLeft,
-    inputRight,
-    inputTop,
-    inputBottom,
     children,
   ]);
 
@@ -163,12 +135,7 @@ export const RBDialog = ({
         >
           {title}
         </BootstrapDialogTitle>
-        <DialogContent
-          dividers={false}
-          sx={{ width: `${rbDialogWidth}px`, height: `${rbDialogHeight}px` }}
-        >
-          {children}
-        </DialogContent>
+        <DialogContent dividers={false}>{children}</DialogContent>
       </>
     </Dialog>
   );

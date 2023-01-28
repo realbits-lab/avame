@@ -3,7 +3,6 @@ import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useWeb3ModalNetwork } from "@web3modal/react";
 import { useAccount } from "wagmi";
 import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
-import "../node_modules/react-resizable/css/styles.css";
 import {
   RBDialog,
   writeToastMessageState,

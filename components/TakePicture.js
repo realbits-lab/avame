@@ -1,9 +1,9 @@
 import React from "react";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "@mui/icons-material/Download";
 import TwitterIcon from "@mui/icons-material/Twitter";
@@ -109,21 +109,21 @@ const TakePicture = ({
           {/*//*-------------------------------------------------------------*/}
           {/*//* Show card image.                                            */}
           {/*//*-------------------------------------------------------------*/}
-          <CardMedia component="img" image={imageDataUrl} alt="Preview image" />
           <CardContent>
-            <Typography variant="body2" color="text.secondary">
-              You can download image picture by clicking file button below.
+            <Typography variant="caption" color="text.secondary">
+              * You can download image or upload it to twitter.
             </Typography>
           </CardContent>
 
           {/*//*-------------------------------------------------------------*/}
           {/*//* Show file download button.                                  */}
           {/*//*-------------------------------------------------------------*/}
-          <CardActions disableSpacing>
+          <CardActions sx={{ justifyContent: "space-around" }}>
             {/*//*-----------------------------------------------------------*/}
             {/*//* Download button.                                          */}
             {/*//*-----------------------------------------------------------*/}
-            <IconButton
+            <Button
+              variant="contained"
               aria-label="download"
               onClick={async () => {
                 let response;
@@ -157,12 +157,13 @@ const TakePicture = ({
               }}
             >
               <DownloadIcon />
-            </IconButton>
+            </Button>
 
             {/*//*-----------------------------------------------------------*/}
             {/*//* Twitter upload button.                                    */}
             {/*//*-----------------------------------------------------------*/}
-            <IconButton
+            <Button
+              variant="contained"
               aria-label="twitter"
               onClick={async function () {
                 // console.log("call onClick()");
@@ -213,8 +214,9 @@ const TakePicture = ({
               }}
             >
               <TwitterIcon />
-            </IconButton>
+            </Button>
           </CardActions>
+          <CardMedia component="img" image={imageDataUrl} alt="Preview image" />
         </Card>
       </RBDialog>
 

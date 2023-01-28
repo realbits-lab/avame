@@ -33,8 +33,8 @@ function AvatarView({
     perspective: "perspective",
     orthographic: "orthographic",
   };
-  const IMAGE_SNAPSHOT_WIDTH = 512;
-  const IMAGE_SNAPSHOT_HEIGHT = 512;
+  const IMAGE_SNAPSHOT_WIDTH = 1024;
+  const IMAGE_SNAPSHOT_HEIGHT = 1024;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -174,7 +174,9 @@ function AvatarView({
       // console.log("textureVideoBackground: ", textureVideoBackground);
     } else {
       sceneRef.current.background = new THREE.Color(WHITE_COLOR_HEX);
-      avatarCanvas.current.style.border = "";
+      if (avatarCanvas.current) {
+        avatarCanvas.current.style.border = "";
+      }
     }
   };
 
