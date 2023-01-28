@@ -23,8 +23,8 @@ const Twitter = ({
   const TWITTER_DIALOG_WIDTH = 500;
   const TWITTER_DIALOG_HEIGHT = 400;
   const TWITTER_AUTH_API_URL = "/api/twitter/auth";
-  const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_twitter_image";
-  const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload_twitter_video";
+  const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_image";
+  const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload__video";
 
   //*---------------------------------------------------------------------------
   //* Define hook variables.
