@@ -24,15 +24,11 @@ const TakePicture = ({
   //*---------------------------------------------------------------------------
   //* Variables.
   //*---------------------------------------------------------------------------
-  const PICTURE_DIALOG_WIDTH = 500;
-  const PICTURE_DIALOG_HEIGHT = 400;
   const USER_NOT_ALLOW_MESSAGE =
     "Your account must own or rent NFT in polygon network. Check metamask wallet.";
 
   const [imageDataUrl, setImageDataUrl] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
-  const [windowWidth, setWindowWidth] = React.useState();
-  const [windowHeight, setWindowHeight] = React.useState();
   const [showTwitterDialog, setShowTwitterDialog] = React.useState(false);
   const [inputSignMessage, setInputSignMessage] = React.useState();
   const [inputPlainMessage, setInputPlainMessage] = React.useState();
@@ -54,10 +50,6 @@ const TakePicture = ({
     // console.log("call React.useEffect()");
     // console.log("window.innerWidth: ", window.innerWidth);
     // console.log("window.innerHeight: ", window.innerHeight);
-
-    setWindowWidth(window.innerWidth);
-    setWindowHeight(window.innerHeight);
-
     takePictureFuncRef.current = takePicture;
   }, [getImageDataUrlFunc, takePictureFuncRef, rentMarketRef]);
 
@@ -93,12 +85,13 @@ const TakePicture = ({
   }
 
   function takePicture() {
-    // Get image data url from AvatarView component by calling function.
+    //* Get image data url from AvatarView component by calling function.
     const responseImageDataUrl = getImageDataUrlFunc.current();
-    // Set image data url.
+
+    //* Set image data url.
     setImageDataUrl(responseImageDataUrl);
 
-    // Open picture dialog.
+    //* Open picture dialog.
     setOpenDialog(true);
   }
 
@@ -110,23 +103,13 @@ const TakePicture = ({
       <RBDialog
         inputOpenRBDialog={openDialog}
         inputSetOpenRBDialogFunc={setOpenDialog}
-        inputRBDialogWidth={PICTURE_DIALOG_WIDTH}
-        inputRBDialogHeight={PICTURE_DIALOG_HEIGHT}
         inputTitle={"Take a picture"}
-        inputRight={5}
-        inputTop={5}
       >
         <Card>
           {/*//*-------------------------------------------------------------*/}
           {/*//* Show card image.                                            */}
           {/*//*-------------------------------------------------------------*/}
-          <CardMedia
-            component="img"
-            width={(windowWidth || 100) / 3}
-            height={(windowHeight || 250) / 3}
-            image={imageDataUrl}
-            alt="Preview image"
-          />
+          <CardMedia component="img" image={imageDataUrl} alt="Preview image" />
           <CardContent>
             <Typography variant="body2" color="text.secondary">
               You can download image picture by clicking file button below.
