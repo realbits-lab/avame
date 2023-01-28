@@ -24,6 +24,7 @@ function AvatarView({
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setTransformAvatarFunc,
+  showGuideCanvas = false,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -86,9 +87,6 @@ function AvatarView({
   const currentOrbitCameraPositionXRef = React.useRef(0);
   const currentOrbitCameraPositionYRef = React.useRef(0.6);
   const currentOrbitCameraPositionZRef = React.useRef(0);
-
-  //* Guide canvas element.
-  const [showGuideCanvas, setShowGuideCanvas] = React.useState(true);
 
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
