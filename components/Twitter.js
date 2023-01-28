@@ -118,7 +118,7 @@ const Twitter = ({
       throw error;
     }
 
-    return axiosResponse.data.path;
+    return axiosResponse.data;
   }
 
   async function uploadVideo() {
@@ -146,7 +146,7 @@ const Twitter = ({
       throw error;
     }
 
-    return axiosResponse.data.path;
+    return axiosResponse.data;
   }
 
   // TODO: Set position of twitter dialog
@@ -213,6 +213,7 @@ const Twitter = ({
                 } catch (error) {
                   throw error;
                 }
+                console.log("uploadResponse: ", uploadResponse);
 
                 if (uploadResponse.error || uploadResponse.path === undefined) {
                   console.error("Upload process is not valid.");
