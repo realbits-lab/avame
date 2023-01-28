@@ -88,7 +88,7 @@ const Twitter = ({
   }, [showTwitterDialog, inputImageUrl, videoFile]);
 
   async function uploadImage({ url }) {
-    console.log("call uploadImage()");
+    // console.log("call uploadImage()");
     // console.log("url: ", url);
 
     let axiosResponse;
@@ -110,7 +110,7 @@ const Twitter = ({
 
       //* Post image blob data with upload url.
       axiosResponse = await axios.post(TWITTER_IMAGE_UPLOAD_URL, formData);
-      console.log("axiosResponse: ", axiosResponse);
+      // console.log("axiosResponse: ", axiosResponse);
 
       setUploadTwitterEnabled(true);
     } catch (error) {
@@ -213,7 +213,7 @@ const Twitter = ({
                 } catch (error) {
                   throw error;
                 }
-                console.log("uploadResponse: ", uploadResponse);
+                // console.log("uploadResponse: ", uploadResponse);
 
                 if (uploadResponse.error || uploadResponse.path === undefined) {
                   console.error("Upload process is not valid.");
@@ -221,13 +221,13 @@ const Twitter = ({
                 }
 
                 const uploadedFilePath = uploadResponse.path;
-                console.log("uploadedFilePath: ", uploadedFilePath);
+                // console.log("uploadedFilePath: ", uploadedFilePath);
 
                 try {
                   const response = await axios.get(
                     `${TWITTER_AUTH_API_URL}?path=${uploadedFilePath}&twitterText=${twitterText}`
                   );
-                  console.log("response: ", response);
+                  // console.log("response: ", response);
 
                   if (response.status === 200) {
                     window.open(response.data.url);

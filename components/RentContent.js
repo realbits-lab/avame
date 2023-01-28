@@ -21,10 +21,10 @@ const RentContent = ({
   rentMarketRef,
 }) => {
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  console.log("selectedChain: ", selectedChain);
+  // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
-  console.log("address: ", address);
-  console.log("isConnected: ", isConnected);
+  // console.log("address: ", address);
+  // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
   //* Dialog open/close status.

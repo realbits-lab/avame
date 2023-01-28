@@ -54,9 +54,10 @@ app.post(upload.single("image_data"), function (req, res) {
     req.body.plain_message,
     req.body.sign_message
   );
-  console.log("verified: ", verified);
-  console.log("req.body.signer_address: ", req.body.signer_address);
+  // console.log("verified: ", verified);
+  // console.log("req.body.signer_address: ", req.body.signer_address);
 
+  //* TODO: Check isUserAllowed function from rent market contract for right.
   if (
     verified.localeCompare(req.body.signer_address, undefined, {
       sensitivity: "accent",

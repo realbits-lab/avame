@@ -159,7 +159,7 @@ const TakePicture = ({
                   return;
                 }
 
-                console.log("response: ", response);
+                // console.log("response: ", response);
                 if (response === false) {
                   setSnackbarValue({
                     snackbarSeverity: AlertSeverity.warning,
@@ -182,7 +182,7 @@ const TakePicture = ({
             <IconButton
               aria-label="twitter"
               onClick={async function () {
-                console.log("call onClick()");
+                // console.log("call onClick()");
 
                 //* Check that user is allowed to upload image to twitter.
                 //* User has to rent or own NFT.
@@ -200,7 +200,7 @@ const TakePicture = ({
                   });
                   return;
                 }
-                console.log("response: ", response);
+                // console.log("response: ", response);
 
                 //* User does not have right to upload image to twitter.
                 if (response === false) {
@@ -220,7 +220,7 @@ const TakePicture = ({
                   rentMarket: rentMarketRef.current,
                   message: message,
                 });
-                console.log("signMessageResponse: ", signMessageResponse);
+                // console.log("signMessageResponse: ", signMessageResponse);
                 setInputPlainMessage(message);
                 setInputSignerAddress(rentMarketRef.current.signerAddress);
                 setInputSignMessage(signMessageResponse);
