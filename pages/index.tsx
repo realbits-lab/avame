@@ -86,12 +86,12 @@ const Service = () => {
       };
     };
   }) {
-    console.log("call selectAvatarFunc()");
-    console.log("element.metadata: ", element.metadata);
-    console.log(
-      "element.metadata.realbits.vrm_url: ",
-      element.metadata.realbits.vrm_url
-    );
+    // console.log("call selectAvatarFunc()");
+    // console.log("element.metadata: ", element.metadata);
+    // console.log(
+    //   "element.metadata.realbits.vrm_url: ",
+    //   element.metadata.realbits.vrm_url
+    // );
 
     setAvatarUrl(element.metadata.realbits.vrm_url);
   }
