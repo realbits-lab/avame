@@ -156,25 +156,11 @@ export const RBDialog = ({
           backgroundColor: "transparent",
         },
         sx: {
-          width: { rbDialogWidth },
-          height: { rbDialogHeight },
           position: "absolute",
-          left: { left },
-          right: { right },
-          top: { top },
-          bottom: { bottom },
           m: 0,
         },
       }}
     >
-      {/* <Resizable
-        width={rbDialogWidth || DEFAULT_WIDTH}
-        height={rbDialogHeight || DEFAULT_HEIGHT}
-        onResize={(event, data) => {
-          setRBDialogWidth(rbDialogWidth + event.movementX);
-          setRBDialogHeight(rbDialogHeight + event.movementY);
-        }}
-      > */}
       <>
         <BootstrapDialogTitle
           onClose={function () {
@@ -198,7 +184,6 @@ export const RBDialog = ({
           {children}
         </DialogContent>
       </>
-      {/* </Resizable> */}
     </Dialog>
   );
 };
@@ -207,7 +192,6 @@ export const writeToastMessageState = atom({
   key: `writeToastMessageState/${v1()}`,
   snackbarSeverity: AlertSeverity.info,
   snackbarMessage: "",
-  // snackbarTime: new Date(),
   snackbarTime: "time",
   snackbarOpen: true,
 });

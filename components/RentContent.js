@@ -172,10 +172,7 @@ const RentContent = ({
       <RBDialog
         inputOpenRBDialog={openMarketDialog}
         inputSetOpenRBDialogFunc={setOpenMarketDialog}
-        inputRBDialogWidth={windowWidth}
-        inputRBDialogHeight={windowHeight}
         inputTitle={"Avatar List"}
-        inputFullScreen={true}
       >
         <Market
           inputRentMarket={inputRentMarket}
@@ -193,10 +190,7 @@ const RentContent = ({
       <RBDialog
         inputOpenRBDialog={openMyDialog}
         inputSetOpenRBDialogFunc={setOpenMyDialog}
-        inputRBDialogWidth={windowWidth}
-        inputRBDialogHeight={windowHeight}
         inputTitle={"My Avatar List"}
-        inputFullScreen={true}
       >
         <My
           selectAvatarFunc={selectAvatarFunc}

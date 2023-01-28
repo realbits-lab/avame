@@ -24,8 +24,6 @@ const TakePicture = ({
   //*---------------------------------------------------------------------------
   //* Variables.
   //*---------------------------------------------------------------------------
-  const DIALOG_WIDTH = 400;
-  const DIALOG_HEIGHT = 600;
   const USER_NOT_ALLOW_MESSAGE =
     "Your account must own or rent NFT in polygon network. Check metamask wallet.";
 
@@ -105,8 +103,6 @@ const TakePicture = ({
       <RBDialog
         inputOpenRBDialog={openDialog}
         inputSetOpenRBDialogFunc={setOpenDialog}
-        inputRBDialogWidth={DIALOG_WIDTH}
-        inputRBDialogHeight={DIALOG_HEIGHT}
         inputTitle={"Take a picture"}
       >
         <Card>
