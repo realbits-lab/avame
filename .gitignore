@@ -1,3 +1,7 @@
+# Upload files
+public/upload_image
+public/upload_video
+
 # Logs
 logs
 *.log

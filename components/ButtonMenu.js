@@ -138,11 +138,13 @@ const ButtonMenu = ({
           ariaLabel="FAB button"
           sx={{ position: "absolute", bottom: 16, right: 16 }}
           icon={<SpeedDialIcon color="secondary" />}
-          onOpen={(event) => {
-            event.stopPropagation();
-            // console.log("onOpen");
-            setOpenSpeedDial(true);
-          }}
+          //* Mouse over event.
+          // onOpen={(event) => {
+          //   event.stopPropagation();
+          //   // console.log("onOpen");
+          //   setOpenSpeedDial(true);
+          // }}
+          //* Mouse click event.
           onClick={(event) => {
             event.stopPropagation();
             // console.log("onClick");

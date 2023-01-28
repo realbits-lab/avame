@@ -16,19 +16,25 @@ const Twitter = ({
   videoFile,
   inputImageUrl,
   inputSetShowTwitterDialog,
+  inputPlainMessage,
+  inputSignMessage,
+  inputSignerAddress,
 }) => {
-  //----------------------------------------------------------------------------
-  // Variables.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Define constant variables.
+  //*---------------------------------------------------------------------------
   const TWITTER_DIALOG_WIDTH = 500;
   const TWITTER_DIALOG_HEIGHT = 400;
-  const uploadDomainRef = React.useRef("");
-  const twitterLoginUrl = React.useRef("");
+  const TWITTER_AUTH_API_URL = "/api/twitter/auth";
+  const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_image";
+  const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload_video";
 
+  //*---------------------------------------------------------------------------
+  //* Define hook variables.
+  //*---------------------------------------------------------------------------
   const [videoUrl, setVideoUrl] = React.useState();
   const [imageUrl, setImageUrl] = React.useState("");
   const [twitterText, setTwitterText] = React.useState("");
-  const [uploadedFilePath, setUploadedFilePath] = React.useState("");
   const [uploadTwitterEnabled, setUploadTwitterEnabled] = React.useState(false);
   const [ImageCardMedia, setImageCardMedia] = React.useState(null);
   const [VideoCardMedia, setVideoCardMedia] = React.useState(null);
@@ -36,7 +42,7 @@ const Twitter = ({
   const [windowHeight, setWindowHeight] = React.useState();
 
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
+    // console.log("call useEffect()");
     // console.log("showTwitterDialog: ", showTwitterDialog);
     // console.log("videoFile: ", videoFile);
     // console.log("inputImageUrl: ", inputImageUrl);
@@ -47,22 +53,10 @@ const Twitter = ({
     setWindowWidth(window.innerWidth);
     setWindowHeight(window.innerHeight);
 
-    twitterLoginUrl.current = "/api/twitter/auth";
-    switch (process.env.NEXT_PUBLIC_NETWORK) {
-      case "localhost":
-        uploadDomainRef.current = "http://localhost:3001";
-        break;
-
-      default:
-        uploadDomainRef.current = "https://realbits-staging.herokuapp.com";
-        break;
-    }
-
     // Use only one of image and video.
     if (inputImageUrl !== undefined && showTwitterDialog === true) {
       setImageUrl(inputImageUrl);
       try {
-        uploadImage({ url: inputImageUrl });
         setImageCardMedia(
           <CardMedia
             component="img"
@@ -77,7 +71,6 @@ const Twitter = ({
       }
     } else if (videoFile !== undefined && showTwitterDialog === true) {
       try {
-        uploadVideo();
         setVideoCardMedia(
           <CardMedia
             width={(windowWidth || 100) / 3}
@@ -94,59 +87,67 @@ const Twitter = ({
     }
   }, [showTwitterDialog, inputImageUrl, videoFile]);
 
-  const uploadImage = ({ url }) => {
-    const UPLOAD_URL = `${uploadDomainRef.current}/upload_image`;
+  async function uploadImage({ url }) {
+    // console.log("call uploadImage()");
     // console.log("url: ", url);
 
-    // https://stackoverflow.com/questions/12168909/blob-from-dataurl
-    fetch(url)
-      .then((res) => {
-        return res.blob();
-      })
-      .then((blob) => {
-        // console.log("blob: ", blob);
+    let axiosResponse;
+    try {
+      setUploadTwitterEnabled(false);
 
-        // 2. Set form with image blob data for uploading.
-        const formData = new FormData();
-        formData.append("image_data", blob);
+      //* Get image blob data.
+      // https://stackoverflow.com/questions/12168909/blob-from-dataurl
+      const fetchResult = await fetch(url);
+      const blobResult = await fetchResult.blob();
+      // console.log("blobResult: ", blobResult);
 
-        // 3. Post image blob data with upload url.
-        setUploadTwitterEnabled(false);
-        axios
-          .post(UPLOAD_URL, formData)
-          .then((response) => {
-            // console.log("response: ", response);
-            setUploadedFilePath(response.data);
-            setUploadTwitterEnabled(true);
-          })
-          .catch((error) => {
-            throw error;
-          });
-      });
-  };
+      //* Set form with image blob data for uploading.
+      const formData = new FormData();
+      formData.append("image_data", blobResult);
+      formData.append("plain_message", inputPlainMessage);
+      formData.append("sign_message", inputSignMessage);
+      formData.append("signer_address", inputSignerAddress);
 
-  const uploadVideo = () => {
+      //* Post image blob data with upload url.
+      axiosResponse = await axios.post(TWITTER_IMAGE_UPLOAD_URL, formData);
+      // console.log("axiosResponse: ", axiosResponse);
+
+      setUploadTwitterEnabled(true);
+    } catch (error) {
+      setUploadTwitterEnabled(true);
+      throw error;
+    }
+
+    return axiosResponse.data;
+  }
+
+  async function uploadVideo() {
     // console.log("call uploadVideo()");
     // console.log("videoFile: ", videoFile);
 
-    const UPLOAD_URL = `${uploadDomainRef.current}/upload_twitter_video`;
     const formData = new FormData();
     formData.append("video_data", videoFile);
+    formData.append("plain_message", inputPlainMessage);
+    formData.append("sign_message", inputSignMessage);
+    formData.append("signer_address", inputSignerAddress);
 
     setVideoUrl(window.URL.createObjectURL(videoFile));
-    setUploadTwitterEnabled(false);
 
-    axios
-      .post(UPLOAD_URL, formData)
-      .then((response) => {
-        // console.log("response: ", response);
-        setUploadedFilePath(response.data);
-        setUploadTwitterEnabled(true);
-      })
-      .catch((error) => {
-        throw error;
-      });
-  };
+    let axiosResponse;
+    try {
+      setUploadTwitterEnabled(false);
+
+      axiosResponse = await axios.post(TWITTER_VIDEO_UPLOAD_URL, formData);
+      // console.log("axiosResponse: ", axiosResponse);
+
+      setUploadTwitterEnabled(true);
+    } catch (error) {
+      setUploadTwitterEnabled(true);
+      throw error;
+    }
+
+    return axiosResponse.data;
+  }
 
   // TODO: Set position of twitter dialog
   // TODO: Set size of twitter dialog.
@@ -163,15 +164,15 @@ const Twitter = ({
         inputTop={5}
       >
         <Card>
-          {/*----------------------------------------------------------------*/}
-          {/* Show image or video snapshot.                                  */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show image or video snapshot.                               */}
+          {/*//*-------------------------------------------------------------*/}
           {ImageCardMedia}
           {VideoCardMedia}
 
-          {/*----------------------------------------------------------------*/}
-          {/* Show text input.                                               */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show text input.                                            */}
+          {/*//*-------------------------------------------------------------*/}
           <CardContent>
             <TextField
               fullWidth
@@ -185,18 +186,48 @@ const Twitter = ({
             />
           </CardContent>
 
-          {/*----------------------------------------------------------------*/}
-          {/* Show upload button.                                            */}
-          {/*----------------------------------------------------------------*/}
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show twitter upload button.                                         */}
+          {/*//*-------------------------------------------------------------*/}
           <CardActions disableSpacing>
-            {uploadTwitterEnabled === true ? (
-              <IconButton
-                aria-label="twitter"
-                onClick={async () => {
+            <IconButton
+              aria-label="twitter"
+              onClick={async function () {
+                // console.log("call onClick()");
+
+                let uploadResponse;
+                try {
+                  if (
+                    inputImageUrl !== undefined &&
+                    showTwitterDialog === true
+                  ) {
+                    uploadResponse = await uploadImage({
+                      url: inputImageUrl,
+                    });
+                  } else if (
+                    videoFile !== undefined &&
+                    showTwitterDialog === true
+                  ) {
+                    uploadResponse = await uploadVideo();
+                  }
+                } catch (error) {
+                  throw error;
+                }
+                // console.log("uploadResponse: ", uploadResponse);
+
+                if (uploadResponse.error || uploadResponse.path === undefined) {
+                  console.error("Upload process is not valid.");
+                  return;
+                }
+
+                const uploadedFilePath = uploadResponse.path;
+                // console.log("uploadedFilePath: ", uploadedFilePath);
+
+                try {
                   const response = await axios.get(
-                    `${twitterLoginUrl.current}?path=${uploadedFilePath}&twitterText=${twitterText}`
+                    `${TWITTER_AUTH_API_URL}?path=${uploadedFilePath}&twitterText=${twitterText}`
                   );
-                  console.log("response: ", response);
+                  // console.log("response: ", response);
 
                   if (response.status === 200) {
                     window.open(response.data.url);
@@ -204,16 +235,16 @@ const Twitter = ({
                     // TODO: Handle response error.
                     console.error(response);
                   }
+                } catch (error) {
+                  throw error;
+                }
 
-                  setUploadTwitterEnabled(false);
-                  inputSetShowTwitterDialog(false);
-                }}
-              >
-                <UploadIcon />
-              </IconButton>
-            ) : (
-              <CircularProgress />
-            )}
+                setUploadTwitterEnabled(false);
+                inputSetShowTwitterDialog(false);
+              }}
+            >
+              <UploadIcon />
+            </IconButton>
           </CardActions>
         </Card>
       </RBDialog>
