@@ -157,11 +157,7 @@ const Twitter = ({
       <RBDialog
         inputOpenRBDialog={showTwitterDialog}
         inputSetOpenRBDialogFunc={inputSetShowTwitterDialog}
-        inputRBDialogWidth={TWITTER_DIALOG_WIDTH}
-        inputRBDialogHeight={TWITTER_DIALOG_HEIGHT}
         inputTitle={"Twitter Upload"}
-        inputRight={5}
-        inputTop={5}
       >
         <Card>
           {/*//*-------------------------------------------------------------*/}

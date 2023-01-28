@@ -25,10 +25,15 @@ function AvatarView({
   getMediaStreamFunc,
   setTransformAvatarFunc,
 }) {
+  //*---------------------------------------------------------------------------
+  //* Constant variables.
+  //*---------------------------------------------------------------------------
   const CameraType = {
     perspective: "perspective",
     orthographic: "orthographic",
   };
+  const IMAGE_SNAPSHOT_WIDTH = 512;
+  const IMAGE_SNAPSHOT_HEIGHT = 512;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -84,43 +89,6 @@ function AvatarView({
 
   //* Guide canvas element.
   const [showGuideCanvas, setShowGuideCanvas] = React.useState(true);
-
-  const defaultMeshArray = [
-    "top",
-    "hair",
-    "face",
-    "side",
-    "middle",
-    "bottom",
-    "eye",
-    "eye_left",
-    "eye_right",
-    "eyelid_left",
-    "eyelid_right",
-    "head",
-    "eyebrow",
-    "eyeball",
-    "brow",
-    "pupil",
-    "teeth",
-    "tongue",
-    "eye_W",
-    "eye_B",
-    // "back",
-    // For testing.
-    "glass",
-    "earring",
-    "main_skin",
-    "Teeth_Lower_",
-    "Teeth_Upper",
-    "Tongue",
-    "Eye_brow",
-    "Hair",
-    "Eyes",
-    "Head",
-  ];
-  // For testing.
-  const HEAD_MESH_NAME = "head";
 
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
@@ -302,8 +270,28 @@ function AvatarView({
   }
 
   function getImageDataUrl() {
-    let avatarCanvasElement = document.getElementById("avatarCanvas");
-    return avatarCanvasElement.toDataURL();
+    //* Make a temporary canvas for a static size.
+    const resizedCanvas = document.createElement("canvas");
+    console.log("resizedCanvas: ", resizedCanvas);
+    resizedCanvas.width = IMAGE_SNAPSHOT_WIDTH;
+    resizedCanvas.height =
+      (resizedCanvas.width * (window.innerHeight || IMAGE_SNAPSHOT_WIDTH)) /
+      (window.innerWidth || IMAGE_SNAPSHOT_HEIGHT);
+    const resizedContext = resizedCanvas.getContext("2d");
+
+    //* Get an original canvas.
+    const avatarCanvasElement = document.getElementById("avatarCanvas");
+    resizedContext.drawImage(
+      avatarCanvasElement,
+      0,
+      0,
+      resizedCanvas.width,
+      resizedCanvas.height
+    );
+    const myResizedData = resizedCanvas.toDataURL();
+
+    // return avatarCanvasElement.toDataURL();
+    return myResizedData;
   }
 
   //*---------------------------------------------------------------------------

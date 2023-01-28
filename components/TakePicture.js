@@ -85,12 +85,13 @@ const TakePicture = ({
   }
 
   function takePicture() {
-    // Get image data url from AvatarView component by calling function.
+    //* Get image data url from AvatarView component by calling function.
     const responseImageDataUrl = getImageDataUrlFunc.current();
-    // Set image data url.
+
+    //* Set image data url.
     setImageDataUrl(responseImageDataUrl);
 
-    // Open picture dialog.
+    //* Open picture dialog.
     setOpenDialog(true);
   }
 
