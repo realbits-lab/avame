@@ -131,7 +131,6 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
   //*---------------------------------------------------------------------------
-  const meshArray = React.useRef([]);
   const avatarCanvas = React.useRef(null);
   const currentAvatarDataUrl = React.useRef();
   const guideCanvasRef = React.useRef();
@@ -246,21 +245,15 @@ function AvatarView({
     });
 
     if (showAvatarOption === false) {
-      // Remove the found mesh to sceneRef.
+      //* Remove the found mesh to sceneRef.
       showAvatarOptionRef.current = false;
       sceneRef.current.clear();
     } else {
       if (showAvatarOptionRef.current === false) {
-        // Add the found mesh to sceneRef.
+        //* Add the found mesh to sceneRef.
         showAvatarOptionRef.current = true;
 
-        // TODO: Remove later.
-        meshArray.current.forEach((element) => {
-          sceneRef.current.add(element);
-        });
-        sceneRef.current.add(currentVrmRef.current.scene);
-
-        // Create light for vrm model.
+        //* Create light for vrm model.
         const light = new THREE.DirectionalLight(0xffffff);
         light.position.set(1.0, 1.0, 1.0).normalize();
         sceneRef.current.add(light);
@@ -472,55 +465,6 @@ function AvatarView({
       currentOrbitCameraPositionYRef.current,
       currentOrbitCameraPositionZRef.current
     );
-
-    // //* Update orbit control.
-    // orbitControlsRef.current.update();
-  }
-
-  //*---------------------------------------------------------------------------
-  //* Load gltf.
-  //*---------------------------------------------------------------------------
-  // TODO: Remove meshArray later.
-  function loadMesh({ gltf }) {
-    //* Find the default mesh in scene children.
-    meshArray.current = [];
-
-    // console.log("gltf.scene: ", gltf.scene);
-    // console.log("gltf.scene.children: ", gltf.scene.children);
-
-    for (let i = 0; i < gltf.scene.children.length; i++) {
-      // console.log(`gltf.scene.children[${i}]: `, gltf.scene.children[i]);
-
-      // Check mesh name for verification.
-      if (defaultMeshArray.includes(gltf.scene.children[i].name)) {
-        // console.log(
-        //   `gltf.scene.children[${i}].name: `,
-        //   gltf.scene.children[i].name
-        // );
-
-        // Add mesh to meshArray variable for transformation.
-        meshArray.current.push(gltf.scene.children[i]);
-      }
-    }
-
-    //* Add the found mesh to scene.
-    meshArray.current.forEach((element) => {
-      sceneRef.current.add(element);
-    });
-
-    //* Set animation loop.
-    rendererRef.current.setAnimationLoop(() => {
-      deltaRef.current += clock.current.getDelta();
-      // console.log("deltaRef.current: ", deltaRef.current);
-      // console.log("INTERVAL.current: ", INTERVAL.current);
-      if (deltaRef.current > INTERVAL.current) {
-        renderAvatar();
-        deltaRef.current = deltaRef.current % INTERVAL.current;
-
-        //* Update stat.
-        // statsLib.current.update();
-      }
-    });
   }
 
   async function loadGLTF(url) {
@@ -584,7 +528,22 @@ function AvatarView({
 
         // Keep gltf data to loadedGltfData variable.
         loadedGltftData.current = gltf;
-        loadMesh({ gltf: loadedGltftData.current });
+
+        //* Set animation loop.
+        rendererRef.current.setAnimationLoop(() => {
+          deltaRef.current += clock.current.getDelta();
+          // console.log("deltaRef.current: ", deltaRef.current);
+          // console.log("INTERVAL.current: ", INTERVAL.current);
+          if (deltaRef.current > INTERVAL.current) {
+            renderAvatar();
+            deltaRef.current = deltaRef.current % INTERVAL.current;
+
+            //* Update stat.
+            // statsLib.current.update();
+          }
+        });
+
+        //* Set camera setting.
         adjustCamera({ gltf: loadedGltftData.current });
 
         // console.log("Loading hidden when gltf loaidng finished.");
