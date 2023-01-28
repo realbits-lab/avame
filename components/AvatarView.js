@@ -43,21 +43,15 @@ function AvatarView({
   //* - rotation, position, and scale
   //*---------------------------------------------------------------------------
   const INTERVAL_FRAME_COUNT = 30;
-  const [showAvatarView, setShowAvatarView] = React.useState(true);
 
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.
   //*---------------------------------------------------------------------------
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
-  const idleStatusTimer = React.useRef();
   const deltaRef = React.useRef(0);
-  const avatarScale = React.useRef(0);
   const INTERVAL = React.useRef(1 / INTERVAL_FRAME_COUNT);
   const clock = React.useRef();
-  const avatarQuartenionArray = React.useRef(new Float32Array(4));
-  const avatarPosition = React.useRef(new Float32Array(3));
-  const alterCoreLib = React.useRef();
   const statsLib = React.useRef();
   const currentWindowRatioRef = React.useRef(1);
   const showAvatarOptionRef = React.useRef(true);
@@ -673,11 +667,7 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Canvas for avatar of GLTF format.                               */}
       {/*//*-----------------------------------------------------------------*/}
-      <canvas
-        id="avatarCanvas"
-        ref={avatarCanvas}
-        hidden={!showAvatarView}
-      ></canvas>
+      <canvas id="avatarCanvas" ref={avatarCanvas}></canvas>
       <Stats ref={initializeStats}></Stats>
 
       <Box

@@ -60,7 +60,7 @@ const ButtonMenu = ({
     { icon: <CameraAltIcon color="primary" />, name: "Image" },
   ];
   //* TODO: For testing, set default status to true.
-  const [openSpeedDial, setOpenSpeedDial] = React.useState(true);
+  const [openSpeedDial, setOpenSpeedDial] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
   const [isScreenShare, setIsScreenShare] = React.useState(false);
   const [recordSize, setRecordSize] = React.useState(0);
@@ -138,12 +138,6 @@ const ButtonMenu = ({
           ariaLabel="FAB button"
           sx={{ position: "absolute", bottom: 16, right: 16 }}
           icon={<SpeedDialIcon color="secondary" />}
-          //* Mouse over event.
-          // onOpen={(event) => {
-          //   event.stopPropagation();
-          //   // console.log("onOpen");
-          //   setOpenSpeedDial(true);
-          // }}
           //* Mouse click event.
           onClick={(event) => {
             event.stopPropagation();
