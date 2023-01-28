@@ -7,7 +7,12 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "@mui/icons-material/Download";
 import TwitterIcon from "@mui/icons-material/Twitter";
-import { AlertSeverity, RBSnackbar, isUserAllowed } from "rent-market";
+import {
+  AlertSeverity,
+  RBSnackbar,
+  isUserAllowed,
+  signMessage,
+} from "rent-market";
 import { RBDialog } from "./RealBitsUtil";
 import Twitter from "./Twitter";
 
@@ -29,6 +34,9 @@ const TakePicture = ({
   const [windowWidth, setWindowWidth] = React.useState();
   const [windowHeight, setWindowHeight] = React.useState();
   const [showTwitterDialog, setShowTwitterDialog] = React.useState(false);
+  const [inputSignMessage, setInputSignMessage] = React.useState();
+  const [inputPlainMessage, setInputPlainMessage] = React.useState();
+  const [inputSignerAddress, setInputSignerAddress] = React.useState();
 
   //*---------------------------------------------------------------------------
   //* Handle toast mesage.
@@ -205,6 +213,18 @@ const TakePicture = ({
                   return;
                 }
 
+                //* Sign message.
+                const message =
+                  "You sign this message for authenticating server.";
+                const signMessageResponse = await signMessage({
+                  rentMarket: rentMarketRef.current,
+                  message: message,
+                });
+                console.log("signMessageResponse: ", signMessageResponse);
+                setInputPlainMessage(message);
+                setInputSignerAddress(rentMarketRef.current.signerAddress);
+                setInputSignMessage(signMessageResponse);
+
                 //* Show twitter dialog for uploading image.
                 setShowTwitterDialog(true);
               }}
@@ -222,6 +242,9 @@ const TakePicture = ({
         inputImageUrl={imageDataUrl}
         showTwitterDialog={showTwitterDialog}
         inputSetShowTwitterDialog={setShowTwitterDialog}
+        inputPlainMessage={inputPlainMessage}
+        inputSignMessage={inputSignMessage}
+        inputSignerAddress={inputSignerAddress}
       />
 
       <RBSnackbar

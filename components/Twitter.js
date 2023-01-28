@@ -16,6 +16,9 @@ const Twitter = ({
   videoFile,
   inputImageUrl,
   inputSetShowTwitterDialog,
+  inputPlainMessage,
+  inputSignMessage,
+  inputSignerAddress,
 }) => {
   //*---------------------------------------------------------------------------
   //* Define constant variables.
@@ -24,7 +27,7 @@ const Twitter = ({
   const TWITTER_DIALOG_HEIGHT = 400;
   const TWITTER_AUTH_API_URL = "/api/twitter/auth";
   const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_image";
-  const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload__video";
+  const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload_video";
 
   //*---------------------------------------------------------------------------
   //* Define hook variables.
@@ -101,6 +104,9 @@ const Twitter = ({
       //* Set form with image blob data for uploading.
       const formData = new FormData();
       formData.append("image_data", blobResult);
+      formData.append("plain_message", inputPlainMessage);
+      formData.append("sign_message", inputSignMessage);
+      formData.append("signer_address", inputSignerAddress);
 
       //* Post image blob data with upload url.
       axiosResponse = await axios.post(TWITTER_IMAGE_UPLOAD_URL, formData);
@@ -112,7 +118,7 @@ const Twitter = ({
       throw error;
     }
 
-    return axiosResponse.data;
+    return axiosResponse.data.path;
   }
 
   async function uploadVideo() {
@@ -121,6 +127,9 @@ const Twitter = ({
 
     const formData = new FormData();
     formData.append("video_data", videoFile);
+    formData.append("plain_message", inputPlainMessage);
+    formData.append("sign_message", inputSignMessage);
+    formData.append("signer_address", inputSignerAddress);
 
     setVideoUrl(window.URL.createObjectURL(videoFile));
 
@@ -137,7 +146,7 @@ const Twitter = ({
       throw error;
     }
 
-    return axiosResponse.data;
+    return axiosResponse.data.path;
   }
 
   // TODO: Set position of twitter dialog
@@ -186,24 +195,31 @@ const Twitter = ({
               onClick={async function () {
                 // console.log("call onClick()");
 
-                let uploadedFilePath;
+                let uploadResponse;
                 try {
                   if (
                     inputImageUrl !== undefined &&
                     showTwitterDialog === true
                   ) {
-                    uploadedFilePath = await uploadImage({
+                    uploadResponse = await uploadImage({
                       url: inputImageUrl,
                     });
                   } else if (
                     videoFile !== undefined &&
                     showTwitterDialog === true
                   ) {
-                    uploadedFilePath = await uploadVideo();
+                    uploadResponse = await uploadVideo();
                   }
                 } catch (error) {
                   throw error;
                 }
+
+                if (uploadResponse.error || uploadResponse.path === undefined) {
+                  console.error("Upload process is not valid.");
+                  return;
+                }
+
+                const uploadedFilePath = uploadResponse.path;
                 console.log("uploadedFilePath: ", uploadedFilePath);
 
                 try {

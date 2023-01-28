@@ -1,4 +1,5 @@
 import nextConnect from "next-connect";
+import { ethers } from "ethers";
 import multer from "multer";
 
 const IMAGE_UPLOAD_DIRECTORY = "./public/upload_image/";
@@ -37,9 +38,34 @@ const app = nextConnect({
 
 const upload = multer({ storage: storage });
 
-app.post(upload.array("file"), function (req, res) {
-  // res.json(req.files.map((v) => v.filename));
-	res.send(`${IMAGE_UPLOAD_DIRECTORY}${path.parse(req.file.path).base}`);
+app.use(function (req, res, next) {
+  console.log("call nextConnect use()");
+  upload.single("image_data");
+
+  next();
+});
+
+app.post(upload.single("image_data"), function (req, res) {
+  // console.log("call image_upload");
+  // console.log("req.body.plain_message: ", req.body.plain_message);
+  // console.log("req.body.sign_message: ", req.body.sign_message);
+
+  const verified = ethers.utils.verifyMessage(
+    req.body.plain_message,
+    req.body.sign_message
+  );
+  console.log("verified: ", verified);
+  console.log("req.body.signer_address: ", req.body.signer_address);
+
+  if (
+    verified.localeCompare(req.body.signer_address, undefined, {
+      sensitivity: "accent",
+    }) === 0
+  ) {
+    res.status(200).json({ path: req.file.path });
+  } else {
+    res.status(404).json({ error: "Sign message is not valid." });
+  }
 });
 
 export default app;
