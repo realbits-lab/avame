@@ -17,7 +17,7 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 
 function BootstrapDialogTitle(props) {
   const { children, onClose, ...other } = props;
-  console.log("onClose: ", onClose);
+  // console.log("onClose: ", onClose);
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
@@ -26,7 +26,7 @@ function BootstrapDialogTitle(props) {
         <IconButton
           aria-label="close"
           onClick={function () {
-            console.log("call onClick()");
+            // console.log("call onClick()");
 
             onClose();
           }}
@@ -122,7 +122,7 @@ export const RBDialog = ({
       <>
         <BootstrapDialogTitle
           onClose={function () {
-            console.log("call onClose()");
+            // console.log("call onClose()");
 
             try {
               inputSetOpenRBDialogFunc(false);

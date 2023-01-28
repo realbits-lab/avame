@@ -33,8 +33,8 @@ function AvatarView({
     perspective: "perspective",
     orthographic: "orthographic",
   };
-  const IMAGE_SNAPSHOT_WIDTH = 1024;
-  const IMAGE_SNAPSHOT_HEIGHT = 1024;
+  const IMAGE_SNAPSHOT_WIDTH = 512;
+  const IMAGE_SNAPSHOT_HEIGHT = 512;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -48,7 +48,7 @@ function AvatarView({
   //* Mesh transfomation data.
   //* - rotation, position, and scale
   //*---------------------------------------------------------------------------
-  const INTERVAL_FRAME_COUNT = 30;
+  const INTERVAL_FRAME_COUNT = 60;
 
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.

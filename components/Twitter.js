@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -149,9 +149,7 @@ const Twitter = ({
     return axiosResponse.data;
   }
 
-  // TODO: Set position of twitter dialog
-  // TODO: Set size of twitter dialog.
-  // TODO: Delete file when closing dialog.
+  //* TODO: Delete file when closing dialog.
   return (
     <div>
       <RBDialog
@@ -186,7 +184,8 @@ const Twitter = ({
           {/*//* Show twitter upload button.                                         */}
           {/*//*-------------------------------------------------------------*/}
           <CardActions disableSpacing>
-            <IconButton
+            <Button
+              variant="contained"
               aria-label="twitter"
               onClick={async function () {
                 // console.log("call onClick()");
@@ -240,7 +239,7 @@ const Twitter = ({
               }}
             >
               <UploadIcon />
-            </IconButton>
+            </Button>
           </CardActions>
         </Card>
       </RBDialog>
