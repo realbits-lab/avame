@@ -656,23 +656,24 @@ function AvatarView({
       <canvas id="avatarCanvas" ref={avatarCanvas}></canvas>
       <Stats ref={initializeStats}></Stats>
 
-      <Box
-        width="160px"
-        height="120px"
-        border={0}
-        borderColor="secondary.main"
-        hidden={!showGuideCanvas}
-        sx={{
-          top: 0,
-          left: 0,
-          zIndex: Z_INDEX.dialog,
-          position: "absolute",
-          display: "flex",
-          transform: "scale(-1, 1)",
-        }}
-      >
-        <canvas id="guideCanvas" ref={guideCanvasRef} />
-      </Box>
+      {showGuideCanvas ? (
+        <Box
+          width="160px"
+          height="120px"
+          border={0}
+          borderColor="secondary.main"
+          sx={{
+            top: 0,
+            left: 0,
+            zIndex: Z_INDEX.dialog,
+            position: "absolute",
+            display: "flex",
+            transform: "scale(-1, 1)",
+          }}
+        >
+          <canvas id="guideCanvas" ref={guideCanvasRef} />
+        </Box>
+      ) : null}
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* GLTF loading progress circle.                                   */}

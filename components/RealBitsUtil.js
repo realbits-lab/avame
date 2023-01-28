@@ -110,7 +110,7 @@ export const RBDialog = ({
       }}
       TransitionComponent={transitionComponent}
       keepMounted={keepMounted}
-      PaperComponent={PaperComponent}
+      // PaperComponent={PaperComponent}
       aria-labelledby="draggable-dialog-title"
       aria-describedby="alert-dialog-slide-description"
       scroll="paper"
@@ -133,38 +133,38 @@ export const RBDialog = ({
         },
       }}
     >
-      <Resizable
+      {/* <Resizable
         width={rbDialogWidth || DEFAULT_WIDTH}
         height={rbDialogHeight || DEFAULT_HEIGHT}
         onResize={(event, data) => {
           setRBDialogWidth(rbDialogWidth + event.movementX);
           setRBDialogHeight(rbDialogHeight + event.movementY);
         }}
-      >
-        <>
-          <BootstrapDialogTitle
-            onClose={function () {
-              console.log("call onClose()");
+      > */}
+      <>
+        <BootstrapDialogTitle
+          onClose={function () {
+            console.log("call onClose()");
 
-              try {
-                inputSetOpenRBDialogFunc(false);
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-            style={{ cursor: "move" }}
-            id="draggable-dialog-title"
-          >
-            {title}
-          </BootstrapDialogTitle>
-          <DialogContent
-            dividers={false}
-            sx={{ width: `${rbDialogWidth}px`, height: `${rbDialogHeight}px` }}
-          >
-            {children}
-          </DialogContent>
-        </>
-      </Resizable>
+            try {
+              inputSetOpenRBDialogFunc(false);
+            } catch (error) {
+              console.error(error);
+            }
+          }}
+          style={{ cursor: "move" }}
+          id="draggable-dialog-title"
+        >
+          {title}
+        </BootstrapDialogTitle>
+        <DialogContent
+          dividers={false}
+          sx={{ width: `${rbDialogWidth}px`, height: `${rbDialogHeight}px` }}
+        >
+          {children}
+        </DialogContent>
+      </>
+      {/* </Resizable> */}
     </Dialog>
   );
 };

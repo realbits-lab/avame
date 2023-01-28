@@ -59,8 +59,11 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     animateVRM(currentVrmRef.current, results);
   }
 
-  // -- drawResults function.
   function drawResults(results) {
+    if (!guideCanvas) {
+      return;
+    }
+
     guideCanvas.width = videoElement.videoWidth;
     guideCanvas.height = videoElement.videoHeight;
 
