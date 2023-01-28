@@ -11,32 +11,35 @@ import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 
 async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
+  console.log("call createHolisticData()");
+
   let oldLookTarget = new THREE.Euler();
   const lerp = Kalidokit.Vector.lerp;
   const remap = Kalidokit.Utils.remap;
   const clamp = Kalidokit.Utils.clamp;
 
-  // 1. Make holistic instance.
+  //* Make holistic instance.
   const holistic = new Holistic({
     locateFile: (file) => {
+      console.log("file: ", file);
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
     },
   });
   await holistic.initialize();
 
-  // 2. Set holistic option.
+  //* Set holistic option.
   holistic.setOptions({
     modelComplexity: 1,
-    smoothLandmarks: true,
+    smoothLandmarks: false,
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7,
     refineFaceLandmarks: true,
   });
 
-  // 3. Register function to a holistic onResult event.
+  //* Register function to a holistic onResult event.
   holistic.onResults(onResults);
 
-  // 4. Make camera instance and connect holistic.
+  //* Make camera instance and connect holistic.
   const camera = new CameraUtils.Camera(videoElement, {
     onFrame: async () => {
       await holistic.send({ image: videoElement });
@@ -45,17 +48,17 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     height: 480,
   });
 
-  // 5. Start a camera.
+  //* Start a camera.
+  console.log("Start camera.");
   camera.start();
 
-  // -- onResults function.
   function onResults(results) {
     // console.log("call onResults()");
 
-    // 1. Draw landmark guides
+    //* Draw landmark guides
     drawResults(results);
 
-    // 2. Animate model
+    //* Animate model
     animateVRM(currentVrmRef.current, results);
   }
 
@@ -71,7 +74,7 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     canvasContext.save();
     canvasContext.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
 
-    // 1. Use `Mediapipe` drawing functions
+    //* Use `Mediapipe` drawing functions
     DrawingUtils.drawConnectors(
       canvasContext,
       results.poseLandmarks,
@@ -134,14 +137,13 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     });
   }
 
-  // -- animateVRM function.
   function animateVRM(currentVrm, results) {
     // console.log("results: ", results);
     if (!currentVrm) {
       return;
     }
 
-    // 1. Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
+    //* Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
     const faceLandmarks = results.faceLandmarks;
@@ -153,7 +155,7 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     const leftHandLandmarks = results.rightHandLandmarks;
     const rightHandLandmarks = results.leftHandLandmarks;
 
-    // 2. Animate Face
+    //* Animate Face
     if (faceLandmarks) {
       riggedFace = Kalidokit.Face.solve(faceLandmarks, {
         runtime: "mediapipe",
@@ -168,7 +170,7 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
       rigFace(riggedFace);
     }
 
-    // Animate Pose
+    //* Animate Pose
     if (pose2DLandmarks && pose3DLandmarks) {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
