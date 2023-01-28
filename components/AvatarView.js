@@ -30,25 +30,25 @@ function AvatarView({
     orthographic: "orthographic",
   };
 
-  //----------------------------------------------------------------------------
-  // GLTF loading variable.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* GLTF loading variable.
+  //*---------------------------------------------------------------------------
   const [gltfLoadingProgress, setGltfLoadingProgress] = React.useState(0);
   // visibility: hidden or visible
   const [showGltfLoadingProgress, setShowGltfLoadingProgress] =
     React.useState("hidden");
 
-  //----------------------------------------------------------------------------
-  // Mesh transfomation data.
-  // - rotation, position, and scale
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Mesh transfomation data.
+  //* - rotation, position, and scale
+  //*---------------------------------------------------------------------------
   const TOTAL_MORPH_COUNT = 42;
   const INTERVAL_FRAME_COUNT = 30;
   const [showAvatarView, setShowAvatarView] = React.useState(true);
 
-  //----------------------------------------------------------------------------
-  // Mutable variable with useRef.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Mutable variable with useRef.
+  //*---------------------------------------------------------------------------
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const isIdleStatus = React.useRef(false);
@@ -70,10 +70,10 @@ function AvatarView({
   const currentAvatarPositionRef = React.useRef(ScreenPosition.center);
   const currentScreenVideoStreamRef = React.useRef();
 
-  // type: ThreeVrm.VRM
+  //* type: ThreeVrm.VRM
   const currentVrmRef = React.useRef();
 
-  // OrbitControl variables.
+  //* OrbitControl variables.
   const orbitControlsRef = React.useRef();
   const ORBIT_CONTROL_ENABLE_DUMPING = true;
   const ORBIT_CONTROL_MIN_DISTANCE = 0.1;
@@ -82,19 +82,17 @@ function AvatarView({
   const ORBIT_CONTROL_MAX_AZIMUTH_ANGLE = Math.PI / 2;
   const ORBIT_CONTROL_MAX_POLAR_ANGLE = Math.PI / 1.8;
 
-  // OrbitCamera variables.
+  //* OrbitCamera variables.
   const CAMERA_FOV = 35;
   const CAMERA_NEAR = ORBIT_CONTROL_MIN_DISTANCE;
   const CAMERA_FAR = ORBIT_CONTROL_MAX_DISTANCE;
   const orbitCameraRef = React.useRef();
-  // TODO: Test for vrm.
   const currentOrbitCameraTypeRef = React.useRef(CameraType.perspective);
-  // const currentOrbitCameraTypeRef = React.useRef(CameraType.orthographic);
   const currentOrbitCameraPositionXRef = React.useRef(0);
   const currentOrbitCameraPositionYRef = React.useRef(1.4);
   const currentOrbitCameraPositionZRef = React.useRef(5.0);
 
-  // Guide canvas element.
+  //* Guide canvas element.
   const [showGuideCanvas, setShowGuideCanvas] = React.useState(true);
 
   const defaultMeshArray = [
@@ -134,9 +132,9 @@ function AvatarView({
   // For testing.
   const HEAD_MESH_NAME = "head";
 
-  //----------------------------------------------------------------------------
-  // useRef, useState variables.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* useRef, useState variables.
+  //*---------------------------------------------------------------------------
   const morphMeshArray = React.useRef([]);
   const meshArray = React.useRef([]);
   const AVATAR_SCALE = React.useRef(5);
@@ -348,22 +346,6 @@ function AvatarView({
     // document.body.appendChild(statsLib.current.dom);
   }
 
-  const initializeHolisticTrackData = async ({
-    default: createHolisticData,
-  }) => {
-    console.log(
-      "initializeHolisticTrackData createHolisticData: ",
-      createHolisticData
-    );
-    const sourceVideoElement = document.getElementById("sourceVideo");
-    const guideCanvasElement = document.getElementById("guideCanvas");
-    await createHolisticData(
-      currentVrmRef,
-      sourceVideoElement,
-      guideCanvasElement
-    );
-  };
-
   function setInterval(interval) {
     INTERVAL.current = interval;
   }
@@ -373,20 +355,20 @@ function AvatarView({
     return avatarCanvasElement.toDataURL();
   }
 
-  //----------------------------------------------------------------------------
-  // Initialize data.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Initialize data.
+  //*---------------------------------------------------------------------------
   async function initializeContent(url) {
     console.log("initializeContent function url: ", url);
     makeContentInstance();
     await loadGLTF(url);
   }
 
-  //----------------------------------------------------------------------------
-  // Make instances.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Make instances.
+  //*---------------------------------------------------------------------------
   function makeContentInstance() {
-    // 1. Make camera instance.
+    //* Make camera instance.
     // Set [-1, 1] range.
     if (window.innerWidth !== 0) {
       currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
@@ -430,10 +412,10 @@ function AvatarView({
       currentOrbitCameraPositionZRef.current
     );
 
-    // 2. Make sceneRef instance.
+    //* Make sceneRef instance.
     sceneRef.current = new THREE.Scene();
 
-    // 3. Make rendererRef instance.
+    //* Make rendererRef instance.
     rendererRef.current = new THREE.WebGLRenderer({
       antialias: true,
       canvas: avatarCanvas.current,
@@ -446,11 +428,11 @@ function AvatarView({
     // rendererRef.current.toneMapping = THREE.ACESFilmicToneMapping;
     rendererRef.current.outputEncoding = THREE.sRGBEncoding;
 
-    // 4. Add resize event listener.
+    //* Add resize event listener.
     window.addEventListener("resize", () => {
       // console.log("-- resize event");
 
-      // 1. Get current window ratio.
+      //* Get current window ratio.
       if (window.innerWidth !== 0) {
         currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
       } else {
@@ -470,11 +452,11 @@ function AvatarView({
 
       orbitCameraRef.current.updateProjectionMatrix();
 
-      // 2. Set renderer configuration of size and pixel ratio.
+      //* Set renderer configuration of size and pixel ratio.
       rendererRef.current.setSize(window.innerWidth, window.innerHeight);
       rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
-      // 3. Redraw avatar.
+      //* Redraw avatar.
       transformAvatar({
         canvasPosition: currentCanvasPositionRef.current,
         avatarPosition: currentAvatarPositionRef.current,
@@ -504,13 +486,13 @@ function AvatarView({
       });
     });
 
-    // 5. Make environment instance.
+    //* Make environment instance.
     const environment = new STDLIB.RoomEnvironment();
     const pmremGenerator = new THREE.PMREMGenerator(rendererRef.current);
     sceneRef.current.environment =
       pmremGenerator.fromScene(environment).texture;
 
-    // 6. Make control instance.
+    //* Make control instance.
     orbitControlsRef.current = new STDLIB.OrbitControls(
       orbitCameraRef.current,
       rendererRef.current.domElement
@@ -532,13 +514,13 @@ function AvatarView({
       0
     );
 
-    // Update orbit control.
+    //* Update orbit control.
     orbitControlsRef.current.update();
   }
 
-  //----------------------------------------------------------------------------
-  // Load gltf.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Load gltf.
+  //*---------------------------------------------------------------------------
   // TODO: Remove meshArray later.
   function loadMesh(gltf) {
     // 1. Find the default mesh in scene children.
@@ -676,11 +658,11 @@ function AvatarView({
     );
   }
 
-  //----------------------------------------------------------------------------
-  // Make stream.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Make stream.
+  //*---------------------------------------------------------------------------
   async function getMediaStream() {
-    // 1. Extract mediaStream:
+    //* Extract mediaStream:
     let originalUserMedia;
     try {
       originalUserMedia = await navigator.mediaDevices.getUserMedia({
@@ -691,17 +673,17 @@ function AvatarView({
       });
 
       try {
-        // 2. Extract audio track:
+        //* Extract audio track:
         const audioTrack = originalUserMedia.getAudioTracks()[0];
 
         // console.log("avatarCanvas.current: ", avatarCanvas.current);
-        // 3. Get video from canvas:
+        //* Get video from canvas:
         const canvasVideoStream = avatarCanvas.current.captureStream(
           AVATAR_CANVAS_CAPTURE_FRAME_RATE
         );
         const canvasVideoTrack = canvasVideoStream.getVideoTracks()[0];
 
-        // 4. Composite the new mediastream:
+        //* Composite the new mediastream:
         let stream;
         if (audioTrack) {
           stream = new MediaStream([canvasVideoTrack, audioTrack]);
@@ -717,18 +699,18 @@ function AvatarView({
     }
   }
 
-  //----------------------------------------------------------------------------
-  // Render data.
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Render data.
+  //*---------------------------------------------------------------------------
   function renderAvatar() {
     // console.log("call renderAvatar()");
 
-    // 1. Set avatar idle status transformation.
+    //* Set avatar idle status transformation.
     if (isIdleStatus.current) {
       transformIdleAvatar();
     }
 
-    // 2. Render avatar and update control.
+    //* Render avatar and update control.
     if (morphMeshArray.current.length > 0) {
       // 2-1. Set avatar influence.
       morphMeshArray.current.forEach((meshElement) => {
@@ -740,7 +722,7 @@ function AvatarView({
       });
     }
 
-    // 2-2. Set avatar quartenion.
+    //* Set avatar quartenion.
     // console.log("meshArray.current: ", meshArray.current);
     // console.log("avatarQuartenionArray.current: ", avatarQuartenionArray.current);
     if (avatarQuartenionArray.current) {
@@ -749,7 +731,7 @@ function AvatarView({
       });
     }
 
-    // 2-3. Set avatar position.
+    //* Set avatar position.
     // console.log("avatarPosition.current: ", avatarPosition.current);
     meshArray.current.forEach((element) => {
       element.position.set(
@@ -759,7 +741,7 @@ function AvatarView({
       );
     });
 
-    // 2-4. Set avatar scale.
+    //* Set avatar scale.
     // console.log("avatarScale.current: ", avatarScale.current);
     if (avatarScale.current) {
       meshArray.current.forEach((element) => {
@@ -775,10 +757,10 @@ function AvatarView({
       currentVrmRef.current.update(deltaRef.current);
     }
 
-    // 3. Render scene and camera.
+    //* Render scene and camera.
     rendererRef.current.render(sceneRef.current, orbitCameraRef.current);
 
-    // 4. Update control.
+    //* Update control.
     orbitControlsRef.current.update();
   }
 
@@ -792,131 +774,18 @@ function AvatarView({
     AVATAR_MOVE_POSITION.current = position;
   }
 
-  //----------------------------------------------------------------------------
-  // Set morph data.
-  //----------------------------------------------------------------------------
-  function setMorphData(trackData) {
-    // console.log("trackData: ", trackData);
-    const _confidence = trackData.confidence;
-
-    if (_confidence < FACE_DETECT_THRESHOLD.current) {
-      // console.log("_confidence: ", _confidence);
-      if (isIdleStatus.current === false) {
-        idleStatusTimer.current = alterCoreLib.current.Timer.start();
-        isIdleStatus.current = true;
-      }
-      return;
-    } else {
-      isIdleStatus.current = false;
-    }
-
-    // 1. Get and set morph data.
-    let data = trackData.blendshapes["_innerMap"];
-    // console.log("data: ", data);
-    // console.log("data[0]: ", data[0]);
-    // console.log("data[1]: ", data[1]);
-    // This is for realbits demo file.
-    avatarInfluence.current[0] = data.get("browOuterUp_L");
-    avatarInfluence.current[1] = data.get("browInnerUp_L");
-    avatarInfluence.current[2] = data.get("browDown_L");
-    avatarInfluence.current[3] = data.get("eyeBlink_L");
-    avatarInfluence.current[4] = data.get("eyeSquint_L");
-    avatarInfluence.current[5] = data.get("eyeWide_L");
-    avatarInfluence.current[6] = data.get("eyeLookUp_L");
-    avatarInfluence.current[7] = data.get("eyeLookOut_L");
-    avatarInfluence.current[8] = data.get("eyeLookIn_L");
-    avatarInfluence.current[9] = data.get("eyeLookDown_L");
-    avatarInfluence.current[10] = data.get("noseSneer_L");
-    avatarInfluence.current[11] = data.get("mouthUpperUp_L");
-    avatarInfluence.current[12] = data.get("mouthSmile_L");
-    avatarInfluence.current[13] = data.get("mouthLeft");
-    avatarInfluence.current[14] = data.get("mouthFrown_L");
-    avatarInfluence.current[15] = data.get("mouthLowerDown_L");
-    avatarInfluence.current[16] = data.get("jawLeft");
-    avatarInfluence.current[17] = data.get("cheekPuff");
-    avatarInfluence.current[18] = data.get("mouthShrugUpper");
-    avatarInfluence.current[19] = data.get("mouthFunnel");
-    avatarInfluence.current[20] = data.get("mouthRollLower");
-    avatarInfluence.current[21] = data.get("jawOpen");
-    avatarInfluence.current[22] = data.get("tongueOut");
-    avatarInfluence.current[23] = data.get("mouthPucker");
-    avatarInfluence.current[24] = data.get("mouthRollUpper");
-    avatarInfluence.current[25] = data.get("jawRight");
-    avatarInfluence.current[26] = data.get("mouthLowerDown_R");
-    avatarInfluence.current[27] = data.get("mouthFrown_R");
-    avatarInfluence.current[28] = data.get("mouthRight");
-    avatarInfluence.current[29] = data.get("mouthSmile_R");
-    avatarInfluence.current[30] = data.get("mouthUpperUp_R");
-    avatarInfluence.current[31] = data.get("noseSneer_R");
-    avatarInfluence.current[32] = data.get("eyeLookDown_R");
-    avatarInfluence.current[33] = data.get("eyeLookIn_R");
-    avatarInfluence.current[34] = data.get("eyeLookOut_R");
-    avatarInfluence.current[35] = data.get("eyeLookUp_R");
-    avatarInfluence.current[36] = data.get("eyeWide_R");
-    avatarInfluence.current[37] = data.get("eyeSquint_R");
-    avatarInfluence.current[38] = data.get("eyeBlink_R");
-    avatarInfluence.current[39] = data.get("browDown_R");
-    avatarInfluence.current[40] = data.get("browInnerUp_R");
-    avatarInfluence.current[41] = data.get("browOuterUp_R");
-    // avatarInfluence.current[] = data.get("cheekSquintLeft");
-    // avatarInfluence.current[] = data.get("cheekSquintRight");
-    // avatarInfluence.current[] = data.get("mouthClose");
-    // avatarInfluence.current[] = data.get("jawForward");
-    // avatarInfluence.current[] = data.get("mouthDimpleLeft");
-    // avatarInfluence.current[] = data.get("mouthDimpleRight");
-    // avatarInfluence.current[] = data.get("mouthPressLeft");
-    // avatarInfluence.current[] = data.get("mouthPressRight");
-    // avatarInfluence.current[] = data.get("mouthShrugLower");
-    // avatarInfluence.current[] = data.get("mouthStretchLeft");
-    // avatarInfluence.current[] = data.get("mouthStretchRight");
-    // console.log("avatarInfluence.current: ", avatarInfluence.current);
-
-    // 2. Get and set rotation data.
-    data = trackData.rotationQuaternion["_elements"];
-    // console.log("data: ", data);
-    avatarQuartenionArray.current[0] = data[0];
-    avatarQuartenionArray.current[1] = data[1];
-    avatarQuartenionArray.current[2] = data[2];
-    avatarQuartenionArray.current[3] = data[3];
-    // console.log(
-    //   "avatarQuartenionArray.current: ",
-    //   avatarQuartenionArray.current
-    // );
-
-    // 3. Get and set scale data.
-    const _positionData = trackData.normalizedImagePosition["_elements"];
-    avatarScale.current = trackData.normalizedImageScale * AVATAR_SCALE.current;
-    // console.log("avatarScale.current: ", avatarScale.current);
-
-    // 4. Get and set position data.
-    // console.log("_positionData: ", _positionData);
-    // _positionData : 0(min) - 1(max) (normalized value)
-    // fov: 45, near: 1, far: 20. camera position: 0, 0, 3
-    // So, range: -(near + camera z) ~ +(near + camera z) and multiply 2 * (near + camera z)
-    avatarPosition.current[0] =
-      (_positionData[0] - 0.5 + AVATAR_MOVE_POSITION.current[0]) *
-      AVATAR_POSITION_SCALE.current;
-    avatarPosition.current[1] =
-      (_positionData[1] -
-        0.5 +
-        AVATAR_MOVE_POSITION.current[1] * currentWindowRatioRef.current) *
-      AVATAR_POSITION_SCALE.current;
-    avatarPosition.current[2] = 0 + AVATAR_MOVE_POSITION.current[2];
-    // console.log("avatarPosition.current: ", avatarPosition.current);
-  }
-
-  //----------------------------------------------------------------------------
-  // Transform function when idle time (no face detection).
-  //----------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Transform function when idle time (no face detection).
+  //*---------------------------------------------------------------------------
   function transformIdleAvatar() {
     console.log("call transformIdleAvatar()");
 
-    // 1. Calculate the elapsed time of idle status.
+    //* Calculate the elapsed time of idle status.
     const elapsedIdleTime = idleStatusTimer.current.tick().elapsed;
     // console.log("elapsedIdleTime: ", elapsedIdleTime);
     const smile = 0.5 + 0.5 * Math.sin(elapsedIdleTime * 0.5);
 
-    // 2. Set avatar influence.
+    //* Set avatar influence.
     for (let i = 0; i < TOTAL_MORPH_COUNT; i++) {
       avatarInfluence.current[i] = 0;
     }
@@ -925,7 +794,7 @@ function AvatarView({
     // mouthSmile_R
     avatarInfluence.current[24] = smile;
 
-    // 3. Set avatar quartenion.
+    //* Set avatar quartenion.
     const rotationData = alterCoreLib.current.Quaternion.fromRotation(
       0.3 * Math.sin(elapsedIdleTime * 0.5),
       alterCoreLib.current.Vec3.xAxis
@@ -943,9 +812,9 @@ function AvatarView({
   // dialog : > 100
   return (
     <>
-      {/*------------------------------------------------------------------*/}
-      {/* 1. Video source for alter core avatar library. */}
-      {/*------------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Video source for alter core avatar library.                     */}
+      {/*//*-----------------------------------------------------------------*/}
       <video
         id="sourceVideo"
         style={{ display: "none" }}
@@ -956,16 +825,15 @@ function AvatarView({
         preload={"auto"}
       ></video>
 
-      {/*------------------------------------------------------------------*/}
-      {/* 2. Canvas for avatar of GLTF format. */}
-      {/*------------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Canvas for avatar of GLTF format.                               */}
+      {/*//*-----------------------------------------------------------------*/}
       <canvas
         id="avatarCanvas"
         ref={avatarCanvas}
         hidden={!showAvatarView}
       ></canvas>
       <Stats ref={initializeStats}></Stats>
-      {/* <HolisticTrackData ref={initializeHolisticTrackData}></HolisticTrackData> */}
 
       <Box
         width="160px"
@@ -985,9 +853,9 @@ function AvatarView({
         <canvas id="guideCanvas" ref={guideCanvasRef} />
       </Box>
 
-      {/*------------------------------------------------------------------*/}
-      {/* 3. GLTF loading progress circle.
-      {/*------------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* GLTF loading progress circle.                                   */}
+      {/*//*-----------------------------------------------------------------*/}
       <Box
         visibility={showGltfLoadingProgress}
         sx={{
