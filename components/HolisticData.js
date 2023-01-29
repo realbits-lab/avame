@@ -1,59 +1,160 @@
+import React from "react";
+import { isMobile } from "react-device-detect";
 import {
   POSE_CONNECTIONS,
   FACEMESH_TESSELATION,
   HAND_CONNECTIONS,
   Holistic,
 } from "@mediapipe/holistic";
+import loadable from "@loadable/component";
+const FaceMesh = loadable.lib(() => import("@mediapipe/face_mesh"), {
+  ssr: false,
+});
 import * as CameraUtils from "@mediapipe/camera_utils";
 import * as DrawingUtils from "@mediapipe/drawing_utils";
 import * as Kalidokit from "kalidokit";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 
-async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
-  console.log("call createHolisticData()");
+function HolisticData({ currentVrmRef }) {
+  // console.log("call createHolisticData()");
 
   let oldLookTarget = new THREE.Euler();
+
+  const deltaRef = React.useRef(0);
+  const FRAME_COUNT = 30;
+  const clock = new THREE.Clock();
+  const interval = 1 / FRAME_COUNT;
+
   const lerp = Kalidokit.Vector.lerp;
   const remap = Kalidokit.Utils.remap;
   const clamp = Kalidokit.Utils.clamp;
+  const faceMeshRef = React.useRef();
+  const holisticMeshRef = React.useRef();
 
-  //* Make holistic instance.
-  const holistic = new Holistic({
-    locateFile: (file) => {
-      console.log("file: ", file);
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
-    },
-  });
-  await holistic.initialize();
+  const sourceVideoElementRef = React.useRef();
+  const guideCanvasElementRef = React.useRef();
 
-  //* Set holistic option.
-  holistic.setOptions({
-    modelComplexity: 1,
-    smoothLandmarks: false,
-    minDetectionConfidence: 0.7,
-    minTrackingConfidence: 0.7,
-    refineFaceLandmarks: true,
-  });
+  React.useEffect(() => {
+    // console.log("call useEffet()");
 
-  //* Register function to a holistic onResult event.
-  holistic.onResults(onResults);
+    sourceVideoElementRef.current = document.getElementById("sourceVideo");
+    guideCanvasElementRef.current = document.getElementById("guideCanvas");
+    // console.log(
+    //   "sourceVideoElementRef.current: ",
+    //   sourceVideoElementRef.current
+    // );
+    // console.log(
+    //   "guideCanvasElementRef.current: ",
+    //   guideCanvasElementRef.current
+    // );
 
-  //* Make camera instance and connect holistic.
-  const camera = new CameraUtils.Camera(videoElement, {
-    onFrame: async () => {
-      await holistic.send({ image: videoElement });
-    },
-    width: 640,
-    height: 480,
-  });
+    async function initialize() {
+      if (isMobile !== true) {
+        //*--------------------------------------------------------------------------
+        //* Make holistic instance.
+        //*--------------------------------------------------------------------------
+        holisticMeshRef.current = new Holistic({
+          locateFile: (file) => {
+            // console.log("file: ", file);
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+          },
+        });
+        // console.log("call holistic.initialize() done");
+        await holisticMeshRef.current.initialize();
 
-  //* Start a camera.
-  console.log("Start camera.");
-  camera.start();
+        //* Set holistic option.
+        holisticMeshRef.current.setOptions({
+          modelComplexity: 1,
+          smoothLandmarks: true,
+          minDetectionConfidence: 0.7,
+          minTrackingConfidence: 0.7,
+          refineFaceLandmarks: true,
+        });
 
-  function onResults(results) {
-    // console.log("call onResults()");
+        //* Register function to a holistic onResult event.
+        holisticMeshRef.current.onResults(onHolisticResults);
+      }
+
+      //*-----------------------------------------------------------------------
+      //* Make camera instance and connect holistic.
+      //*-----------------------------------------------------------------------
+      const camera = new CameraUtils.Camera(sourceVideoElementRef.current, {
+        onFrame: async () => {
+          // console.log("call onFrame()");
+
+          deltaRef.current += clock.getDelta();
+          // console.log("deltaRef.current: ", deltaRef.current);
+          if (deltaRef.current > interval) {
+            if (isMobile === true) {
+              if (faceMeshRef.current) {
+                await faceMeshRef.current.send({
+                  image: sourceVideoElementRef.current,
+                });
+              }
+            } else {
+              if (holisticMeshRef.current) {
+                // console.log("call holisticMeshRef.current.send()");
+                await holisticMeshRef.current.send({
+                  image: sourceVideoElementRef.current,
+                });
+              }
+            }
+            deltaRef.current = deltaRef.current % interval;
+          }
+        },
+        width: 640,
+        height: 480,
+      });
+
+      //*---------------------------------------------------------------------------
+      //* Start a camera.
+      //*---------------------------------------------------------------------------
+      // console.log("call camera.start() start.");
+      camera.start();
+    }
+    initialize();
+  }, [currentVrmRef]);
+
+  function onHolisticResults(results) {
+    // console.log("call onHolisticResults()");
+
+    //* Draw landmark guides
+    drawResults(results);
+
+    //* Animate model
+    animateVRM(currentVrmRef.current, results);
+  }
+
+  function initializeFaceMesh({ default: inputLib }) {
+    // console.log("call initializeFaceMesh()");
+    // console.log("inputLib: ", inputLib);
+
+    if (isMobile === true) {
+      //*---------------------------------------------------------------------------
+      //* Make face mesh instance.
+      //*---------------------------------------------------------------------------
+      faceMeshRef.current = new inputLib.FaceMesh({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        },
+      });
+      // console.log("faceMeshRef.current: ", faceMeshRef.current);
+
+      faceMeshRef.current.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      faceMeshRef.current.onResults(onFaceMeshResults);
+    }
+  }
+
+  function onFaceMeshResults(results) {
+    // console.log("call onFaceMeshResults()");
+    // console.log("results: ", results);
 
     //* Draw landmark guides
     drawResults(results);
@@ -63,12 +164,14 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
   }
 
   function drawResults(results) {
+    const guideCanvas = guideCanvasElementRef.current;
+    // console.log("guideCanvas: ", guideCanvas);
     if (!guideCanvas) {
       return;
     }
 
-    guideCanvas.width = videoElement.videoWidth;
-    guideCanvas.height = videoElement.videoHeight;
+    guideCanvas.width = sourceVideoElementRef.current.videoWidth;
+    guideCanvas.height = sourceVideoElementRef.current.videoHeight;
 
     let canvasContext = guideCanvas.getContext("2d");
     canvasContext.save();
@@ -146,7 +249,13 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     //* Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
-    const faceLandmarks = results.faceLandmarks;
+    let faceLandmarks;
+    if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+      faceLandmarks = results.multiFaceLandmarks[0];
+    } else {
+      faceLandmarks = results.faceLandmarks;
+    }
+    // console.log("faceLandmarks: ", faceLandmarks);
     // Pose 3D Landmarks are with respect to Hip distance in meters
     const pose3DLandmarks = results.ea;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
@@ -159,7 +268,7 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     if (faceLandmarks) {
       riggedFace = Kalidokit.Face.solve(faceLandmarks, {
         runtime: "mediapipe",
-        video: videoElement,
+        video: sourceVideoElementRef.current,
       });
       // console.log("riggedFace: ", riggedFace);
       // console.log("riggedFace.eye.l: ", riggedFace.eye.l);
@@ -174,7 +283,7 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     if (pose2DLandmarks && pose3DLandmarks) {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
-        video: videoElement,
+        video: sourceVideoElementRef.current,
       });
       rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
       rigPosition(
@@ -445,6 +554,8 @@ async function createHolisticData(currentVrmRef, videoElement, guideCanvas) {
     );
     Part.position.lerp(vector, lerpAmount); // interpolate
   };
+
+  return <FaceMesh ref={initializeFaceMesh}></FaceMesh>;
 }
 
-export default createHolisticData;
+export default HolisticData;

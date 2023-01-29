@@ -6,18 +6,13 @@ import loadable from "@loadable/component";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
 import { humanFileSize } from "rent-market";
-
+import HolisticData from "./HolisticData";
 const Stats = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
   {
     ssr: false,
   }
 );
-
-import createHolisticData from "./createHolisticData";
-const HolisticTrackData = loadable.lib(() => import("./createHolisticData"), {
-  ssr: false,
-});
 
 function AvatarView({
   gltfDataUrl,
@@ -48,7 +43,7 @@ function AvatarView({
   //* Mesh transfomation data.
   //* - rotation, position, and scale
   //*---------------------------------------------------------------------------
-  const INTERVAL_FRAME_COUNT = 60;
+  const FRAME_COUNT = 60;
 
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.
@@ -56,7 +51,7 @@ function AvatarView({
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
-  const INTERVAL = React.useRef(1 / INTERVAL_FRAME_COUNT);
+  const INTERVAL = React.useRef(1 / FRAME_COUNT);
   const clock = React.useRef();
   const statsLib = React.useRef();
   const currentWindowRatioRef = React.useRef(1);
@@ -134,18 +129,6 @@ function AvatarView({
     if (isFirstCall.current === true) {
       // * Holistic function should be called only once.
       isFirstCall.current = false;
-
-      const initialize = async () => {
-        const sourceVideoElement = document.getElementById("sourceVideo");
-        const guideCanvasElement = document.getElementById("guideCanvas");
-        await createHolisticData(
-          currentVrmRef,
-          sourceVideoElement,
-          guideCanvasElement
-        );
-      };
-
-      initialize();
     }
   }, []);
 
@@ -262,7 +245,7 @@ function AvatarView({
   function initializeStats({ default: inputStatsLib }) {
     // console.log("initializeStats inputStatsLib: ", inputStatsLib);
     statsLib.current = new inputStatsLib();
-    // document.body.appendChild(statsLib.current.dom);
+    document.body.appendChild(statsLib.current.dom);
   }
 
   function setInterval(interval) {
@@ -516,12 +499,14 @@ function AvatarView({
           deltaRef.current += clock.current.getDelta();
           // console.log("deltaRef.current: ", deltaRef.current);
           // console.log("INTERVAL.current: ", INTERVAL.current);
+
           if (deltaRef.current > INTERVAL.current) {
+            // console.log("render");
             renderAvatar();
             deltaRef.current = deltaRef.current % INTERVAL.current;
 
             //* Update stat.
-            // statsLib.current.update();
+            statsLib.current.update();
           }
         });
 
@@ -650,6 +635,8 @@ function AvatarView({
         muted={true}
         loop={true}
         preload={"auto"}
+        width="1280px"
+        height="720px"
       ></video>
 
       {/*//*-----------------------------------------------------------------*/}
@@ -676,6 +663,8 @@ function AvatarView({
           <canvas id="guideCanvas" ref={guideCanvasRef} />
         </Box>
       ) : null}
+
+      <HolisticData currentVrmRef={currentVrmRef} />
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* GLTF loading progress circle.                                   */}
