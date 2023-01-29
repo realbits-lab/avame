@@ -20,6 +20,7 @@ function AvatarView({
   getMediaStreamFunc,
   setTransformAvatarFunc,
   showGuideCanvas = false,
+  showFrameStats = false,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -244,8 +245,11 @@ function AvatarView({
 
   function initializeStats({ default: inputStatsLib }) {
     // console.log("initializeStats inputStatsLib: ", inputStatsLib);
-    statsLib.current = new inputStatsLib();
-    document.body.appendChild(statsLib.current.dom);
+
+    if (showFrameStats === true) {
+      statsLib.current = new inputStatsLib();
+      document.body.appendChild(statsLib.current.dom);
+    }
   }
 
   function getImageDataUrl() {
@@ -501,8 +505,10 @@ function AvatarView({
             renderAvatar();
             deltaRef.current = deltaRef.current % INTERVAL.current;
 
-            //* Update stat.
-            statsLib.current.update();
+            if (showFrameStats === true) {
+              //* Update stat.
+              statsLib.current.update();
+            }
           }
         });
 
