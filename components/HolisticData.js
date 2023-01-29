@@ -50,7 +50,8 @@ function HolisticData({ currentVrmRef }) {
     // );
 
     async function initialize() {
-      if (isMobile !== true) {
+      if (isMobile === true) {
+      } else {
         //*--------------------------------------------------------------------------
         //* Make holistic instance.
         //*--------------------------------------------------------------------------
@@ -280,6 +281,13 @@ function HolisticData({ currentVrmRef }) {
     }
 
     //* Animate Pose
+    if (isMobile) {
+      rigRotation("RightUpperArm", { x: 0, y: 0, z: -Math.PI / 4 }, 1, 1);
+      rigRotation("RightLowerArm", { x: 0, y: 0, z: -Math.PI / 2 }, 1, 1);
+      rigRotation("LeftUpperArm", { x: 0, y: 0, z: Math.PI / 4 }, 1, 1);
+      rigRotation("LeftLowerArm", { x: 0, y: 0, z: Math.PI / 2 }, 1, 1);
+    }
+
     if (pose2DLandmarks && pose3DLandmarks) {
       riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
         runtime: "mediapipe",
@@ -504,13 +512,12 @@ function HolisticData({ currentVrmRef }) {
     currentVrmRef.current.lookAt.applier.applyYawPitch(yaw, pitch);
   }
 
-  // Animate Rotation Helper function
-  const rigRotation = (
+  function rigRotation(
     name,
     rotation = { x: 0, y: 0, z: 0 },
     dampener = 1,
     lerpAmount = 0.3
-  ) => {
+  ) {
     if (!currentVrmRef.current) {
       return;
     }
@@ -529,15 +536,14 @@ function HolisticData({ currentVrmRef }) {
     let quaternion = new THREE.Quaternion().setFromEuler(euler);
     Part.quaternion.slerp(quaternion, lerpAmount);
     // console.log("update-Part.quaternion: ", Part.quaternion);
-  };
+  }
 
-  // Animate Position Helper Function
-  const rigPosition = (
+  function rigPosition(
     name,
     position = { x: 0, y: 0, z: 0 },
     dampener = 1,
     lerpAmount = 0.3
-  ) => {
+  ) {
     if (!currentVrmRef.current) {
       return;
     }
@@ -553,7 +559,7 @@ function HolisticData({ currentVrmRef }) {
       position.z * dampener
     );
     Part.position.lerp(vector, lerpAmount); // interpolate
-  };
+  }
 
   return <FaceMesh ref={initializeFaceMesh}></FaceMesh>;
 }
