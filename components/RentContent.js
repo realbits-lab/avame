@@ -5,8 +5,6 @@ import {
   useWeb3ModalNetwork,
 } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount } from "wagmi";
 import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
