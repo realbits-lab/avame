@@ -196,12 +196,24 @@ const RentContent = ({
         inputSetOpenRBDialogFunc={setOpenMyDialog}
         inputTitle={"My Avatar List"}
       >
-        <Grid container spacing={2}>
-          <Grid item>
-            <Web3Button />
-          </Grid>
-          <Grid item>
-            <Web3NetworkSwitch />
+        <Grid
+          container
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-around"
+            alignItems="stretch"
+          >
+            <Grid item xs={6}>
+              <Web3Button />
+            </Grid>
+            <Grid item xs={6}>
+              <Web3NetworkSwitch />
+            </Grid>
           </Grid>
           <Grid item>
             <My
