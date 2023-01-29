@@ -49,13 +49,6 @@ const server = nextConnect({
   },
 });
 
-server.use(function (req, res, next) {
-  console.log("call nextConnect use()");
-  upload.single("image_data");
-
-  next();
-});
-
 server.post(multerUpload.single("image_data"), function (req, res) {
   // console.log("call /upload_image");
   // console.log("req.body.plain_message: ", req.body.plain_message);
