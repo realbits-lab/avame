@@ -207,8 +207,12 @@ const RentContent = ({
           alignItems="flex-start"
         >
           <Grid container direction="row" justifyContent="space-around">
-            <Web3Button />
-            <Web3NetworkSwitch />
+            <Grid item xs={6}>
+              <Web3Button />
+            </Grid>
+            <Grid item xs={6}>
+              <Web3NetworkSwitch />
+            </Grid>
           </Grid>
           <My
             selectAvatarFunc={selectAvatarFunc}
