@@ -2,17 +2,23 @@ import nextConnect from "next-connect";
 import { ethers } from "ethers";
 import multer from "multer";
 
+//*-----------------------------------------------------------------------------
+//* Define image upload process.
+//*-----------------------------------------------------------------------------
 const IMAGE_UPLOAD_DIRECTORY = "./public/upload_image/";
-
-//* Define image upload configuration.
-const storage = multer.diskStorage({
+const diskStorageOptions = multer.diskStorage({
+  //* Set destination directory of upload.
   destination: function (req, file, cb) {
     cb(null, IMAGE_UPLOAD_DIRECTORY);
   },
+
+  //* Set uploaded file name.
   filename: function (req, file, cb) {
     // console.log("file: ", file);
     cb(null, Date.now() + ".jpg");
   },
+
+  //* Set uploaded file filter as image file.
   fileFilter: function (req, file, callback) {
     var ext = path.extname(file.originalname);
     if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
@@ -20,33 +26,38 @@ const storage = multer.diskStorage({
     }
     callback(null, true);
   },
+
+  //* Set the maximum size of uploaded file as 1 MB.
   limits: {
     fileSize: 1024 * 1024,
   },
 });
 
-const app = nextConnect({
+const multerUpload = multer({ storage: diskStorageOptions });
+
+//*-----------------------------------------------------------------------------
+//* Define server logic process.
+//*-----------------------------------------------------------------------------
+const server = nextConnect({
   onError(error, req, res) {
     res
       .status(501)
-      .json({ error: `Sorry something Happened! ${error.message}` });
+      .json({ error: `Sorry, error happened. message: ${error.message}` });
   },
   onNoMatch(req, res) {
     res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
   },
 });
 
-const upload = multer({ storage: storage });
-
-app.use(function (req, res, next) {
+server.use(function (req, res, next) {
   console.log("call nextConnect use()");
   upload.single("image_data");
 
   next();
 });
 
-app.post(upload.single("image_data"), function (req, res) {
-  // console.log("call image_upload");
+server.post(multerUpload.single("image_data"), function (req, res) {
+  // console.log("call /upload_image");
   // console.log("req.body.plain_message: ", req.body.plain_message);
   // console.log("req.body.sign_message: ", req.body.sign_message);
 
@@ -69,10 +80,11 @@ app.post(upload.single("image_data"), function (req, res) {
   }
 });
 
-export default app;
+export default server;
 
 export const config = {
   api: {
-    bodyParser: false, // Disallow body parsing, consume as stream
+    //* Disallow body parsing, consume as stream
+    bodyParser: false,
   },
 };
