@@ -55,7 +55,13 @@ const TakePicture = ({
     // console.log("window.innerWidth: ", window.innerWidth);
     // console.log("window.innerHeight: ", window.innerHeight);
     takePictureFuncRef.current = takePicture;
-  }, [getImageDataUrlFunc, takePictureFuncRef, rentMarketRef]);
+  }, [
+    getImageDataUrlFunc,
+    takePictureFuncRef,
+    takePictureFuncRef.current,
+    rentMarketRef,
+    rentMarketRef.current,
+  ]);
 
   //*---------------------------------------------------------------------------
   //* Download picture function.
@@ -142,10 +148,9 @@ const TakePicture = ({
                 onClick={async () => {
                   let response;
                   try {
-                    response = await isUserAllowed({
-                      rentMarket: rentMarketRef.current,
-                    	address: address,
-                    });
+                    response = await rentMarketRef.current.isOwnerOrRenter(
+                      address
+                    );
                   } catch (error) {
                     console.error(error);
                     setSnackbarValue({
@@ -156,8 +161,8 @@ const TakePicture = ({
                     });
                     return;
                   }
-
                   // console.log("response: ", response);
+
                   if (response === false) {
                     setSnackbarValue({
                       snackbarSeverity: AlertSeverity.warning,

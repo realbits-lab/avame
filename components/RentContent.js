@@ -88,6 +88,9 @@ const RentContent = ({
   React.useEffect(() => {
     // console.log("call useEffect()");
 
+    //* Initialize data before getting rent market class and data.
+    onEventFunc();
+
     async function initRentMarket() {
       // console.log("rentMarketAddress: ", rentMarketAddress);
       rentMarket.current = new RentMarket({
@@ -131,18 +134,31 @@ const RentContent = ({
     serviceAddress,
     openMyFuncRef,
     openMarketFuncRef,
+    address,
+    isConnected,
+    selectedChain,
   ]);
 
   function onEventFunc(message) {
     // console.log("call onEventFunc()");
 
-    setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
-    setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
-    setRegisterNFTArray(rentMarket.current.registerNFTArray);
-    setMyRentNFTArray(rentMarket.current.myRentNFTArray);
-    setCollectionArray(rentMarket.current.collectionArray);
-    setServiceArray(rentMarket.current.serviceArray);
-    setTokenArray(rentMarket.current.tokenArray);
+    if (rentMarket.current === undefined || rentMarket.current === null) {
+      setMyRegisteredNFTArray(undefined);
+      setMyUnregisteredNFTArray(undefined);
+      setRegisterNFTArray(undefined);
+      setMyRentNFTArray(undefined);
+      setCollectionArray(undefined);
+      setServiceArray(undefined);
+      setTokenArray(undefined);
+    } else {
+      setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
+      setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
+      setRegisterNFTArray(rentMarket.current.registerNFTArray);
+      setMyRentNFTArray(rentMarket.current.myRentNFTArray);
+      setCollectionArray(rentMarket.current.collectionArray);
+      setServiceArray(rentMarket.current.serviceArray);
+      setTokenArray(rentMarket.current.tokenArray);
+    }
 
     // console.log(
     //   "rentMarket.current.registerNFTArray: ",
@@ -159,7 +175,7 @@ const RentContent = ({
 
     if (message) {
       // console.log("message: ", message);
-      // TODO: Show toast message.
+      //* TODO: Show toast message.
     }
   }
 
@@ -224,7 +240,7 @@ const RentContent = ({
             inputBlockchainNetwork={blockchainNetwork}
             setWriteToastMessage={setWriteToastMessage}
             web3modalSelectedChain={selectedChain}
-            wagmiIsConnected={address}
+            wagmiIsConnected={isConnected}
           />
         </Grid>
       </RBDialog>
