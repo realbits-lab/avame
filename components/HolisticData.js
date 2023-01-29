@@ -17,7 +17,7 @@ import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 
 function HolisticData({ currentVrmRef }) {
-  console.log("call HolisticData()");
+  // console.log("call HolisticData()");
 
   let oldLookTarget = new THREE.Euler();
 
@@ -36,7 +36,7 @@ function HolisticData({ currentVrmRef }) {
   const guideCanvasElementRef = React.useRef();
 
   React.useEffect(() => {
-    console.log("call useEffet()");
+    // console.log("call useEffet()");
 
     sourceVideoElementRef.current = document.getElementById("sourceVideo");
     guideCanvasElementRef.current = document.getElementById("guideCanvas");
@@ -82,21 +82,21 @@ function HolisticData({ currentVrmRef }) {
       //*-----------------------------------------------------------------------
       const camera = new CameraUtils.Camera(sourceVideoElementRef.current, {
         onFrame: async () => {
-          console.log("call onFrame()");
+          // console.log("call onFrame()");
 
           deltaRef.current += clock.getDelta();
           // console.log("deltaRef.current: ", deltaRef.current);
           if (deltaRef.current > interval) {
             if (isMobile === true) {
               if (faceMeshRef.current) {
-                console.log("call faceMeshRef.current.send()");
+                // console.log("call faceMeshRef.current.send()");
                 await faceMeshRef.current.send({
                   image: sourceVideoElementRef.current,
                 });
               }
             } else {
               if (holisticMeshRef.current) {
-                console.log("call holisticMeshRef.current.send()");
+                // console.log("call holisticMeshRef.current.send()");
                 await holisticMeshRef.current.send({
                   image: sourceVideoElementRef.current,
                 });
@@ -129,9 +129,9 @@ function HolisticData({ currentVrmRef }) {
   }
 
   function initializeFaceMesh({ default: inputLib }) {
-    console.log("call initializeFaceMesh()");
-    console.log("inputLib: ", inputLib);
-    console.log("isMobile: ", isMobile);
+    // console.log("call initializeFaceMesh()");
+    // console.log("inputLib: ", inputLib);
+    // console.log("isMobile: ", isMobile);
 
     if (isMobile === true) {
       //*---------------------------------------------------------------------------
@@ -142,7 +142,7 @@ function HolisticData({ currentVrmRef }) {
           return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
         },
       });
-      console.log("faceMeshRef.current: ", faceMeshRef.current);
+      // console.log("faceMeshRef.current: ", faceMeshRef.current);
 
       faceMeshRef.current.setOptions({
         maxNumFaces: 1,
@@ -156,8 +156,8 @@ function HolisticData({ currentVrmRef }) {
   }
 
   function onFaceMeshResults(results) {
-    console.log("call onFaceMeshResults()");
-    console.log("results: ", results);
+    // console.log("call onFaceMeshResults()");
+    // console.log("results: ", results);
 
     //* Draw landmark guides
     drawResults(results);
