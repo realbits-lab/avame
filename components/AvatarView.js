@@ -93,7 +93,6 @@ function AvatarView({
   const AVATAR_CANVAS_CAPTURE_FRAME_RATE = 20;
   const WHITE_COLOR_HEX = 0xffffff;
   const CIRCULAR_PROGRESS_SIZE = 112;
-  const isFirstCall = React.useRef(true);
 
   React.useEffect(() => {
     // console.log("call useEffect()");
@@ -123,15 +122,6 @@ function AvatarView({
     getMediaStreamFunc,
     setTransformAvatarFunc,
   ]);
-
-  React.useEffect(() => {
-    // console.log("call useEffect()");
-
-    if (isFirstCall.current === true) {
-      // * Holistic function should be called only once.
-      isFirstCall.current = false;
-    }
-  }, []);
 
   const setBackgroundVideo = ({ canvasPosition, screenVideoStreamRef }) => {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
