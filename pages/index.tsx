@@ -101,16 +101,20 @@ const Service = () => {
       {/* //*----------------------------------------------------------------*/}
       {/* //* RentContent component.                                         */}
       {/* //*----------------------------------------------------------------*/}
-      <RentContent
-        selectAvatarFunc={selectAvatarFunc}
-        rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
-        blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
-        testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
-        serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+      <WagmiConfig client={wagmiClient}>
+        <RentContent
+          selectAvatarFunc={selectAvatarFunc}
+          rentMarketAddress={
+            process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
+          }
+          blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+          testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+          serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+      </WagmiConfig>
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* AvatarView component.                                           */}
@@ -129,11 +133,13 @@ const Service = () => {
       {/*//*-----------------------------------------------------------------*/}
       {/*//*TakePicture component.                                           */}
       {/*//*-----------------------------------------------------------------*/}
-      <TakePicture
-        getImageDataUrlFunc={getImageDataUrl}
-        takePictureFuncRef={takePictureFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+      <WagmiConfig client={wagmiClient}>
+        <TakePicture
+          getImageDataUrlFunc={getImageDataUrl}
+          takePictureFuncRef={takePictureFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+      </WagmiConfig>
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Fab menu button.                                                */}
@@ -151,6 +157,11 @@ const Service = () => {
         openMarketFuncRef={openMarketFuncRef}
         stopScreenEventFuncRef={stopScreenEventFuncRef}
         rentMarketRef={rentMarketRef}
+      />
+
+      <Web3Modal
+        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
+        ethereumClient={ethereumClient}
       />
     </>
   );

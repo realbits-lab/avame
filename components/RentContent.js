@@ -197,25 +197,27 @@ const RentContent = ({
         inputTitle={"My Avatar List"}
       >
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item>
             <Web3Button />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item>
             <Web3NetworkSwitch />
           </Grid>
+          <Grid item>
+            <My
+              selectAvatarFunc={selectAvatarFunc}
+              inputRentMarket={inputRentMarket}
+              inputCollectionArray={collectionArray}
+              inputServiceAddress={serviceAddress}
+              inputMyRegisteredNFTArray={myRegisteredNFTArray}
+              inputMyRentNFTArray={myRentNFTArray}
+              inputBlockchainNetwork={blockchainNetwork}
+              setWriteToastMessage={setWriteToastMessage}
+              web3modalSelectedChain={selectedChain}
+              wagmiIsConnected={address}
+            />
+          </Grid>
         </Grid>
-        <My
-          selectAvatarFunc={selectAvatarFunc}
-          inputRentMarket={inputRentMarket}
-          inputCollectionArray={collectionArray}
-          inputServiceAddress={serviceAddress}
-          inputMyRegisteredNFTArray={myRegisteredNFTArray}
-          inputMyRentNFTArray={myRentNFTArray}
-          inputBlockchainNetwork={blockchainNetwork}
-          setWriteToastMessage={setWriteToastMessage}
-          web3modalSelectedChain={selectedChain}
-          wagmiIsConnected={address}
-        />
       </RBDialog>
 
       {/*//*-----------------------------------------------------------------*/}
