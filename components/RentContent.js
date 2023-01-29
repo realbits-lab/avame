@@ -5,6 +5,8 @@ import {
   useWeb3ModalNetwork,
 } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount } from "wagmi";
 import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
@@ -206,33 +208,22 @@ const RentContent = ({
           justifyContent="flex-start"
           alignItems="flex-start"
         >
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-around"
-            alignItems="stretch"
-          >
-            <Grid item xs={6}>
-              <Web3Button />
-            </Grid>
-            <Grid item xs={6}>
-              <Web3NetworkSwitch />
-            </Grid>
+          <Grid container direction="row" justifyContent="space-around">
+            <Web3Button />
+            <Web3NetworkSwitch />
           </Grid>
-          <Grid item>
-            <My
-              selectAvatarFunc={selectAvatarFunc}
-              inputRentMarket={inputRentMarket}
-              inputCollectionArray={collectionArray}
-              inputServiceAddress={serviceAddress}
-              inputMyRegisteredNFTArray={myRegisteredNFTArray}
-              inputMyRentNFTArray={myRentNFTArray}
-              inputBlockchainNetwork={blockchainNetwork}
-              setWriteToastMessage={setWriteToastMessage}
-              web3modalSelectedChain={selectedChain}
-              wagmiIsConnected={address}
-            />
-          </Grid>
+          <My
+            selectAvatarFunc={selectAvatarFunc}
+            inputRentMarket={inputRentMarket}
+            inputCollectionArray={collectionArray}
+            inputServiceAddress={serviceAddress}
+            inputMyRegisteredNFTArray={myRegisteredNFTArray}
+            inputMyRentNFTArray={myRentNFTArray}
+            inputBlockchainNetwork={blockchainNetwork}
+            setWriteToastMessage={setWriteToastMessage}
+            web3modalSelectedChain={selectedChain}
+            wagmiIsConnected={address}
+          />
         </Grid>
       </RBDialog>
 

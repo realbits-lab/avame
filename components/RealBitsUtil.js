@@ -105,6 +105,9 @@ export const RBDialog = ({
           throw error;
         }
       }}
+      onClick={function () {
+        console.log("call onClick()");
+      }}
       TransitionComponent={transitionComponent}
       keepMounted={keepMounted}
       scroll="paper"
@@ -114,7 +117,7 @@ export const RBDialog = ({
           backgroundColor: "transparent",
         },
         sx: {
-          position: "absolute",
+          // position: "absolute",
           m: 0,
         },
       }}

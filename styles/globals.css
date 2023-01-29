@@ -98,3 +98,7 @@ a {
     color-scheme: dark;
   }
 }
+
+.w3m-modal.w3m-overlay.w3m-open {
+  z-index: 2000 !important;
+}
