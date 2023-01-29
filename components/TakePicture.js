@@ -1,6 +1,9 @@
 import React from "react";
+import { ethers } from "ethers";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import { useAccount } from "wagmi";
+import { isMobile } from "react-device-detect";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -220,13 +223,40 @@ const TakePicture = ({
                   //* Sign message.
                   const message =
                     "You sign this message for authenticating server.";
-                  const signMessageResponse = await signMessage({
-                    rentMarket: rentMarketRef.current,
-                    message: message,
-                  });
-                  // console.log("signMessageResponse: ", signMessageResponse);
+
+                  let signMessageResponse;
+                  if (isMobile === true) {
+                    // * Create WalletConnect Provider.
+                    let provider;
+                    if (isMobile === true) {
+                      provider = new WalletConnectProvider({
+                        rpc: {
+                          137: "https://rpc-mainnet.maticvigil.com",
+                          80001: "https://rpc-mumbai.maticvigil.com/",
+                        },
+                        infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                      });
+
+                      // * Enable session (triggers QR Code modal).
+                      await provider.enable();
+                      // console.log("provider: ", provider);
+                      const web3Provider = new ethers.providers.Web3Provider(
+                        provider
+                      );
+                      // console.log("web3Provider: ", web3Provider);
+                      const signer = web3Provider.getSigner();
+                      signMessageResponse = await signer.signMessage(message);
+                    }
+                  } else {
+                    signMessageResponse = await signMessage({
+                      rentMarket: rentMarketRef.current,
+                      message: message,
+                    });
+                  }
+                  console.log("signMessageResponse: ", signMessageResponse);
+
                   setInputPlainMessage(message);
-                  setInputSignerAddress(rentMarketRef.current.signerAddress);
+                  setInputSignerAddress(address);
                   setInputSignMessage(signMessageResponse);
 
                   //* Show twitter dialog for uploading image.

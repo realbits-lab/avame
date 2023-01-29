@@ -23,8 +23,6 @@ const Twitter = ({
   //*---------------------------------------------------------------------------
   //* Define constant variables.
   //*---------------------------------------------------------------------------
-  const TWITTER_DIALOG_WIDTH = 500;
-  const TWITTER_DIALOG_HEIGHT = 400;
   const TWITTER_AUTH_API_URL = "/api/twitter/auth";
   const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_image";
   const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload_video";
@@ -208,7 +206,7 @@ const Twitter = ({
                 } catch (error) {
                   throw error;
                 }
-                // console.log("uploadResponse: ", uploadResponse);
+                console.log("uploadResponse: ", uploadResponse);
 
                 if (uploadResponse.error || uploadResponse.path === undefined) {
                   console.error("Upload process is not valid.");
@@ -216,16 +214,16 @@ const Twitter = ({
                 }
 
                 const uploadedFilePath = uploadResponse.path;
-                // console.log("uploadedFilePath: ", uploadedFilePath);
+                console.log("uploadedFilePath: ", uploadedFilePath);
 
                 try {
                   const response = await axios.get(
                     `${TWITTER_AUTH_API_URL}?path=${uploadedFilePath}&twitterText=${twitterText}`
                   );
-                  // console.log("response: ", response);
+                  console.log("response: ", response);
 
                   if (response.status === 200) {
-                    window.open(response.data.url);
+                    window.location.assign(response.data.url);
                   } else {
                     // TODO: Handle response error.
                     console.error(response);

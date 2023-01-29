@@ -114,50 +114,48 @@ const Service = () => {
           openMarketFuncRef={openMarketFuncRef}
           rentMarketRef={rentMarketRef}
         />
-      </WagmiConfig>
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* AvatarView component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <AvatarView
-        gltfDataUrl={avatarUrl}
-        getImageDataUrlFunc={getImageDataUrl}
-        // VideoChat -> AvatarView call for new Remon.
-        // TakeVideo -> AvatarView call for recording video.
-        getMediaStreamFunc={getMediaStreamFuncRef}
-        // VideoChat -> AvatarView call for changing avatar canvas position.
-        // ScreenView -> AvatarView call for changing avatar canvas position.
-        setTransformAvatarFunc={setTransformAvatarFuncRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* AvatarView component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <AvatarView
+          gltfDataUrl={avatarUrl}
+          getImageDataUrlFunc={getImageDataUrl}
+          // VideoChat -> AvatarView call for new Remon.
+          // TakeVideo -> AvatarView call for recording video.
+          getMediaStreamFunc={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          // ScreenView -> AvatarView call for changing avatar canvas position.
+          setTransformAvatarFunc={setTransformAvatarFuncRef}
+        />
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//*TakePicture component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <WagmiConfig client={wagmiClient}>
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//*TakePicture component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
         <TakePicture
           getImageDataUrlFunc={getImageDataUrl}
           takePictureFuncRef={takePictureFuncRef}
           rentMarketRef={rentMarketRef}
         />
-      </WagmiConfig>
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* Fab menu button.                                                */}
-      {/*//*-----------------------------------------------------------------*/}
-      <ButtonMenu
-        useFab={true}
-        startScreenStreamFuncRef={startScreenStreamFuncRef}
-        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
-        takePictureFuncRef={takePictureFuncRef}
-        startRecordingFuncRef={startRecordingFuncRef}
-        stopRecordingFuncRef={stopRecordingFuncRef}
-        getRecordStatusFuncRef={getRecordStatusFuncRef}
-        requestDataFuncRef={requestDataFuncRef}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        stopScreenEventFuncRef={stopScreenEventFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Fab menu button.                                                */}
+        {/*//*-----------------------------------------------------------------*/}
+        <ButtonMenu
+          useFab={true}
+          startScreenStreamFuncRef={startScreenStreamFuncRef}
+          stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+          takePictureFuncRef={takePictureFuncRef}
+          startRecordingFuncRef={startRecordingFuncRef}
+          stopRecordingFuncRef={stopRecordingFuncRef}
+          getRecordStatusFuncRef={getRecordStatusFuncRef}
+          requestDataFuncRef={requestDataFuncRef}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          stopScreenEventFuncRef={stopScreenEventFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+      </WagmiConfig>
 
       <Web3Modal
         projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
