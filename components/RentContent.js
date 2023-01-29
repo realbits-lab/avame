@@ -1,6 +1,11 @@
 import React from "react";
+import {
+  Web3Button,
+  Web3NetworkSwitch,
+  useWeb3ModalNetwork,
+} from "@web3modal/react";
+import Grid from "@mui/material/Grid";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { useWeb3ModalNetwork } from "@web3modal/react";
 import { useAccount } from "wagmi";
 import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
 import {
@@ -191,6 +196,14 @@ const RentContent = ({
         inputSetOpenRBDialogFunc={setOpenMyDialog}
         inputTitle={"My Avatar List"}
       >
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Web3Button />
+          </Grid>
+          <Grid item xs={6}>
+            <Web3NetworkSwitch />
+          </Grid>
+        </Grid>
         <My
           selectAvatarFunc={selectAvatarFunc}
           inputRentMarket={inputRentMarket}
