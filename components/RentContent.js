@@ -30,9 +30,9 @@ const RentContent = ({
   //* Web3 hook variables.
   //* --------------------------------------------------------------------------
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  console.log("selectedChain: ", selectedChain);
+  // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
-  console.log("address: ", address);
+  // console.log("address: ", address);
   // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
@@ -136,7 +136,7 @@ const RentContent = ({
   ]);
 
   function onEventFunc(message) {
-    console.log("call onEventFunc()");
+    // console.log("call onEventFunc()");
 
     setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
     setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
@@ -146,14 +146,14 @@ const RentContent = ({
     setServiceArray(rentMarket.current.serviceArray);
     setTokenArray(rentMarket.current.tokenArray);
 
-    console.log(
-      "rentMarket.current.registerNFTArray: ",
-      rentMarket.current.registerNFTArray
-    );
-    console.log(
-      "rentMarket.current.myRentNFTArray: ",
-      rentMarket.current.myRentNFTArray
-    );
+    // console.log(
+    //   "rentMarket.current.registerNFTArray: ",
+    //   rentMarket.current.registerNFTArray
+    // );
+    // console.log(
+    //   "rentMarket.current.myRentNFTArray: ",
+    //   rentMarket.current.myRentNFTArray
+    // );
     // console.log(
     //   "rentMarket.current.collectionArray: ",
     //   rentMarket.current.collectionArray
