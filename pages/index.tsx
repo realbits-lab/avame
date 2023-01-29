@@ -101,56 +101,66 @@ const Service = () => {
       {/* //*----------------------------------------------------------------*/}
       {/* //* RentContent component.                                         */}
       {/* //*----------------------------------------------------------------*/}
-      <RentContent
-        selectAvatarFunc={selectAvatarFunc}
-        rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
-        blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
-        testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
-        serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+      <WagmiConfig client={wagmiClient}>
+        <RentContent
+          selectAvatarFunc={selectAvatarFunc}
+          rentMarketAddress={
+            process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
+          }
+          blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+          testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+          serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* AvatarView component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <AvatarView
-        gltfDataUrl={avatarUrl}
-        getImageDataUrlFunc={getImageDataUrl}
-        // VideoChat -> AvatarView call for new Remon.
-        // TakeVideo -> AvatarView call for recording video.
-        getMediaStreamFunc={getMediaStreamFuncRef}
-        // VideoChat -> AvatarView call for changing avatar canvas position.
-        // ScreenView -> AvatarView call for changing avatar canvas position.
-        setTransformAvatarFunc={setTransformAvatarFuncRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* AvatarView component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <AvatarView
+          gltfDataUrl={avatarUrl}
+          getImageDataUrlFunc={getImageDataUrl}
+          // VideoChat -> AvatarView call for new Remon.
+          // TakeVideo -> AvatarView call for recording video.
+          getMediaStreamFunc={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          // ScreenView -> AvatarView call for changing avatar canvas position.
+          setTransformAvatarFunc={setTransformAvatarFuncRef}
+        />
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//*TakePicture component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <TakePicture
-        getImageDataUrlFunc={getImageDataUrl}
-        takePictureFuncRef={takePictureFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//*TakePicture component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <TakePicture
+          getImageDataUrlFunc={getImageDataUrl}
+          takePictureFuncRef={takePictureFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* Fab menu button.                                                */}
-      {/*//*-----------------------------------------------------------------*/}
-      <ButtonMenu
-        useFab={true}
-        startScreenStreamFuncRef={startScreenStreamFuncRef}
-        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
-        takePictureFuncRef={takePictureFuncRef}
-        startRecordingFuncRef={startRecordingFuncRef}
-        stopRecordingFuncRef={stopRecordingFuncRef}
-        getRecordStatusFuncRef={getRecordStatusFuncRef}
-        requestDataFuncRef={requestDataFuncRef}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        stopScreenEventFuncRef={stopScreenEventFuncRef}
-        rentMarketRef={rentMarketRef}
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Fab menu button.                                                */}
+        {/*//*-----------------------------------------------------------------*/}
+        <ButtonMenu
+          useFab={true}
+          startScreenStreamFuncRef={startScreenStreamFuncRef}
+          stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+          takePictureFuncRef={takePictureFuncRef}
+          startRecordingFuncRef={startRecordingFuncRef}
+          stopRecordingFuncRef={stopRecordingFuncRef}
+          getRecordStatusFuncRef={getRecordStatusFuncRef}
+          requestDataFuncRef={requestDataFuncRef}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          stopScreenEventFuncRef={stopScreenEventFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+      </WagmiConfig>
+
+      <Web3Modal
+        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
+        ethereumClient={ethereumClient}
+        themeZIndex={20000}
       />
     </>
   );

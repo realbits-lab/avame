@@ -1,9 +1,15 @@
 import React from "react";
+import { ethers } from "ethers";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
+import { useAccount } from "wagmi";
+import { isMobile } from "react-device-detect";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "@mui/icons-material/Download";
 import TwitterIcon from "@mui/icons-material/Twitter";
@@ -24,6 +30,7 @@ const TakePicture = ({
   //*---------------------------------------------------------------------------
   //* Variables.
   //*---------------------------------------------------------------------------
+  const { address, isConnected } = useAccount();
   const USER_NOT_ALLOW_MESSAGE =
     "Your account must own or rent NFT in polygon network. Check metamask wallet.";
 
@@ -51,7 +58,13 @@ const TakePicture = ({
     // console.log("window.innerWidth: ", window.innerWidth);
     // console.log("window.innerHeight: ", window.innerHeight);
     takePictureFuncRef.current = takePicture;
-  }, [getImageDataUrlFunc, takePictureFuncRef, rentMarketRef]);
+  }, [
+    getImageDataUrlFunc,
+    takePictureFuncRef,
+    takePictureFuncRef.current,
+    rentMarketRef,
+    rentMarketRef.current,
+  ]);
 
   //*---------------------------------------------------------------------------
   //* Download picture function.
@@ -105,117 +118,161 @@ const TakePicture = ({
         inputSetOpenRBDialogFunc={setOpenDialog}
         inputTitle={"Take a picture"}
       >
-        <Card>
-          {/*//*-------------------------------------------------------------*/}
-          {/*//* Show card image.                                            */}
-          {/*//*-------------------------------------------------------------*/}
-          <CardMedia component="img" image={imageDataUrl} alt="Preview image" />
-          <CardContent>
-            <Typography variant="body2" color="text.secondary">
-              You can download image picture by clicking file button below.
-            </Typography>
-          </CardContent>
+        <Grid
+          container
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <Grid container direction="row" justifyContent="space-around">
+            <Web3Button />
+            <Web3NetworkSwitch />
+          </Grid>
+          <Card sx={{ marginTop: "10px" }}>
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Show card image.                                            */}
+            {/*//*-------------------------------------------------------------*/}
+            <CardContent>
+              <Typography variant="caption" color="text.secondary">
+                * You can download image or upload it to twitter.
+              </Typography>
+            </CardContent>
 
-          {/*//*-------------------------------------------------------------*/}
-          {/*//* Show file download button.                                  */}
-          {/*//*-------------------------------------------------------------*/}
-          <CardActions disableSpacing>
-            {/*//*-----------------------------------------------------------*/}
-            {/*//* Download button.                                          */}
-            {/*//*-----------------------------------------------------------*/}
-            <IconButton
-              aria-label="download"
-              onClick={async () => {
-                let response;
-                try {
-                  response = await isUserAllowed({
-                    rentMarket: rentMarketRef.current,
-                  });
-                } catch (error) {
-                  console.error(error);
-                  setSnackbarValue({
-                    snackbarSeverity: AlertSeverity.warning,
-                    snackbarMessage: USER_NOT_ALLOW_MESSAGE,
-                    snackbarTime: new Date(),
-                    snackbarOpen: true,
-                  });
-                  return;
-                }
+            {/*//*-------------------------------------------------------------*/}
+            {/*//* Show file download button.                                  */}
+            {/*//*-------------------------------------------------------------*/}
+            <CardActions sx={{ justifyContent: "space-around" }}>
+              {/*//*-----------------------------------------------------------*/}
+              {/*//* Download button.                                          */}
+              {/*//*-----------------------------------------------------------*/}
+              <Button
+                variant="contained"
+                aria-label="download"
+                onClick={async () => {
+                  let response;
+                  try {
+                    response = await rentMarketRef.current.isOwnerOrRenter(
+                      address
+                    );
+                  } catch (error) {
+                    console.error(error);
+                    setSnackbarValue({
+                      snackbarSeverity: AlertSeverity.warning,
+                      snackbarMessage: USER_NOT_ALLOW_MESSAGE,
+                      snackbarTime: new Date(),
+                      snackbarOpen: true,
+                    });
+                    return;
+                  }
+                  // console.log("response: ", response);
 
-                // console.log("response: ", response);
-                if (response === false) {
-                  setSnackbarValue({
-                    snackbarSeverity: AlertSeverity.warning,
-                    snackbarMessage: USER_NOT_ALLOW_MESSAGE,
-                    snackbarTime: new Date(),
-                    snackbarOpen: true,
-                  });
-                  return;
-                }
+                  if (response === false) {
+                    setSnackbarValue({
+                      snackbarSeverity: AlertSeverity.warning,
+                      snackbarMessage: USER_NOT_ALLOW_MESSAGE,
+                      snackbarTime: new Date(),
+                      snackbarOpen: true,
+                    });
+                    return;
+                  }
 
-                downloadImage(imageDataUrl);
-              }}
-            >
-              <DownloadIcon />
-            </IconButton>
+                  downloadImage(imageDataUrl);
+                }}
+              >
+                <DownloadIcon />
+              </Button>
 
-            {/*//*-----------------------------------------------------------*/}
-            {/*//* Twitter upload button.                                    */}
-            {/*//*-----------------------------------------------------------*/}
-            <IconButton
-              aria-label="twitter"
-              onClick={async function () {
-                // console.log("call onClick()");
+              {/*//*-----------------------------------------------------------*/}
+              {/*//* Twitter upload button.                                    */}
+              {/*//*-----------------------------------------------------------*/}
+              <Button
+                variant="contained"
+                aria-label="twitter"
+                onClick={async function () {
+                  // console.log("call onClick()");
 
-                //* Check that user is allowed to upload image to twitter.
-                //* User has to rent or own NFT.
-                let response;
-                try {
-                  response = await isUserAllowed({
-                    rentMarket: rentMarketRef.current,
-                  });
-                } catch (error) {
-                  setSnackbarValue({
-                    snackbarSeverity: AlertSeverity.warning,
-                    snackbarMessage: USER_NOT_ALLOW_MESSAGE,
-                    snackbarTime: new Date(),
-                    snackbarOpen: true,
-                  });
-                  return;
-                }
-                // console.log("response: ", response);
+                  //* Check that user is allowed to upload image to twitter.
+                  //* User has to rent or own NFT.
+                  let response;
+                  try {
+                    response = await isUserAllowed({
+                      rentMarket: rentMarketRef.current,
+                    });
+                  } catch (error) {
+                    setSnackbarValue({
+                      snackbarSeverity: AlertSeverity.warning,
+                      snackbarMessage: USER_NOT_ALLOW_MESSAGE,
+                      snackbarTime: new Date(),
+                      snackbarOpen: true,
+                    });
+                    return;
+                  }
+                  // console.log("response: ", response);
 
-                //* User does not have right to upload image to twitter.
-                if (response === false) {
-                  setSnackbarValue({
-                    snackbarSeverity: AlertSeverity.warning,
-                    snackbarMessage: USER_NOT_ALLOW_MESSAGE,
-                    snackbarTime: new Date(),
-                    snackbarOpen: true,
-                  });
-                  return;
-                }
+                  //* User does not have right to upload image to twitter.
+                  if (response === false) {
+                    setSnackbarValue({
+                      snackbarSeverity: AlertSeverity.warning,
+                      snackbarMessage: USER_NOT_ALLOW_MESSAGE,
+                      snackbarTime: new Date(),
+                      snackbarOpen: true,
+                    });
+                    return;
+                  }
 
-                //* Sign message.
-                const message =
-                  "You sign this message for authenticating server.";
-                const signMessageResponse = await signMessage({
-                  rentMarket: rentMarketRef.current,
-                  message: message,
-                });
-                // console.log("signMessageResponse: ", signMessageResponse);
-                setInputPlainMessage(message);
-                setInputSignerAddress(rentMarketRef.current.signerAddress);
-                setInputSignMessage(signMessageResponse);
+                  //* Sign message.
+                  const message =
+                    "You sign this message for authenticating server.";
 
-                //* Show twitter dialog for uploading image.
-                setShowTwitterDialog(true);
-              }}
-            >
-              <TwitterIcon />
-            </IconButton>
-          </CardActions>
-        </Card>
+                  let signMessageResponse;
+                  if (isMobile === true) {
+                    // * Create WalletConnect Provider.
+                    let provider;
+                    if (isMobile === true) {
+                      provider = new WalletConnectProvider({
+                        rpc: {
+                          137: "https://rpc-mainnet.maticvigil.com",
+                          80001: "https://rpc-mumbai.maticvigil.com/",
+                        },
+                        infuraId: process.env.NEXT_PUBLIC_INFURA_KEY,
+                      });
+
+                      // * Enable session (triggers QR Code modal).
+                      await provider.enable();
+                      // console.log("provider: ", provider);
+                      const web3Provider = new ethers.providers.Web3Provider(
+                        provider
+                      );
+                      // console.log("web3Provider: ", web3Provider);
+                      const signer = web3Provider.getSigner();
+                      signMessageResponse = await signer.signMessage(message);
+                    }
+                  } else {
+                    signMessageResponse = await signMessage({
+                      rentMarket: rentMarketRef.current,
+                      message: message,
+                    });
+                  }
+                  console.log("signMessageResponse: ", signMessageResponse);
+
+                  setInputPlainMessage(message);
+                  setInputSignerAddress(address);
+                  setInputSignMessage(signMessageResponse);
+
+                  //* Show twitter dialog for uploading image.
+                  setShowTwitterDialog(true);
+                }}
+              >
+                <TwitterIcon />
+              </Button>
+            </CardActions>
+            <CardMedia
+              component="img"
+              image={imageDataUrl}
+              alt="Preview image"
+            />
+          </Card>
+        </Grid>
       </RBDialog>
 
       {/*//*-----------------------------------------------------------------*/}

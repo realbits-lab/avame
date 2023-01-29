@@ -6,7 +6,7 @@ import loadable from "@loadable/component";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
 import { humanFileSize } from "rent-market";
-
+import HolisticData from "./HolisticData";
 const Stats = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
   {
@@ -14,16 +14,13 @@ const Stats = loadable.lib(
   }
 );
 
-import createHolisticData from "./createHolisticData";
-const HolisticTrackData = loadable.lib(() => import("./createHolisticData"), {
-  ssr: false,
-});
-
 function AvatarView({
   gltfDataUrl,
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setTransformAvatarFunc,
+  showGuideCanvas = false,
+  showFrameStats = false,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -47,7 +44,7 @@ function AvatarView({
   //* Mesh transfomation data.
   //* - rotation, position, and scale
   //*---------------------------------------------------------------------------
-  const INTERVAL_FRAME_COUNT = 30;
+  const FRAME_COUNT = 60;
 
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.
@@ -55,7 +52,7 @@ function AvatarView({
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
-  const INTERVAL = React.useRef(1 / INTERVAL_FRAME_COUNT);
+  const INTERVAL = React.useRef(1 / FRAME_COUNT);
   const clock = React.useRef();
   const statsLib = React.useRef();
   const currentWindowRatioRef = React.useRef(1);
@@ -87,9 +84,6 @@ function AvatarView({
   const currentOrbitCameraPositionYRef = React.useRef(0.6);
   const currentOrbitCameraPositionZRef = React.useRef(0);
 
-  //* Guide canvas element.
-  const [showGuideCanvas, setShowGuideCanvas] = React.useState(true);
-
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
   //*---------------------------------------------------------------------------
@@ -99,7 +93,6 @@ function AvatarView({
   const AVATAR_CANVAS_CAPTURE_FRAME_RATE = 20;
   const WHITE_COLOR_HEX = 0xffffff;
   const CIRCULAR_PROGRESS_SIZE = 112;
-  const isFirstCall = React.useRef(true);
 
   React.useEffect(() => {
     // console.log("call useEffect()");
@@ -130,27 +123,6 @@ function AvatarView({
     setTransformAvatarFunc,
   ]);
 
-  React.useEffect(() => {
-    // console.log("call useEffect()");
-
-    if (isFirstCall.current === true) {
-      // * Holistic function should be called only once.
-      isFirstCall.current = false;
-
-      const initialize = async () => {
-        const sourceVideoElement = document.getElementById("sourceVideo");
-        const guideCanvasElement = document.getElementById("guideCanvas");
-        await createHolisticData(
-          currentVrmRef,
-          sourceVideoElement,
-          guideCanvasElement
-        );
-      };
-
-      initialize();
-    }
-  }, []);
-
   const setBackgroundVideo = ({ canvasPosition, screenVideoStreamRef }) => {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
     if (
@@ -176,7 +148,9 @@ function AvatarView({
       // console.log("textureVideoBackground: ", textureVideoBackground);
     } else {
       sceneRef.current.background = new THREE.Color(WHITE_COLOR_HEX);
-      avatarCanvas.current.style.border = "";
+      if (avatarCanvas.current) {
+        avatarCanvas.current.style.border = "";
+      }
     }
   };
 
@@ -261,18 +235,17 @@ function AvatarView({
 
   function initializeStats({ default: inputStatsLib }) {
     // console.log("initializeStats inputStatsLib: ", inputStatsLib);
-    statsLib.current = new inputStatsLib();
-    // document.body.appendChild(statsLib.current.dom);
-  }
 
-  function setInterval(interval) {
-    INTERVAL.current = interval;
+    if (showFrameStats === true) {
+      statsLib.current = new inputStatsLib();
+      document.body.appendChild(statsLib.current.dom);
+    }
   }
 
   function getImageDataUrl() {
     //* Make a temporary canvas for a static size.
     const resizedCanvas = document.createElement("canvas");
-    console.log("resizedCanvas: ", resizedCanvas);
+    // console.log("resizedCanvas: ", resizedCanvas);
     resizedCanvas.width = IMAGE_SNAPSHOT_WIDTH;
     resizedCanvas.height =
       (resizedCanvas.width * (window.innerHeight || IMAGE_SNAPSHOT_WIDTH)) /
@@ -298,7 +271,7 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeContent(url) {
-    console.log("initializeContent function url: ", url);
+    // console.log("initializeContent function url: ", url);
 
     makeContentInstance();
     await loadGLTF(url);
@@ -516,12 +489,16 @@ function AvatarView({
           deltaRef.current += clock.current.getDelta();
           // console.log("deltaRef.current: ", deltaRef.current);
           // console.log("INTERVAL.current: ", INTERVAL.current);
+
           if (deltaRef.current > INTERVAL.current) {
+            // console.log("render");
             renderAvatar();
             deltaRef.current = deltaRef.current % INTERVAL.current;
 
-            //* Update stat.
-            // statsLib.current.update();
+            if (showFrameStats === true) {
+              //* Update stat.
+              statsLib.current.update();
+            }
           }
         });
 
@@ -549,12 +526,12 @@ function AvatarView({
   }
 
   function adjustCamera({ gltf }) {
-    console.log("call adjustCamera()");
-    console.log("gltf: ", gltf);
+    // console.log("call adjustCamera()");
+    // console.log("gltf: ", gltf);
 
     if (gltf.cameras.length > 0) {
       const camera = gltf.cameras[0];
-      console.log("camera: ", camera);
+      // console.log("camera: ", camera);
 
       orbitCameraRef.current.ratio = camera.aspect;
       orbitCameraRef.current.fov = camera.fov;
@@ -650,6 +627,8 @@ function AvatarView({
         muted={true}
         loop={true}
         preload={"auto"}
+        width="1280px"
+        height="720px"
       ></video>
 
       {/*//*-----------------------------------------------------------------*/}
@@ -658,23 +637,26 @@ function AvatarView({
       <canvas id="avatarCanvas" ref={avatarCanvas}></canvas>
       <Stats ref={initializeStats}></Stats>
 
-      <Box
-        width="160px"
-        height="120px"
-        border={0}
-        borderColor="secondary.main"
-        hidden={!showGuideCanvas}
-        sx={{
-          top: 0,
-          left: 0,
-          zIndex: Z_INDEX.dialog,
-          position: "absolute",
-          display: "flex",
-          transform: "scale(-1, 1)",
-        }}
-      >
-        <canvas id="guideCanvas" ref={guideCanvasRef} />
-      </Box>
+      {showGuideCanvas ? (
+        <Box
+          width="160px"
+          height="120px"
+          border={0}
+          borderColor="secondary.main"
+          sx={{
+            top: 0,
+            left: 0,
+            zIndex: Z_INDEX.dialog,
+            position: "absolute",
+            display: "flex",
+            transform: "scale(-1, 1)",
+          }}
+        >
+          <canvas id="guideCanvas" ref={guideCanvasRef} />
+        </Box>
+      ) : null}
+
+      <HolisticData currentVrmRef={currentVrmRef} />
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* GLTF loading progress circle.                                   */}

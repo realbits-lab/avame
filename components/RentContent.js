@@ -1,9 +1,13 @@
 import React from "react";
+import {
+  Web3Button,
+  Web3NetworkSwitch,
+  useWeb3ModalNetwork,
+} from "@web3modal/react";
+import Grid from "@mui/material/Grid";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { useWeb3ModalNetwork } from "@web3modal/react";
 import { useAccount } from "wagmi";
 import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
-import "../node_modules/react-resizable/css/styles.css";
 import {
   RBDialog,
   writeToastMessageState,
@@ -20,6 +24,9 @@ const RentContent = ({
   openMarketFuncRef,
   rentMarketRef,
 }) => {
+  //* --------------------------------------------------------------------------
+  //* Web3 hook variables.
+  //* --------------------------------------------------------------------------
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
   // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
@@ -27,16 +34,8 @@ const RentContent = ({
   // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
-  //* Dialog open/close status.
-  //* --------------------------------------------------------------------------
-  // https://tkdodo.eu/blog/putting-props-to-use-state
-  const [openMyDialog, setOpenMyDialog] = React.useState(false);
-  const [openMarketDialog, setOpenMarketDialog] = React.useState(false);
-  const [windowWidth, setWindowWidth] = React.useState();
-  const [windowHeight, setWindowHeight] = React.useState();
-
-  //* --------------------------------------------------------------------------
   //* Rent market variables.
+  //* If undefined, it would be a loading status.
   //* --------------------------------------------------------------------------
   const rentMarket = React.useRef();
   const [myRegisteredNFTArray, setMyRegisteredNFTArray] = React.useState([]);
@@ -47,13 +46,19 @@ const RentContent = ({
   const [serviceArray, setServiceArray] = React.useState([]);
   const [tokenArray, setTokenArray] = React.useState([]);
   const [inputRentMarket, setInputRentMarket] = React.useState();
-
-  //* If undefined, it'd loading status.
   const [registerNFTArray, setRegisterNFTArray] = React.useState();
   const [myRentNFTArray, setMyRentNFTArray] = React.useState();
 
   //* --------------------------------------------------------------------------
-  //* Handle toast message.
+  //* Dialog variables.
+  //* --------------------------------------------------------------------------
+  const [openMyDialog, setOpenMyDialog] = React.useState(false);
+  const [openMarketDialog, setOpenMarketDialog] = React.useState(false);
+  const [windowWidth, setWindowWidth] = React.useState();
+  const [windowHeight, setWindowHeight] = React.useState();
+
+  //* --------------------------------------------------------------------------
+  //* Snackbar variables.
   //* --------------------------------------------------------------------------
   const [writeToastMessageLoadable, setWriteToastMessage] =
     useRecoilStateLoadable(writeToastMessageState);
@@ -80,15 +85,16 @@ const RentContent = ({
           snackbarOpen: true,
         };
 
-  //* --------------------------------------------------------------------------
-  //* Initialize data.
-  //* --------------------------------------------------------------------------
   React.useEffect(() => {
-    // console.log("call React.useEffect() with condition");
+    // console.log("call useEffect()");
 
-    const initRentMarket = async () => {
+    //* Initialize data before getting rent market class and data.
+    onEventFunc();
+
+    async function initRentMarket() {
       // console.log("rentMarketAddress: ", rentMarketAddress);
       rentMarket.current = new RentMarket({
+        accountAddress: address,
         rentMarketAddress,
         testNftAddress,
         blockchainNetwork,
@@ -105,7 +111,7 @@ const RentContent = ({
       }
       rentMarketRef.current = rentMarket.current;
       // console.log("rentMarketRef.current: ", rentMarketRef.current);
-    };
+    }
 
     setWindowWidth(window.innerWidth);
     setWindowHeight(window.innerHeight);
@@ -128,20 +134,36 @@ const RentContent = ({
     serviceAddress,
     openMyFuncRef,
     openMarketFuncRef,
+    address,
+    isConnected,
+    selectedChain,
   ]);
 
-  const onEventFunc = (message) => {
-    // Set data.
+  function onEventFunc(message) {
     // console.log("call onEventFunc()");
 
-    setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
-    setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
-    setRegisterNFTArray(rentMarket.current.registerNFTArray);
-    setMyRentNFTArray(rentMarket.current.myRentNFTArray);
-    setCollectionArray(rentMarket.current.collectionArray);
-    setServiceArray(rentMarket.current.serviceArray);
-    setTokenArray(rentMarket.current.tokenArray);
+    if (rentMarket.current === undefined || rentMarket.current === null) {
+      setMyRegisteredNFTArray(undefined);
+      setMyUnregisteredNFTArray(undefined);
+      setRegisterNFTArray(undefined);
+      setMyRentNFTArray(undefined);
+      setCollectionArray(undefined);
+      setServiceArray(undefined);
+      setTokenArray(undefined);
+    } else {
+      setMyRegisteredNFTArray(rentMarket.current.myRegisteredNFTArray);
+      setMyUnregisteredNFTArray(rentMarket.current.myUnregisteredNFTArray);
+      setRegisterNFTArray(rentMarket.current.registerNFTArray);
+      setMyRentNFTArray(rentMarket.current.myRentNFTArray);
+      setCollectionArray(rentMarket.current.collectionArray);
+      setServiceArray(rentMarket.current.serviceArray);
+      setTokenArray(rentMarket.current.tokenArray);
+    }
 
+    // console.log(
+    //   "rentMarket.current.registerNFTArray: ",
+    //   rentMarket.current.registerNFTArray
+    // );
     // console.log(
     //   "rentMarket.current.myRentNFTArray: ",
     //   rentMarket.current.myRentNFTArray
@@ -153,33 +175,28 @@ const RentContent = ({
 
     if (message) {
       // console.log("message: ", message);
-      // TODO: Show toast message.
+      //* TODO: Show toast message.
     }
-  };
+  }
 
-  const openMy = () => {
+  function openMy() {
     // console.log("call openMy()");
     setOpenMyDialog(true);
-  };
+  }
 
-  const openMarket = () => {
+  function openMarket() {
     setOpenMarketDialog(true);
-  };
-
-  // console.log("Build RentContent component.");
+  }
 
   return (
     <div>
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show market content list.                                      */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//*  Show market content list.                                      */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBDialog
         inputOpenRBDialog={openMarketDialog}
         inputSetOpenRBDialogFunc={setOpenMarketDialog}
-        inputRBDialogWidth={windowWidth}
-        inputRBDialogHeight={windowHeight}
         inputTitle={"Avatar List"}
-        inputFullScreen={true}
       >
         <Market
           inputRentMarket={inputRentMarket}
@@ -191,34 +208,46 @@ const RentContent = ({
         />
       </RBDialog>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Show my content list.                                          */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Show my content list.                                           */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBDialog
         inputOpenRBDialog={openMyDialog}
         inputSetOpenRBDialogFunc={setOpenMyDialog}
-        inputRBDialogWidth={windowWidth}
-        inputRBDialogHeight={windowHeight}
         inputTitle={"My Avatar List"}
-        inputFullScreen={true}
       >
-        <My
-          selectAvatarFunc={selectAvatarFunc}
-          inputRentMarket={inputRentMarket}
-          inputCollectionArray={collectionArray}
-          inputServiceAddress={serviceAddress}
-          inputMyRegisteredNFTArray={myRegisteredNFTArray}
-          inputMyRentNFTArray={myRentNFTArray}
-          inputBlockchainNetwork={blockchainNetwork}
-          setWriteToastMessage={setWriteToastMessage}
-          web3modalSelectedChain={selectedChain}
-          wagmiIsConnected={address}
-        />
+        <Grid
+          container
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <Grid container direction="row" justifyContent="space-around">
+            <Grid item xs={6}>
+              <Web3Button />
+            </Grid>
+            <Grid item xs={6}>
+              <Web3NetworkSwitch />
+            </Grid>
+          </Grid>
+          <My
+            selectAvatarFunc={selectAvatarFunc}
+            inputRentMarket={inputRentMarket}
+            inputCollectionArray={collectionArray}
+            inputServiceAddress={serviceAddress}
+            inputMyRegisteredNFTArray={myRegisteredNFTArray}
+            inputMyRentNFTArray={myRentNFTArray}
+            inputBlockchainNetwork={blockchainNetwork}
+            setWriteToastMessage={setWriteToastMessage}
+            web3modalSelectedChain={selectedChain}
+            wagmiIsConnected={isConnected}
+          />
+        </Grid>
       </RBDialog>
 
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* Toast message.                                                 */}
-      {/* //*----------------------------------------------------------------*/}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Toast message.                                                  */}
+      {/*//*-----------------------------------------------------------------*/}
       <RBSnackbar
         open={readToastMessage.snackbarOpen}
         message={readToastMessage.snackbarMessage}

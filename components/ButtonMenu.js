@@ -15,8 +15,8 @@ import { tooltipClasses } from "@mui/material/Tooltip";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
-import FaceIcon from "@mui/icons-material/Face";
-import SaveIcon from "@mui/icons-material/Save";
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import PersonIcon from '@mui/icons-material/Person';
 import {
   humanFileSize,
   RBSnackbar,
@@ -53,8 +53,8 @@ const ButtonMenu = ({
   //* Variables.
   //*---------------------------------------------------------------------------
   const fabActions = [
-    { icon: <FaceIcon color="primary" />, name: "My" },
-    { icon: <SaveIcon color="primary" />, name: "Market" },
+    { icon: <PersonIcon color="primary" />, name: "My" },
+    { icon: <StorefrontIcon color="primary" />, name: "Market" },
     // { icon: <ScreenShareIcon color="secondary" />, name: "Screen" },
     // { icon: <OndemandVideoIcon color="secondary" />, name: "Video" },
     { icon: <CameraAltIcon color="primary" />, name: "Image" },
@@ -286,7 +286,7 @@ const ButtonMenu = ({
             sx={{ m: 1 }}
           >
             <LightTooltip title="My Content" placement="left">
-              <FaceIcon color="secondary" />
+              <PersonIcon color="secondary" />
             </LightTooltip>
           </Fab>
 
@@ -301,7 +301,7 @@ const ButtonMenu = ({
             sx={{ m: 1 }}
           >
             <LightTooltip title="Content Market" placement="left">
-              <SaveIcon color="secondary" />
+              <StorefrontIcon color="secondary" />
             </LightTooltip>
           </Fab>
 
@@ -325,6 +325,7 @@ const ButtonMenu = ({
               onClick={async () => {
                 // console.log("rentMarketRef.current: ", rentMarketRef.current);
 
+								//* TODO: Put address.
                 const response = await isUserAllowed({
                   rentMarket: rentMarketRef.current,
                 });

@@ -4,7 +4,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
-import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -23,8 +23,6 @@ const Twitter = ({
   //*---------------------------------------------------------------------------
   //* Define constant variables.
   //*---------------------------------------------------------------------------
-  const TWITTER_DIALOG_WIDTH = 500;
-  const TWITTER_DIALOG_HEIGHT = 400;
   const TWITTER_AUTH_API_URL = "/api/twitter/auth";
   const TWITTER_IMAGE_UPLOAD_URL = "/api/twitter/upload_image";
   const TWITTER_VIDEO_UPLOAD_URL = "/api/twitter/upload_video";
@@ -149,9 +147,7 @@ const Twitter = ({
     return axiosResponse.data;
   }
 
-  // TODO: Set position of twitter dialog
-  // TODO: Set size of twitter dialog.
-  // TODO: Delete file when closing dialog.
+  //* TODO: Delete file when closing dialog.
   return (
     <div>
       <RBDialog
@@ -186,7 +182,8 @@ const Twitter = ({
           {/*//* Show twitter upload button.                                         */}
           {/*//*-------------------------------------------------------------*/}
           <CardActions disableSpacing>
-            <IconButton
+            <Button
+              variant="contained"
               aria-label="twitter"
               onClick={async function () {
                 // console.log("call onClick()");
@@ -209,7 +206,7 @@ const Twitter = ({
                 } catch (error) {
                   throw error;
                 }
-                // console.log("uploadResponse: ", uploadResponse);
+                console.log("uploadResponse: ", uploadResponse);
 
                 if (uploadResponse.error || uploadResponse.path === undefined) {
                   console.error("Upload process is not valid.");
@@ -217,16 +214,16 @@ const Twitter = ({
                 }
 
                 const uploadedFilePath = uploadResponse.path;
-                // console.log("uploadedFilePath: ", uploadedFilePath);
+                console.log("uploadedFilePath: ", uploadedFilePath);
 
                 try {
                   const response = await axios.get(
                     `${TWITTER_AUTH_API_URL}?path=${uploadedFilePath}&twitterText=${twitterText}`
                   );
-                  // console.log("response: ", response);
+                  console.log("response: ", response);
 
                   if (response.status === 200) {
-                    window.open(response.data.url);
+                    window.location.assign(response.data.url);
                   } else {
                     // TODO: Handle response error.
                     console.error(response);
@@ -240,7 +237,7 @@ const Twitter = ({
               }}
             >
               <UploadIcon />
-            </IconButton>
+            </Button>
           </CardActions>
         </Card>
       </RBDialog>

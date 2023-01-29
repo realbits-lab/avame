@@ -97,10 +97,22 @@ async function handler(req, res) {
 }
 
 function buildResponsePage({ tweetUrl }) {
-  // TODO: Design upload landing page.
-  return `<html>Upload done<br/> \
-    <a href="${tweetUrl}">tweet link</a><br/> \
-    <button onClick="javascript:window.close('','_parent','');">Close window</button></html>`;
+  return `<html> \
+    <head> \
+    <link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/style.css"> \
+    </head> \
+    <body> \
+      <div class="container"> \
+        <div class="child"> \
+          Tweet is uploaded.<p/> \
+          <br/><br/> \
+          <a href="${tweetUrl}" class="button-52">Go to tweet post</a><p/> \
+          <br/><br/> \
+          <a href="${process.env.NEXT_PUBLIC_AVAME_URL}" class="button-52">Go to avame site</a><p/> \
+        </div> \
+      </div> \
+    </body> \
+    </html>`;
 }
 
 export default withIronSessionApiRoute(handler, sessionOptions);
