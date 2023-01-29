@@ -248,10 +248,6 @@ function AvatarView({
     document.body.appendChild(statsLib.current.dom);
   }
 
-  function setInterval(interval) {
-    INTERVAL.current = interval;
-  }
-
   function getImageDataUrl() {
     //* Make a temporary canvas for a static size.
     const resizedCanvas = document.createElement("canvas");
