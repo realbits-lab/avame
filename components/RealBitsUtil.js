@@ -77,14 +77,10 @@ export const RBDialog = ({
   const [title, setTitle] = React.useState(0);
 
   React.useEffect(() => {
-    console.log("call React.useEffect()");
+    // console.log("call React.useEffect()");
     // console.log("inputOpenRBDialog: ", inputOpenRBDialog);
     // console.log("inputSetOpenRBDialogFunc: ", inputSetOpenRBDialogFunc);
     // console.log("inputTitle: ", inputTitle);
-    // console.log("inputFullScreen: ", inputFullScreen);
-    // console.log("inputRBDialogWidth: ", inputRBDialogWidth);
-    // console.log("inputRBDialogHeight: ", inputRBDialogHeight);
-    console.log("transparent: ", transparent);
 
     setOpenRBDialog(inputOpenRBDialog);
     setTitle(inputTitle);
