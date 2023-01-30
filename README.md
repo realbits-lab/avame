@@ -3,30 +3,43 @@
 - npm install --legacy-peer-deps
 - Add "legacy-peer-deps=true" to .npmrc
 
-# Login heroku
+# Build in heroku
+
+## Login
 
 - heroku login
 
-# Set heroku remote
+## Set heroku remote
 
-- heroku git:remote -a [app_name]
+- heroku git:remote --app [app_name]
 
-# Push heroku
+## Push heroku
 
 - git push heroku [branch_name]:master
 
-# Log heroku
+## Log heroku
 
-- heroku logs --tail
+- heroku logs --tail --app [app_name]
 
-# Set config heroku
+# Setting in heorku
 
-- heroku config:set GITHUB_USERNAME=joesmith
+## List config heroku
 
-# Set build with cache in heroku
+- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
 
-- heroku config:set NODE_MODULES_CACHE=true -a APP_NAME
+## Set config heroku
 
-# Shell in heroku
+- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+
+## Set build with cache in heroku
+
+- heroku config:set NODE_MODULES_CACHE=true --app [app_name]
+
+## Shell in heroku
 
 - heroku ps:exec
+
+## App in heroku
+
+- heroku apps
+- heroku apps:info (--app [app_name])
