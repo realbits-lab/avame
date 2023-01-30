@@ -5,6 +5,7 @@ import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import { useAccount } from "wagmi";
 import { isMobile } from "react-device-detect";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -118,6 +119,7 @@ const TakePicture = ({
         inputSetOpenRBDialogFunc={setOpenDialog}
         inputTitle={"Take a picture"}
       >
+        {" "}
         <Grid
           container
           direction="column"
@@ -128,7 +130,7 @@ const TakePicture = ({
             <Web3Button />
             <Web3NetworkSwitch />
           </Grid>
-          <Card sx={{ marginTop: "10px" }}>
+          <Card sx={{ marginTop: "10px", width: "90vw" }}>
             {/*//*-------------------------------------------------------------*/}
             {/*//* Show card image.                                            */}
             {/*//*-------------------------------------------------------------*/}

@@ -114,8 +114,8 @@ export const RBDialog = ({
           backgroundColor: "transparent",
         },
         sx: {
-          // position: "absolute",
           m: 0,
+          // width: "100vw",
         },
       }}
     >
