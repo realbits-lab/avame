@@ -118,6 +118,7 @@ const TakePicture = ({
         inputOpenRBDialog={openDialog}
         inputSetOpenRBDialogFunc={setOpenDialog}
         inputTitle={"Take a picture"}
+        transparent={false}
       >
         {" "}
         <Grid

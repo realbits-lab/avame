@@ -6,7 +6,6 @@ import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
 import UploadIcon from "@mui/icons-material/Upload";
 import { RBDialog } from "./RealBitsUtil";
 
@@ -58,8 +57,6 @@ const Twitter = ({
         setImageCardMedia(
           <CardMedia
             component="img"
-            width={(window.innerWidth || 100) / 3}
-            height={(window.innerHeight || 250) / 3}
             image={inputImageUrl}
             alt="Preview image"
           />
@@ -71,8 +68,6 @@ const Twitter = ({
       try {
         setVideoCardMedia(
           <CardMedia
-            width={(windowWidth || 100) / 3}
-            height={(windowHeight || 250) / 3}
             component="video"
             // autoPlay
             controls
@@ -154,18 +149,14 @@ const Twitter = ({
         inputOpenRBDialog={showTwitterDialog}
         inputSetOpenRBDialogFunc={inputSetShowTwitterDialog}
         inputTitle={"Twitter Upload"}
+        transparent={false}
       >
-        <Card>
-          {/*//*-------------------------------------------------------------*/}
-          {/*//* Show image or video snapshot.                               */}
-          {/*//*-------------------------------------------------------------*/}
-          {ImageCardMedia}
-          {VideoCardMedia}
-
+        <Card sx={{ marginTop: "10px", width: "90vw" }}>
           {/*//*-------------------------------------------------------------*/}
           {/*//* Show text input.                                            */}
+          {/*//* Show twitter upload button.                                         */}
           {/*//*-------------------------------------------------------------*/}
-          <CardContent>
+          <CardActions disableSpacing>
             <TextField
               fullWidth
               label="twitter text"
@@ -176,12 +167,6 @@ const Twitter = ({
                 setTwitterText(event.target.value);
               }}
             />
-          </CardContent>
-
-          {/*//*-------------------------------------------------------------*/}
-          {/*//* Show twitter upload button.                                         */}
-          {/*//*-------------------------------------------------------------*/}
-          <CardActions disableSpacing>
             <Button
               variant="contained"
               aria-label="twitter"
@@ -239,6 +224,11 @@ const Twitter = ({
               <UploadIcon />
             </Button>
           </CardActions>
+          {/*//*-------------------------------------------------------------*/}
+          {/*//* Show image or video snapshot.                               */}
+          {/*//*-------------------------------------------------------------*/}
+          {ImageCardMedia}
+          {VideoCardMedia}
         </Card>
       </RBDialog>
     </div>
