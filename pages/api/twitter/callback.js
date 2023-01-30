@@ -8,6 +8,22 @@ const sessionOptions = {
     secure: process.env.NODE_ENV === "production",
   },
 };
+function buildErrorPage() {
+  return `<html> \
+    <head> \
+    <link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/style.css"> \
+    </head> \
+    <body> \
+      <div class="container"> \
+        <div class="child"> \
+          Message can't be uploaded for any reason.<p/> \
+          <br/><br/> \
+          <a href="${process.env.NEXT_PUBLIC_AVAME_URL}" class="button-52">Go to avame site</a><p/> \
+        </div> \
+      </div> \
+    </body> \
+    </html>`;
+}
 
 async function handler(req, res) {
   //*-------------------------------------------------------------------------
@@ -25,10 +41,8 @@ async function handler(req, res) {
   // console.log("oauth_token_secret: ", oauth_token_secret);
 
   if (!oauth_token || !oauth_verifier || !oauth_token_secret) {
-    // TODO: Handle denied error.
-    return res
-      .status(400)
-      .json({ error: "You denied the app or your session expired." });
+    //* Handle denied error.
+    res.status(200).send(buildErrorPage());
   }
 
   //*-------------------------------------------------------------------------
