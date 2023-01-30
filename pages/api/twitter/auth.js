@@ -28,7 +28,7 @@ async function handler(req, res) {
       linkMode: "authorize",
     }
   );
-  console.log("twitterAuthLink: ", twitterAuthLink);
+  // console.log("twitterAuthLink: ", twitterAuthLink);
 
   //*---------------------------------------------------------------------------
   //* Save oauth_token and oauth_token_secret in req.session.
@@ -39,8 +39,8 @@ async function handler(req, res) {
   //*---------------------------------------------------------------------------
   //* Save path and twitter text in req.session.
   //*---------------------------------------------------------------------------
-  console.log("req.query.path: ", req.query.path);
-  console.log("req.query.twitterText: ", req.query.twitterText);
+  // console.log("req.query.path: ", req.query.path);
+  // console.log("req.query.twitterText: ", req.query.twitterText);
   req.session.path = req.query.path;
   req.session.twitterText = req.query.twitterText;
 

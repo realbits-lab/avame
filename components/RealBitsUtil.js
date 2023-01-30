@@ -65,6 +65,7 @@ export const RBDialog = ({
   keepMounted,
   inputTitle,
   children,
+  transparent,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -76,13 +77,14 @@ export const RBDialog = ({
   const [title, setTitle] = React.useState(0);
 
   React.useEffect(() => {
-    // console.log("call React.useEffect()");
+    console.log("call React.useEffect()");
     // console.log("inputOpenRBDialog: ", inputOpenRBDialog);
     // console.log("inputSetOpenRBDialogFunc: ", inputSetOpenRBDialogFunc);
     // console.log("inputTitle: ", inputTitle);
     // console.log("inputFullScreen: ", inputFullScreen);
     // console.log("inputRBDialogWidth: ", inputRBDialogWidth);
     // console.log("inputRBDialogHeight: ", inputRBDialogHeight);
+    console.log("transparent: ", transparent);
 
     setOpenRBDialog(inputOpenRBDialog);
     setTitle(inputTitle);
@@ -93,6 +95,7 @@ export const RBDialog = ({
     keepMounted,
     inputTitle,
     children,
+    transparent,
   ]);
 
   return (
@@ -111,11 +114,11 @@ export const RBDialog = ({
       fullScreen={fullScreen}
       PaperProps={{
         style: {
-          backgroundColor: "transparent",
+          backgroundColor: transparent ? "transparent" : "white",
         },
         sx: {
-          // position: "absolute",
           m: 0,
+          // width: "100vw",
         },
       }}
     >

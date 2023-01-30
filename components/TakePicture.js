@@ -5,6 +5,7 @@ import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import { useAccount } from "wagmi";
 import { isMobile } from "react-device-detect";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -32,7 +33,7 @@ const TakePicture = ({
   //*---------------------------------------------------------------------------
   const { address, isConnected } = useAccount();
   const USER_NOT_ALLOW_MESSAGE =
-    "Your account must own or rent NFT in polygon network. Check metamask wallet.";
+    "User must own or rent NFT in polygon network. Check metamask wallet.";
 
   const [imageDataUrl, setImageDataUrl] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -117,7 +118,9 @@ const TakePicture = ({
         inputOpenRBDialog={openDialog}
         inputSetOpenRBDialogFunc={setOpenDialog}
         inputTitle={"Take a picture"}
+        transparent={false}
       >
+        {" "}
         <Grid
           container
           direction="column"
@@ -125,8 +128,12 @@ const TakePicture = ({
           alignItems="flex-start"
         >
           <Grid container direction="row" justifyContent="space-around">
-            <Web3Button />
-            <Web3NetworkSwitch />
+            <Grid item xs={6}>
+              <Web3Button />
+            </Grid>
+            <Grid item xs={6}>
+              <Web3NetworkSwitch />
+            </Grid>
           </Grid>
           <Card sx={{ marginTop: "10px" }}>
             {/*//*-------------------------------------------------------------*/}

@@ -197,6 +197,7 @@ const RentContent = ({
         inputOpenRBDialog={openMarketDialog}
         inputSetOpenRBDialogFunc={setOpenMarketDialog}
         inputTitle={"Avatar List"}
+        transparent={true}
       >
         <Market
           inputRentMarket={inputRentMarket}
@@ -215,6 +216,7 @@ const RentContent = ({
         inputOpenRBDialog={openMyDialog}
         inputSetOpenRBDialogFunc={setOpenMyDialog}
         inputTitle={"My Avatar List"}
+        transparent={true}
       >
         <Grid
           container
