@@ -12,16 +12,18 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  // TODO: Check this is user is ok to isOwnerOrRenter in rent-market contract.
+  console.log("call /api/chat/validate");
+
+  //* TODO: Check this is user is ok to isOwnerOrRenter in rent-market contract.
   const isAdmin = req?.query?.admin === "true";
   const payload = {
     uuid: uuidv4(),
     isAdmin,
   };
 
-  // * -------------------------------------------------------------------------
-  // * Make a token with jwt sign function.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Make a token with jwt sign function.
+  //*---------------------------------------------------------------------------
   const token = jwt.sign(
     payload,
     process.env.NEXT_PUBLIC_CHAT_AUTH_TOKEN_SECRET,
@@ -30,8 +32,8 @@ export default function handler(
     }
   );
 
-  // * -------------------------------------------------------------------------
-  // * Send a token.
-  // * -------------------------------------------------------------------------
+  //*---------------------------------------------------------------------------
+  //* Send a token.
+  //*---------------------------------------------------------------------------
   res.send({ token });
 }

@@ -11,6 +11,7 @@ import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
+import VideoChat from "../components/VideoChat";
 import { getChainName } from "rent-market";
 
 const Service = () => {
@@ -153,6 +154,19 @@ const Service = () => {
           openMyFuncRef={openMyFuncRef}
           openMarketFuncRef={openMarketFuncRef}
           stopScreenEventFuncRef={stopScreenEventFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Video chat component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <VideoChat
+          // VideoChat -> AvatarView call for new Remon.
+          inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          inputSetTransformAvatarFuncRef={setTransformAvatarFuncRef}
+          // ScreenView -> VideoChat call for setting background screen.
+          inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
           rentMarketRef={rentMarketRef}
         />
       </WagmiConfig>

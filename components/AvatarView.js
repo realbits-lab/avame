@@ -160,7 +160,7 @@ function AvatarView({
     screenVideoStreamRef,
     showAvatarOption,
   }) {
-    // console.log("call transformAvatar()");
+    console.log("call transformAvatar()");
     // Keep data for webgl lost event and restore.
     if (canvasPosition !== undefined) {
       currentCanvasPositionRef.current = canvasPosition;
@@ -188,6 +188,9 @@ function AvatarView({
       if (showAvatarOptionRef.current === false) {
         //* Add the found mesh to sceneRef.
         showAvatarOptionRef.current = true;
+        
+        //* Recover scene mesh objects.
+        sceneRef.current.add(currentVrmRef.current.scene);
 
         //* Create light for vrm model.
         const light = new THREE.DirectionalLight(0xffffff);
