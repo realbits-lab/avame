@@ -29,8 +29,8 @@ function AvatarView({
     perspective: "perspective",
     orthographic: "orthographic",
   };
-  const IMAGE_SNAPSHOT_WIDTH = 512;
-  const IMAGE_SNAPSHOT_HEIGHT = 512;
+  const IMAGE_SNAPSHOT_WIDTH = 1024;
+  const IMAGE_SNAPSHOT_HEIGHT = 1024;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.

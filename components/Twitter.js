@@ -151,7 +151,7 @@ const Twitter = ({
         inputTitle={"Twitter Upload"}
         transparent={false}
       >
-        <Card sx={{ marginTop: "10px", width: "90vw" }}>
+        <Card sx={{ marginTop: "10px" }}>
           {/*//*-------------------------------------------------------------*/}
           {/*//* Show text input.                                            */}
           {/*//* Show twitter upload button.                                         */}

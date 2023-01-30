@@ -131,7 +131,7 @@ const TakePicture = ({
             <Web3Button />
             <Web3NetworkSwitch />
           </Grid>
-          <Card sx={{ marginTop: "10px", width: "90vw" }}>
+          <Card sx={{ marginTop: "10px" }}>
             {/*//*-------------------------------------------------------------*/}
             {/*//* Show card image.                                            */}
             {/*//*-------------------------------------------------------------*/}
