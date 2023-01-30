@@ -18,3 +18,15 @@
 # Log heroku
 
 - heroku logs --tail
+
+# Set config heroku
+
+- heroku config:set GITHUB_USERNAME=joesmith
+
+# Set build with cache in heroku
+
+- heroku config:set NODE_MODULES_CACHE=true -a APP_NAME
+
+# Shell in heroku
+
+- heroku ps:exec
