@@ -33,7 +33,7 @@ const TakePicture = ({
   //*---------------------------------------------------------------------------
   const { address, isConnected } = useAccount();
   const USER_NOT_ALLOW_MESSAGE =
-    "Your account must own or rent NFT in polygon network. Check metamask wallet.";
+    "User must own or rent NFT in polygon network. Check metamask wallet.";
 
   const [imageDataUrl, setImageDataUrl] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -128,8 +128,12 @@ const TakePicture = ({
           alignItems="flex-start"
         >
           <Grid container direction="row" justifyContent="space-around">
-            <Web3Button />
-            <Web3NetworkSwitch />
+            <Grid item xs={6}>
+              <Web3Button />
+            </Grid>
+            <Grid item xs={6}>
+              <Web3NetworkSwitch />
+            </Grid>
           </Grid>
           <Card sx={{ marginTop: "10px" }}>
             {/*//*-------------------------------------------------------------*/}
