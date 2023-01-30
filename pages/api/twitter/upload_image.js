@@ -1,3 +1,4 @@
+import fs from "fs";
 import nextConnect from "next-connect";
 import { ethers } from "ethers";
 import multer from "multer";
@@ -9,6 +10,7 @@ const IMAGE_UPLOAD_DIRECTORY = "./public/upload_image/";
 const diskStorageOptions = multer.diskStorage({
   //* Set destination directory of upload.
   destination: function (req, file, cb) {
+    fs.mkdirSync(IMAGE_UPLOAD_DIRECTORY, { recursive: true });
     cb(null, IMAGE_UPLOAD_DIRECTORY);
   },
 
