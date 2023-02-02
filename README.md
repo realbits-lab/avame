@@ -52,3 +52,4 @@
 # NPM local pacakge update error
 
 - When local rent-market package link is not update, re-make npm link with "sudo npm link" command in package directory and "npm link rent-market" in application directory.
+- Remove .next directory and restart

@@ -92,7 +92,7 @@ const RentContent = ({
     onEventFunc();
 
     async function initRentMarket() {
-      // console.log("rentMarketAddress: ", rentMarketAddress);
+      console.log("rentMarketAddress: ", rentMarketAddress);
       rentMarket.current = new RentMarket({
         accountAddress: address,
         rentMarketAddress,
@@ -101,8 +101,8 @@ const RentContent = ({
         onEventFunc,
         setWriteToastMessage,
       });
+      console.log("rentMarket.current: ", rentMarket.current);
 
-      // console.log("rentMarket.current: ", rentMarket.current);
       setInputRentMarket(rentMarket.current);
       try {
         await rentMarket.current.initializeAll();
@@ -110,7 +110,7 @@ const RentContent = ({
         console.error(error);
       }
       rentMarketRef.current = rentMarket.current;
-      // console.log("rentMarketRef.current: ", rentMarketRef.current);
+      console.log("rentMarketRef.current: ", rentMarketRef.current);
     }
 
     setWindowWidth(window.innerWidth);
@@ -199,8 +199,16 @@ const RentContent = ({
         inputTitle={"Avatar List"}
         transparent={true}
       >
+        <Grid container direction="row" justifyContent="space-around">
+          <Grid item>
+            <Web3Button />
+          </Grid>
+          <Grid item>
+            <Web3NetworkSwitch />
+          </Grid>
+        </Grid>
         <Market
-          inputRentMarket={inputRentMarket}
+          inputRentMarketClass={inputRentMarket}
           inputCollectionArray={collectionArray}
           inputServiceAddress={serviceAddress}
           inputRegisterNFTArray={registerNFTArray}
@@ -225,10 +233,10 @@ const RentContent = ({
           alignItems="flex-start"
         >
           <Grid container direction="row" justifyContent="space-around">
-            <Grid item xs={6}>
+            <Grid item>
               <Web3Button />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item>
               <Web3NetworkSwitch />
             </Grid>
           </Grid>

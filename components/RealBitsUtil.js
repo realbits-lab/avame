@@ -15,7 +15,7 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function BootstrapDialogTitle(props) {
+export function BootstrapDialogTitle(props) {
   const { children, onClose, ...other } = props;
   // console.log("onClose: ", onClose);
 
