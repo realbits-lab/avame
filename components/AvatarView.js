@@ -81,7 +81,7 @@ function AvatarView({
   const orbitCameraRef = React.useRef();
   const currentOrbitCameraTypeRef = React.useRef(CameraType.perspective);
   const currentOrbitCameraPositionXRef = React.useRef(0);
-  const currentOrbitCameraPositionYRef = React.useRef(0.6);
+  const currentOrbitCameraPositionYRef = React.useRef(0.8);
   const currentOrbitCameraPositionZRef = React.useRef(0);
 
   //*---------------------------------------------------------------------------
