@@ -2,6 +2,13 @@
   "name": "avame",
   "version": "0.0.1",
   "private": false,
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
+  },
+  "cacheDirectories": [
+    ".next/cache"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
