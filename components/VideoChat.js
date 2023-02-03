@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import CryptoJS from "crypto-js";
+import { isMobile } from "react-device-detect";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import DialogContent from "@mui/material/DialogContent";
@@ -907,31 +908,34 @@ function VideoChat({
           {/*//*-------------------------------------------------------------*/}
           {/*//* Toggle button.                                              */}
           {/*//*-------------------------------------------------------------*/}
-          <ListItem>
-            <Fab
-              color="primary"
-              onClick={async () => {
-                //* Toggle local video between avatar and camera.
-                await toggleLocalVideoSource();
-              }}
-            >
-              {localVideoSource === LocalVideoSource.avatarWithoutCamera ? (
-                <Badge badgeContent={0} color="secondary">
-                  <CameraswitchIcon color="secondary" />
-                </Badge>
-              ) : localVideoSource === LocalVideoSource.avatarWithCamera ? (
-                <Badge badgeContent={1} color="secondary">
-                  <CameraswitchIcon color="secondary" />
-                </Badge>
-              ) : localVideoSource === LocalVideoSource.cameraWithoutAvatar ? (
-                <Badge badgeContent={2} color="secondary">
-                  <CameraswitchIcon color="secondary" />
-                </Badge>
-              ) : (
-                <CameraswitchIcon color="error" />
-              )}
-            </Fab>
-          </ListItem>
+          {isMobile === true ? (
+            <ListItem>
+              <Fab
+                color="primary"
+                onClick={async () => {
+                  //* Toggle local video between avatar and camera.
+                  await toggleLocalVideoSource();
+                }}
+              >
+                {localVideoSource === LocalVideoSource.avatarWithoutCamera ? (
+                  <Badge badgeContent={0} color="secondary">
+                    <CameraswitchIcon color="secondary" />
+                  </Badge>
+                ) : localVideoSource === LocalVideoSource.avatarWithCamera ? (
+                  <Badge badgeContent={1} color="secondary">
+                    <CameraswitchIcon color="secondary" />
+                  </Badge>
+                ) : localVideoSource ===
+                  LocalVideoSource.cameraWithoutAvatar ? (
+                  <Badge badgeContent={2} color="secondary">
+                    <CameraswitchIcon color="secondary" />
+                  </Badge>
+                ) : (
+                  <CameraswitchIcon color="error" />
+                )}
+              </Fab>
+            </ListItem>
+          ) : null}
         </List>
       </Box>
 
