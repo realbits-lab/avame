@@ -137,20 +137,20 @@ function VideoChat({
     snackbarValue;
 
   React.useEffect(() => {
-    console.log("call useEffect()");
+    // console.log("call useEffect()");
 
     async function checkAuth() {
-      console.log("call checkAuth()");
+      // console.log("call checkAuth()");
       let response;
 
       // Get user token from auth API server.
       response = await axios.get(
         `${KAKAO_CONNECT_LIVE_TOKEN_GENERATE_URL}?admin=false`
       );
-      console.log("response: ", response);
+      // console.log("response: ", response);
 
       const userToken = response.data.token;
-      console.log("userToken: ", userToken);
+      // console.log("userToken: ", userToken);
 
       // Get admin token from auth API server.
       // response = await axios.get(
@@ -169,7 +169,7 @@ function VideoChat({
         // serviceSecret: KAKAO_CONNECT_LIVE_SERVICE_SECRET,
         token: userToken,
       });
-      console.log("signInResponse: ", signInResponse);
+      // console.log("signInResponse: ", signInResponse);
 
       if (signInResponse !== undefined) {
         console.error(signInResponse);
@@ -188,7 +188,7 @@ function VideoChat({
       if (!roomRef.current) {
         throw new Error("Failed to create roomRef.current");
       }
-      console.log("roomRef.current: ", roomRef.current);
+      // console.log("roomRef.current: ", roomRef.current);
 
       //* TODO: Connect a room after reloading page.
       // Check the previous connected room id.
@@ -425,7 +425,7 @@ function VideoChat({
     //             "{ROOM_ID_2}"
     //         ]
     // }
-    console.log("Room.ListRooms response: ", response);
+    // console.log("Room.ListRooms response: ", response);
     //* Check response error.
     if (response.data !== undefined && response.data.error !== undefined) {
       throw response.data.error;
@@ -439,7 +439,7 @@ function VideoChat({
       //* With room case.
       let oneParticipantRoomId = -1;
       for (const room of response.data.result.rooms) {
-        console.log("room: ", room);
+        // console.log("room: ", room);
         const roomId = room.roomId;
         //* Check room participant number.
         response = await axiosInstance.post(
@@ -747,7 +747,7 @@ function VideoChat({
   }
 
   async function setLocalCameraStream() {
-    console.log("call setLocalCameraStream()");
+    // console.log("call setLocalCameraStream()");
 
     try {
       let localCameraStream = await navigator.mediaDevices.getUserMedia({
@@ -773,8 +773,8 @@ function VideoChat({
   }
 
   async function toggleLocalVideoSource() {
-    console.log("toggleLocalVideoSource");
-    console.log("localVideoSource: ", localVideoSource);
+    // console.log("toggleLocalVideoSource");
+    // console.log("localVideoSource: ", localVideoSource);
     // console.log("screenStreamVideoRef: ", screenStreamVideoRef);
     let showAvatarOption = true;
     let backgroundStreamRef;
@@ -802,9 +802,9 @@ function VideoChat({
   }
 
   function changeAvatarScreen({ showAvatarOption, backgroundStreamRef }) {
-    console.log("call changeAvatarScreen()");
-    console.log("callStatusRef.current: ", callStatusRef.current);
-    console.log("showAvatarOption: ", showAvatarOption);
+    // console.log("call changeAvatarScreen()");
+    // console.log("callStatusRef.current: ", callStatusRef.current);
+    // console.log("showAvatarOption: ", showAvatarOption);
 
     let avatarTransformOption = {};
 

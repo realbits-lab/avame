@@ -160,7 +160,7 @@ function AvatarView({
     screenVideoStreamRef,
     showAvatarOption,
   }) {
-    console.log("call transformAvatar()");
+    // console.log("call transformAvatar()");
     // Keep data for webgl lost event and restore.
     if (canvasPosition !== undefined) {
       currentCanvasPositionRef.current = canvasPosition;
@@ -514,10 +514,10 @@ function AvatarView({
       function (xhr) {
         if (xhr.lengthComputable === true && xhr.total !== 0) {
           const progressPercent = Math.round((xhr.loaded / xhr.total) * 100);
-          console.log(`${progressPercent}% loaded`);
+          // console.log(`${progressPercent}% loaded`);
           setGltfLoadingProgress(progressPercent);
         } else {
-          console.log(humanFileSize(xhr.loaded) + " loaded");
+          // console.log(humanFileSize(xhr.loaded) + " loaded");
         }
       },
       function (error) {
