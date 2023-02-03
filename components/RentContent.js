@@ -92,7 +92,7 @@ const RentContent = ({
     onEventFunc();
 
     async function initRentMarket() {
-      console.log("rentMarketAddress: ", rentMarketAddress);
+      // console.log("rentMarketAddress: ", rentMarketAddress);
       rentMarket.current = new RentMarket({
         accountAddress: address,
         rentMarketAddress,
@@ -101,7 +101,7 @@ const RentContent = ({
         onEventFunc,
         setWriteToastMessage,
       });
-      console.log("rentMarket.current: ", rentMarket.current);
+      // console.log("rentMarket.current: ", rentMarket.current);
 
       setInputRentMarket(rentMarket.current);
       try {
@@ -110,7 +110,7 @@ const RentContent = ({
         console.error(error);
       }
       rentMarketRef.current = rentMarket.current;
-      console.log("rentMarketRef.current: ", rentMarketRef.current);
+      // console.log("rentMarketRef.current: ", rentMarketRef.current);
     }
 
     setWindowWidth(window.innerWidth);
