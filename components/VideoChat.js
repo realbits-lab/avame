@@ -869,41 +869,43 @@ function VideoChat({
           {/*//*-------------------------------------------------------------*/}
           {/*//* Call button.                                                */}
           {/*//*-------------------------------------------------------------*/}
-          <ListItem key="my">
-            <Fab
-              color="primary"
-              onClick={async () => {
-                if (callStatus === CallStatus.close) {
-                  //* TODO: Check user is rentee or owner of NFT.
-                  // const response = await isUserAllowed({
-                  //   rentMarket: rentMarketRef.current,
-                  // });
-                  // if (response === false) {
-                  //   setSnackbarValue({
-                  //     snackbarSeverity: AlertSeverity.info,
-                  //     snackbarMessage: ALLOW_MESSAGE,
-                  //     snackbarTime: new Date(),
-                  //     snackbarOpen: true,
-                  //   });
-                  //   return;
-                  // }
+          {process.env.NODE_ENV !== "production" ? (
+            <ListItem key="my">
+              <Fab
+                color="primary"
+                onClick={async () => {
+                  if (callStatus === CallStatus.close) {
+                    //* TODO: Check user is rentee or owner of NFT.
+                    // const response = await isUserAllowed({
+                    //   rentMarket: rentMarketRef.current,
+                    // });
+                    // if (response === false) {
+                    //   setSnackbarValue({
+                    //     snackbarSeverity: AlertSeverity.info,
+                    //     snackbarMessage: ALLOW_MESSAGE,
+                    //     snackbarTime: new Date(),
+                    //     snackbarOpen: true,
+                    //   });
+                    //   return;
+                    // }
 
-                  // await makeRoom();
-                  await connectRandomCall();
-                } else {
-                  await closeCall();
-                }
-              }}
-            >
-              {callStatus === CallStatus.close ? (
-                <PhoneEnabledIcon color="secondary" />
-              ) : callStatus === CallStatus.wait ? (
-                <PhoneForwardedIcon color="secondary" />
-              ) : (
-                <PhoneInTalkIcon color="error" />
-              )}
-            </Fab>
-          </ListItem>
+                    // await makeRoom();
+                    await connectRandomCall();
+                  } else {
+                    await closeCall();
+                  }
+                }}
+              >
+                {callStatus === CallStatus.close ? (
+                  <PhoneEnabledIcon color="secondary" />
+                ) : callStatus === CallStatus.wait ? (
+                  <PhoneForwardedIcon color="secondary" />
+                ) : (
+                  <PhoneInTalkIcon color="error" />
+                )}
+              </Fab>
+            </ListItem>
+          ) : null}
 
           {/*//*-------------------------------------------------------------*/}
           {/*//* Toggle button.                                              */}
