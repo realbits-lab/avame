@@ -1,7 +1,15 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  transpilePackages: ["kalidokit"],
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: "/",
+  //       destination: "/home",
+  //       permanent: false,
+  //     },
+  //   ];
+  // },
+  reactStrictMode: false,
+  transpilePackages: ["kalidokit", "rent-market"],
 };
 
 module.exports = nextConfig;
