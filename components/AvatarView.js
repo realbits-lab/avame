@@ -188,7 +188,7 @@ function AvatarView({
       if (showAvatarOptionRef.current === false) {
         //* Add the found mesh to sceneRef.
         showAvatarOptionRef.current = true;
-        
+
         //* Recover scene mesh objects.
         sceneRef.current.add(currentVrmRef.current.scene);
 
@@ -403,26 +403,27 @@ function AvatarView({
       pmremGenerator.fromScene(environment).texture;
 
     // //* Make control instance.
-    orbitControlsRef.current = new STDLIB.OrbitControls(
-      orbitCameraRef.current,
-      rendererRef.current.domElement
-    );
-    orbitControlsRef.current.mouseButtons = {
-      LEFT: THREE.MOUSE.RIGHT,
-      MIDDLE: THREE.MOUSE.PAN,
-      RIGHT: THREE.MOUSE.ROTATE,
-    };
-    orbitControlsRef.current.enableDamping = ORBIT_CONTROL_ENABLE_DUMPING;
-    orbitControlsRef.current.minDistance = ORBIT_CONTROL_MIN_DISTANCE;
-    orbitControlsRef.current.maxDistance = ORBIT_CONTROL_MAX_DISTANCE;
-    orbitControlsRef.current.minAzimuthAngle = ORBIT_CONTROL_MIN_AZIMUTH_ANGLE;
-    orbitControlsRef.current.maxAzimuthAngle = ORBIT_CONTROL_MAX_AZIMUTH_ANGLE;
-    orbitControlsRef.current.maxPolarAngle = ORBIT_CONTROL_MAX_POLAR_ANGLE;
-    orbitControlsRef.current.target.set(
-      currentOrbitCameraPositionXRef.current,
-      currentOrbitCameraPositionYRef.current,
-      currentOrbitCameraPositionZRef.current
-    );
+    // orbitControlsRef.current = new STDLIB.OrbitControls(
+    //   orbitCameraRef.current,
+    //   rendererRef.current.domElement
+    // );
+    // orbitControlsRef.current.mouseButtons = {
+    //   LEFT: THREE.MOUSE.RIGHT,
+    //   MIDDLE: THREE.MOUSE.PAN,
+    //   RIGHT: THREE.MOUSE.ROTATE,
+    // };
+    // orbitControlsRef.current.enableDamping = ORBIT_CONTROL_ENABLE_DUMPING;
+    // orbitControlsRef.current.minDistance = ORBIT_CONTROL_MIN_DISTANCE;
+    // orbitControlsRef.current.maxDistance = ORBIT_CONTROL_MAX_DISTANCE;
+    // orbitControlsRef.current.minAzimuthAngle = ORBIT_CONTROL_MIN_AZIMUTH_ANGLE;
+    // orbitControlsRef.current.maxAzimuthAngle = ORBIT_CONTROL_MAX_AZIMUTH_ANGLE;
+    // orbitControlsRef.current.maxPolarAngle = ORBIT_CONTROL_MAX_POLAR_ANGLE;
+
+    // orbitControlsRef.current.target.set(
+    //   currentOrbitCameraPositionXRef.current,
+    //   currentOrbitCameraPositionYRef.current,
+    //   currentOrbitCameraPositionZRef.current
+    // );
   }
 
   async function loadGLTF(url) {
@@ -460,7 +461,7 @@ function AvatarView({
 
           // Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
-          ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
+          // ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
 
           // Add vrm model to scene.
           // currentVrmRef.current.humanoid.autoUpdateHumanBones = false;
@@ -529,12 +530,13 @@ function AvatarView({
   }
 
   function adjustCamera({ gltf }) {
-    // console.log("call adjustCamera()");
+    console.log("call adjustCamera()");
     // console.log("gltf: ", gltf);
 
     if (gltf.cameras.length > 0) {
       const camera = gltf.cameras[0];
-      // console.log("camera: ", camera);
+      console.log("camera: ", camera);
+      // console.log("orbitCameraRef.current: ", orbitCameraRef.current);
 
       orbitCameraRef.current.ratio = camera.aspect;
       orbitCameraRef.current.fov = camera.fov;
@@ -543,12 +545,11 @@ function AvatarView({
       orbitCameraRef.current.position.set(
         camera.position.x,
         camera.position.y,
-        -1 * camera.position.z
+        camera.position.z,
       );
-      // console.log("orbitCameraRef.current.fov: ", orbitCameraRef.current.fov);
-      // console.log("orbitCameraRef.current.near: ", orbitCameraRef.current.near);
-      // console.log("orbitCameraRef.current.far: ", orbitCameraRef.current.far);
+      orbitCameraRef.current.setRotationFromQuaternion(camera.quaternion);
 
+      console.log("orbitCameraRef.current: ", orbitCameraRef.current);
       orbitCameraRef.current.updateProjectionMatrix();
     }
   }
@@ -609,7 +610,7 @@ function AvatarView({
     rendererRef.current.render(sceneRef.current, orbitCameraRef.current);
 
     //* Update control.
-    orbitControlsRef.current.update();
+    // orbitControlsRef.current.update();
   }
 
   // Z-index
