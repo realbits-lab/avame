@@ -402,7 +402,7 @@ function AvatarView({
     sceneRef.current.environment =
       pmremGenerator.fromScene(environment).texture;
 
-    // //* Make control instance.
+    //* Make control instance.
     // orbitControlsRef.current = new STDLIB.OrbitControls(
     //   orbitCameraRef.current,
     //   rendererRef.current.domElement
