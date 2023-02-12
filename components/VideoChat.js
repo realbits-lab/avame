@@ -224,6 +224,7 @@ function VideoChat({
     setTransformAvatarFuncRef.current = inputSetTransformAvatarFuncRef.current;
     inputSetBackgroundScreenFuncRef.current = setBackgroundScreen;
 
+    console.log("process.env: ", process.env);
     if (process.env.NODE_ENV === "production") {
       setShowVideoChatButton(false);
     } else {

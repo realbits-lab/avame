@@ -530,12 +530,12 @@ function AvatarView({
   }
 
   function adjustCamera({ gltf }) {
-    console.log("call adjustCamera()");
+    // console.log("call adjustCamera()");
     // console.log("gltf: ", gltf);
 
     if (gltf.cameras.length > 0) {
       const camera = gltf.cameras[0];
-      console.log("camera: ", camera);
+      // console.log("camera: ", camera);
       // console.log("orbitCameraRef.current: ", orbitCameraRef.current);
 
       orbitCameraRef.current.ratio = camera.aspect;
@@ -549,7 +549,7 @@ function AvatarView({
       );
       orbitCameraRef.current.setRotationFromQuaternion(camera.quaternion);
 
-      console.log("orbitCameraRef.current: ", orbitCameraRef.current);
+      // console.log("orbitCameraRef.current: ", orbitCameraRef.current);
       orbitCameraRef.current.updateProjectionMatrix();
     }
   }
