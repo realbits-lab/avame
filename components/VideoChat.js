@@ -138,7 +138,7 @@ function VideoChat({
     snackbarValue;
 
   React.useEffect(() => {
-    // console.log("call useEffect()");
+    console.log("call useEffect()");
 
     async function checkAuth() {
       // console.log("call checkAuth()");

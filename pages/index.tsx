@@ -11,11 +11,8 @@ import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
-import loadable from "@loadable/component";
-const VideoChat = loadable.lib(() => import("../components/VideoChat"), {
-  ssr: false,
-});
-import { getChainName } from "rent-market";
+import VideoChat from "../components/VideoChat";
+import { getChainName } from "../components/RealBitsUtil";
 
 const Service = () => {
   //*---------------------------------------------------------------------------
