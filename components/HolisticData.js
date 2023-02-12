@@ -162,6 +162,13 @@ function HolisticData({ currentVrmRef }) {
       //*---------------------------------------------------------------------------
       //* Make face mesh instance.
       //*---------------------------------------------------------------------------
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "FaceMesh model is loading...",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+
       faceMeshRef.current = new inputLib.FaceMesh({
         locateFile: (file) => {
           return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
