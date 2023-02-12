@@ -111,6 +111,7 @@ function VideoChat({
   const [localVideoSource, setLocalVideoSource] = React.useState(
     LocalVideoSource.avatarWithoutCamera
   );
+  const [showVideoChatButton, setShowVideoChatButton] = React.useState(false);
 
   //*---------------------------------------------------------------------------
   //* Function and variable references.
@@ -222,6 +223,12 @@ function VideoChat({
     getMediaStreamFuncRef.current = inputGetMediaStreamFuncRef.current;
     setTransformAvatarFuncRef.current = inputSetTransformAvatarFuncRef.current;
     inputSetBackgroundScreenFuncRef.current = setBackgroundScreen;
+
+    if (process.env.NODE_ENV === "production") {
+      setShowVideoChatButton(false);
+    } else {
+      setShowVideoChatButton(true);
+    }
   }, [
     inputGetMediaStreamFuncRef,
     inputSetTransformAvatarFuncRef,
@@ -869,7 +876,7 @@ function VideoChat({
           {/*//*-------------------------------------------------------------*/}
           {/*//* Call button.                                                */}
           {/*//*-------------------------------------------------------------*/}
-          {process.env.NODE_ENV !== "production" ? (
+          {showVideoChatButton ? (
             <ListItem key="my">
               <Fab
                 color="primary"
