@@ -6,6 +6,7 @@
 
 import React from "react";
 import axios from "axios";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Dialog from "@mui/material/Dialog";
@@ -86,6 +87,37 @@ function SelectPage({ collectionUri }) {
     );
   };
 
+  const SelectContent = () => {
+    return (
+      <>
+        <Grid container spacing={2}>
+          {Object.entries(attrDict).map(([key, value] = entry) => {
+            console.log("key: ", key);
+            console.log("value: ", value);
+            if (key === selectedTraitType) {
+              return value.map((e) => {
+                console.log("e: ", e);
+                return (
+                  <Grid item key={`${key}/${e}`}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      key={`${key}/${e}`}
+                      sx={{ m: "2px" }}
+                    >
+                      {e}
+                    </Button>
+                  </Grid>
+                );
+              });
+            }
+          })}
+        </Grid>
+        <Box sx={{ width: "90vw", height: "90vh" }}></Box>
+      </>
+    );
+  };
+
   const SelectDialog = () => {
     return (
       <Dialog
@@ -94,10 +126,10 @@ function SelectPage({ collectionUri }) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Prompt</DialogTitle>
+        <DialogTitle id="alert-dialog-title">SELECT</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {selectedTraitType || ""}
+            <SelectContent />
           </DialogContentText>
         </DialogContent>
         <DialogActions>
