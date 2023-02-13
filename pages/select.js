@@ -9,6 +9,7 @@ import axios from "axios";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import CardMedia from "@mui/material/CardMedia";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -16,10 +17,12 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 
 function SelectPage({ collectionUri }) {
-  const [traitArray, setTraitArray] = React.useState([]);
-  const [attrArray, setAttrArray] = React.useState([]);
+  //* TODO: Get from json data.
+  const imageUrl =
+    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection";
   const [attributes, setAttributes] = React.useState({});
   const [selectedTraitType, setSelectedTraitType] = React.useState("");
+  const [selectedValue, setSelectedValue] = React.useState("");
   const [openDialog, setOpenDialog] = React.useState(false);
 
   React.useEffect(
@@ -89,6 +92,9 @@ function SelectPage({ collectionUri }) {
                       variant="contained"
                       key={`${traitType}/${value}`}
                       sx={{ m: "2px" }}
+                      onClick={() => {
+                        setSelectedValue(value);
+                      }}
                     >
                       {value}
                     </Button>
@@ -98,7 +104,12 @@ function SelectPage({ collectionUri }) {
             }
           })}
         </Grid>
-        <Box sx={{ width: "90vw", height: "90vh" }}></Box>
+        <Box sx={{ width: "90vw", height: "90vh" }}>
+          <CardMedia
+            component="img"
+            image={`${imageUrl}/${selectedTraitType}/${selectedValue}.png`}
+          />
+        </Box>
       </>
     );
   };
