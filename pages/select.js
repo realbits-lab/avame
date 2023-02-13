@@ -18,7 +18,7 @@ import DialogActions from "@mui/material/DialogActions";
 function SelectPage({ collectionUri }) {
   const [traitArray, setTraitArray] = React.useState([]);
   const [attrArray, setAttrArray] = React.useState([]);
-  const [attrDict, setAttrDict] = React.useState({});
+  const [attributes, setAttributes] = React.useState({});
   const [selectedTraitType, setSelectedTraitType] = React.useState("");
   const [openDialog, setOpenDialog] = React.useState(false);
 
@@ -37,26 +37,11 @@ function SelectPage({ collectionUri }) {
         axios
           .get(testCollectionUri)
           .then(async function (testCollectionUriResult) {
-            console.log("testCollectionUriResult: ", testCollectionUriResult);
-            const entries = Object.entries(
+            console.log(
+              "testCollectionUriResult.data.attributes: ",
               testCollectionUriResult.data.attributes
             );
-            setAttrDict(testCollectionUriResult.data.attributes);
-            console.log("entries: ", entries);
-            // const key = entries[0];
-            // const value = entries[1];
-
-            // //* Set attributes.
-            // await Promise.all(
-            //   value.map((attr) => {
-            //     attrArrayResult.push({
-            //       trait_type: key,
-            //       attributes: attr,
-            //       isSelected: false,
-            //     });
-            //   })
-            // );
-            // console.log("attrArrayResult: ", attrArrayResult);
+            setAttributes(testCollectionUriResult.data.attributes);
           });
       }
       initialize();
@@ -68,7 +53,7 @@ function SelectPage({ collectionUri }) {
     return (
       <>
         <Grid container>
-          {Object.keys(attrDict).map((traitType, idx) => {
+          {Object.keys(attributes).map((traitType, idx) => {
             return (
               <Grid item key={idx}>
                 <Button
@@ -91,21 +76,21 @@ function SelectPage({ collectionUri }) {
     return (
       <>
         <Grid container spacing={2}>
-          {Object.entries(attrDict).map(([key, value] = entry) => {
-            console.log("key: ", key);
-            console.log("value: ", value);
-            if (key === selectedTraitType) {
-              return value.map((e) => {
-                console.log("e: ", e);
+          {Object.entries(attributes).map(([traitType, values] = entry) => {
+            console.log("traitType: ", traitType);
+            console.log("values: ", values);
+            if (traitType === selectedTraitType) {
+              return values.map((value) => {
+                console.log("value: ", value);
                 return (
-                  <Grid item key={`${key}/${e}`}>
+                  <Grid item key={`${traitType}/${value}`}>
                     <Button
                       size="small"
                       variant="contained"
-                      key={`${key}/${e}`}
+                      key={`${traitType}/${value}`}
                       sx={{ m: "2px" }}
                     >
-                      {e}
+                      {value}
                     </Button>
                   </Grid>
                 );
