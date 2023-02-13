@@ -15,6 +15,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
+import Typography from "@mui/material/Typography";
 
 function SelectPage({ collectionUri }) {
   //* TODO: Get from json data.
@@ -23,14 +24,15 @@ function SelectPage({ collectionUri }) {
   const [attributes, setAttributes] = React.useState({});
   const [selectedTraitType, setSelectedTraitType] = React.useState("");
   const [selectedValue, setSelectedValue] = React.useState("");
+  const [selectedData, setSelectedData] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
 
   React.useEffect(
     function () {
-      console.log("call useEffect()");
+      // console.log("call useEffect()");
 
       async function initialize() {
-        console.log("call initialize()");
+        // console.log("call initialize()");
 
         //* Get trait list from collection uri.
         let attrArrayResult = [];
@@ -40,10 +42,10 @@ function SelectPage({ collectionUri }) {
         axios
           .get(testCollectionUri)
           .then(async function (testCollectionUriResult) {
-            console.log(
-              "testCollectionUriResult.data.attributes: ",
-              testCollectionUriResult.data.attributes
-            );
+            // console.log(
+            //   "testCollectionUriResult.data.attributes: ",
+            //   testCollectionUriResult.data.attributes
+            // );
             setAttributes(testCollectionUriResult.data.attributes);
           });
       }
@@ -52,7 +54,44 @@ function SelectPage({ collectionUri }) {
     [collectionUri]
   );
 
-  const TraitListPage = () => {
+  function fetchSelectedData() {
+    console.log("call fetchSelectedData()");
+    console.log("selectedTraitType: ", selectedTraitType);
+    console.log("selectedValue: ", selectedValue);
+
+    axios
+      .get("/api/get-register-data-list", {
+        params: {
+          type: selectedTraitType,
+          value: selectedValue,
+        },
+      })
+      .then((result) => {
+        console.log("result: ", result);
+        console.log("result.data.data: ", result.data.data);
+        setSelectedData(result.data.data);
+      })
+      .catch((error) => console.error(error));
+  }
+
+  const SelectDataList = ({ data }) => {
+    // console.log("call SelectDataList()");
+    // console.log("data: ", data);
+
+    if (!data) {
+      return <></>;
+    }
+
+    return (
+      <>
+        {data.map((data, idx) => {
+          return <Typography key={idx}>{data.name}</Typography>;
+        })}
+      </>
+    );
+  };
+
+  const TraitListPage = ({ data }) => {
     return (
       <>
         <Grid container>
@@ -71,6 +110,7 @@ function SelectPage({ collectionUri }) {
             );
           })}
         </Grid>
+        <SelectDataList data={data} />
       </>
     );
   };
@@ -118,7 +158,10 @@ function SelectPage({ collectionUri }) {
     return (
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        onClose={() => {
+          fetchSelectedData();
+          setOpenDialog(false);
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -129,7 +172,13 @@ function SelectPage({ collectionUri }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} autoFocus>
+          <Button
+            onClick={() => {
+              fetchSelectedData();
+              setOpenDialog(false);
+            }}
+            autoFocus
+          >
             Close
           </Button>
         </DialogActions>
@@ -139,7 +188,7 @@ function SelectPage({ collectionUri }) {
 
   return (
     <>
-      <TraitListPage />
+      <TraitListPage data={selectedData} />
       <SelectDialog />
     </>
   );
