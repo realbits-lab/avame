@@ -15,6 +15,8 @@ import * as DrawingUtils from "@mediapipe/drawing_utils";
 import * as Kalidokit from "kalidokit";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
+import { useRecoilStateLoadable } from "recoil";
+import { writeToastMessageState, AlertSeverity } from "./RealBitsUtil";
 
 function HolisticData({ currentVrmRef }) {
   // console.log("call HolisticData()");
@@ -34,6 +36,21 @@ function HolisticData({ currentVrmRef }) {
 
   const sourceVideoElementRef = React.useRef();
   const guideCanvasElementRef = React.useRef();
+
+  //* --------------------------------------------------------------------------
+  //* Snackbar variables.
+  //* --------------------------------------------------------------------------
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   React.useEffect(() => {
     // console.log("call useEffet()");
@@ -55,14 +72,22 @@ function HolisticData({ currentVrmRef }) {
         //*--------------------------------------------------------------------------
         //* Make holistic instance.
         //*--------------------------------------------------------------------------
+        setWriteToastMessage({
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "Holistic model is loading...",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        });
+
         holisticMeshRef.current = new Holistic({
           locateFile: (file) => {
             // console.log("file: ", file);
             return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
           },
         });
-        // console.log("call holistic.initialize() done");
+        // console.log("call new Holistic() done");
         await holisticMeshRef.current.initialize();
+        // console.log("call holistic.initialize() done");
 
         //* Set holistic option.
         holisticMeshRef.current.setOptions({
@@ -112,8 +137,8 @@ function HolisticData({ currentVrmRef }) {
       //*---------------------------------------------------------------------------
       //* Start a camera.
       //*---------------------------------------------------------------------------
-      // console.log("call camera.start() start.");
       camera.start();
+      // console.log("call camera.start() done.");
     }
     initialize();
   }, [currentVrmRef]);
@@ -137,6 +162,13 @@ function HolisticData({ currentVrmRef }) {
       //*---------------------------------------------------------------------------
       //* Make face mesh instance.
       //*---------------------------------------------------------------------------
+      setWriteToastMessage({
+        snackbarSeverity: AlertSeverity.info,
+        snackbarMessage: "FaceMesh model is loading...",
+        snackbarTime: new Date(),
+        snackbarOpen: true,
+      });
+
       faceMeshRef.current = new inputLib.FaceMesh({
         locateFile: (file) => {
           return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;

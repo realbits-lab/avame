@@ -12,7 +12,7 @@ import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
 import VideoChat from "../components/VideoChat";
-import { getChainName } from "rent-market";
+import { getChainName } from "../components/RealBitsUtil";
 
 const Service = () => {
   //*---------------------------------------------------------------------------

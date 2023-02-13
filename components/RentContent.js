@@ -7,7 +7,9 @@ import {
 import Grid from "@mui/material/Grid";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount } from "wagmi";
-import { My, Market, RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
+import { RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
+import My from "./My";
+import Market from "./Market";
 import {
   RBDialog,
   writeToastMessageState,
