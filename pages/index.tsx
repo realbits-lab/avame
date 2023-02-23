@@ -30,7 +30,7 @@ const Service = () => {
   //*---------------------------------------------------------------------------
   const getImageDataUrl = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
-  const setTransformAvatarFuncRef = React.useRef();
+  const setAvatarPositionFuncRef = React.useRef();
   const takePictureFuncRef = React.useRef();
   const startRecordingFuncRef = React.useRef();
   const stopRecordingFuncRef = React.useRef();
@@ -127,7 +127,7 @@ const Service = () => {
           getMediaStreamFunc={getMediaStreamFuncRef}
           // VideoChat -> AvatarView call for changing avatar canvas position.
           // ScreenView -> AvatarView call for changing avatar canvas position.
-          setAvatarPositionFunc={setTransformAvatarFuncRef}
+          setAvatarPositionFunc={setAvatarPositionFuncRef}
         />
 
         {/*//*-----------------------------------------------------------------*/}
@@ -164,7 +164,7 @@ const Service = () => {
           // VideoChat -> AvatarView call for new Remon.
           inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
           // VideoChat -> AvatarView call for changing avatar canvas position.
-          inputSetTransformAvatarFuncRef={setTransformAvatarFuncRef}
+          inputSetAvatarPositionFuncRef={setAvatarPositionFuncRef}
           // ScreenView -> VideoChat call for setting background screen.
           inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
           rentMarketRef={rentMarketRef}
