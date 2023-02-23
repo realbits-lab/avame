@@ -8,7 +8,6 @@ import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import AvatarView from "../components/AvatarView";
-import Demo from "../components/Demo";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
@@ -45,7 +44,8 @@ const Service = () => {
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
 
-  let chains: any[] = [];
+  // let chains: any[] = [];
+  let chains = [];
   if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "matic"
@@ -80,14 +80,15 @@ const Service = () => {
   // * Web3Modal Ethereum Client
   const ethereumClient = new EthereumClient(wagmiClient, chains);
 
-  function selectAvatarFunc(element: {
-    metadata: {
-      realbits: {
-        glb_url: React.SetStateAction<string>;
-        vrm_url: React.SetStateAction<string>;
-      };
-    };
-  }) {
+  // function selectAvatarFunc(element: {
+  //   metadata: {
+  //     realbits: {
+  //       glb_url: React.SetStateAction<string>,
+  //       vrm_url: React.SetStateAction<string>,
+  //     },
+  //   },
+  // }) {
+  function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
     // console.log("element.metadata: ", element.metadata);
     // console.log(
@@ -98,7 +99,6 @@ const Service = () => {
     setAvatarUrl(element.metadata.realbits.vrm_url);
   }
 
-  // return <Demo />;
   return (
     <>
       {/* //*----------------------------------------------------------------*/}

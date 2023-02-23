@@ -1,11 +1,6 @@
 const nextConfig = {
   reactStrictMode: false,
-  transpilePackages: [
-    "kalidokit",
-    "rent-market",
-    "v3d-core",
-    "@babylonjs/core",
-  ],
+  transpilePackages: ["kalidokit", "rent-market"],
 };
 
 module.exports = nextConfig;

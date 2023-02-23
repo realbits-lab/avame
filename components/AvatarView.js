@@ -720,7 +720,7 @@ function AvatarView({
         </Box>
       ) : null}
 
-      <HolisticData currentVrmRef={currentVrmRef} />
+      {/* <HolisticData currentVrmRef={currentVrmRef} /> */}
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* GLTF loading progress circle.                                   */}

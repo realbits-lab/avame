@@ -29,7 +29,11 @@ const RentContent = ({
   //* --------------------------------------------------------------------------
   //* Web3 hook variables.
   //* --------------------------------------------------------------------------
+  console.log("Web3Button: ", Web3Button);
+  console.log("Web3NetworkSwitch: ", Web3NetworkSwitch);
+  console.log("useWeb3ModalNetwork: ", useWeb3ModalNetwork);
   const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
+  // const selectedChain = "maticmum";
   // console.log("selectedChain: ", selectedChain);
   const { address, isConnected } = useAccount();
   // console.log("address: ", address);
