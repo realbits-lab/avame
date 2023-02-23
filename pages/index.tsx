@@ -120,14 +120,14 @@ const Service = () => {
         {/*//* AvatarView component.                                           */}
         {/*//*-----------------------------------------------------------------*/}
         <AvatarView
-          gltfDataUrl={avatarUrl}
+          inputGltfDataUrl={avatarUrl}
           getImageDataUrlFunc={getImageDataUrl}
           // VideoChat -> AvatarView call for new Remon.
           // TakeVideo -> AvatarView call for recording video.
           getMediaStreamFunc={getMediaStreamFuncRef}
           // VideoChat -> AvatarView call for changing avatar canvas position.
           // ScreenView -> AvatarView call for changing avatar canvas position.
-          setTransformAvatarFunc={setTransformAvatarFuncRef}
+          setAvatarPositionFunc={setTransformAvatarFuncRef}
         />
 
         {/*//*-----------------------------------------------------------------*/}

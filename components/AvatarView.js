@@ -18,7 +18,7 @@ function AvatarView({
   inputGltfDataUrl,
   getImageDataUrlFunc,
   getMediaStreamFunc,
-  setTransformAvatarFunc,
+  setAvatarPositionFunc,
   showGuideCanvas = false,
   showFrameStats = false,
 }) {
@@ -98,7 +98,7 @@ function AvatarView({
     async function initialize() {
       await initializeAvatarContent({ url: inputGltfDataUrl });
 
-      transformAvatar({
+      setAvatarPosition({
         canvasPosition: undefined,
         avatarPosition: undefined,
         screenVideoStreamRef: currentScreenVideoStreamRef,
@@ -120,12 +120,12 @@ function AvatarView({
     //* Set get image data url and get media stream and set show avatar view function.
     getImageDataUrlFunc.current = getImageDataUrl;
     getMediaStreamFunc.current = getMediaStream;
-    setTransformAvatarFunc.current = transformAvatar;
+    setAvatarPositionFunc.current = setAvatarPosition;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
-    setTransformAvatarFunc,
+    setAvatarPositionFunc,
   ]);
 
   function setBackgroundVideo({ canvasPosition, screenVideoStreamRef }) {
@@ -159,13 +159,13 @@ function AvatarView({
     }
   }
 
-  function transformAvatar({
+  function setAvatarPosition({
     canvasPosition,
     avatarPosition,
     screenVideoStreamRef,
     showAvatarOption,
   }) {
-    // console.log("call transformAvatar()");
+    // console.log("call setAvatarPosition()");
     // Keep data for webgl lost event and restore.
     if (canvasPosition !== undefined) {
       currentCanvasPositionRef.current = canvasPosition;
@@ -373,7 +373,7 @@ function AvatarView({
       rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
       //* Set avatar position.
-      transformAvatar({
+      setAvatarPosition({
         canvasPosition: currentCanvasPositionRef.current,
         avatarPosition: currentAvatarPositionRef.current,
         screenVideoStreamRef: currentScreenVideoStreamRef,
@@ -401,7 +401,7 @@ function AvatarView({
         await initializeAvatarContent({ url: currentAvatarDataUrl.current });
 
         //* Set avatar position.
-        transformAvatar({
+        setAvatarPosition({
           canvasPosition: currentCanvasPositionRef.current,
           avatarPosition: currentAvatarPositionRef.current,
           screenVideoStreamRef: currentScreenVideoStreamRef,
