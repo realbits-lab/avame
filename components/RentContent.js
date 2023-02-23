@@ -25,12 +25,8 @@ const RentContent = ({
   //* --------------------------------------------------------------------------
   //* Web3 hook variables.
   //* --------------------------------------------------------------------------
-  console.log("Web3Button: ", Web3Button);
-  console.log("Web3NetworkSwitch: ", Web3NetworkSwitch);
   const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
-  // console.log("address: ", address);
-  // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
   //* Rent market variables.
