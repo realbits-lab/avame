@@ -87,7 +87,7 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
   //*---------------------------------------------------------------------------
-  const avatarCanvas = React.useRef(null);
+  const avatarCanvasRef = React.useRef(null);
   const currentAvatarDataUrl = React.useRef();
   const guideCanvasRef = React.useRef();
   const AVATAR_CANVAS_CAPTURE_FRAME_RATE = 20;
@@ -153,8 +153,8 @@ function AvatarView({
       // console.log("textureVideoBackground: ", textureVideoBackground);
     } else {
       sceneRef.current.background = new THREE.Color(WHITE_COLOR_HEX);
-      if (avatarCanvas.current) {
-        avatarCanvas.current.style.border = "";
+      if (avatarCanvasRef.current) {
+        avatarCanvasRef.current.style.border = "";
       }
     }
   }
@@ -220,23 +220,23 @@ function AvatarView({
       case canvasPosition === ScreenPosition.center &&
         avatarPosition === ScreenPosition.center:
       default:
-        avatarCanvas.current.style.position = "absolute";
-        avatarCanvas.current.style.zIndex = Z_INDEX.avatarCanvasCenter;
-        avatarCanvas.current.style.width = "100%";
-        avatarCanvas.current.style.height = "100%";
-        avatarCanvas.current.style.right = "0px";
-        avatarCanvas.current.style.top = "0px";
+        avatarCanvasRef.current.style.position = "absolute";
+        avatarCanvasRef.current.style.zIndex = Z_INDEX.avatarCanvasCenter;
+        avatarCanvasRef.current.style.width = "100%";
+        avatarCanvasRef.current.style.height = "100%";
+        avatarCanvasRef.current.style.right = "0px";
+        avatarCanvasRef.current.style.top = "0px";
         break;
 
       case canvasPosition === ScreenPosition.rightTop &&
         avatarPosition === ScreenPosition.center:
-        avatarCanvas.current.style.position = "absolute";
-        avatarCanvas.current.style.zIndex = 100;
-        avatarCanvas.current.style.width = "25%";
-        avatarCanvas.current.style.height = "25%";
-        avatarCanvas.current.style.right = "20px";
-        avatarCanvas.current.style.top = "20px";
-        avatarCanvas.current.style.boxShadow = "10px 10px 20px 1px grey";
+        avatarCanvasRef.current.style.position = "absolute";
+        avatarCanvasRef.current.style.zIndex = 100;
+        avatarCanvasRef.current.style.width = "25%";
+        avatarCanvasRef.current.style.height = "25%";
+        avatarCanvasRef.current.style.right = "20px";
+        avatarCanvasRef.current.style.top = "20px";
+        avatarCanvasRef.current.style.boxShadow = "10px 10px 20px 1px grey";
         break;
     }
   }
@@ -261,7 +261,7 @@ function AvatarView({
     const resizedContext = resizedCanvas.getContext("2d");
 
     //* Get an original canvas.
-    const avatarCanvasElement = document.getElementById("avatarCanvas");
+    const avatarCanvasElement = document.getElementById("avatarCanvasRef");
     resizedContext.drawImage(
       avatarCanvasElement,
       0,
@@ -333,7 +333,7 @@ function AvatarView({
     //* Create webgl renderer.
     rendererRef.current = new THREE.WebGLRenderer({
       antialias: true,
-      canvas: avatarCanvas.current,
+      canvas: avatarCanvasRef.current,
       preserveDrawingBuffer: true,
       alpha: true,
     });
@@ -383,13 +383,13 @@ function AvatarView({
 
     //* Register webglcontextlost event.
     //* https://stackoverflow.com/questions/61020416/how-to-handle-webgl-context-lost-webgl-errors-more-gracefully-in-pixijs
-    avatarCanvas.current.addEventListener("webglcontextlost", function () {
+    avatarCanvasRef.current.addEventListener("webglcontextlost", function () {
       // console.log("webglcontextlost event");
     });
 
     //* Register webglcontextrestored event.
     //* https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextrestored_event
-    avatarCanvas.current.addEventListener(
+    avatarCanvasRef.current.addEventListener(
       "webglcontextrestored",
       async function () {
         //* Remove avatarscene.
@@ -587,9 +587,9 @@ function AvatarView({
         //* Extract audio track:
         const audioTrack = originalUserMedia.getAudioTracks()[0];
 
-        // console.log("avatarCanvas.current: ", avatarCanvas.current);
+        // console.log("avatarCanvasRef.current: ", avatarCanvasRef.current);
         //* Get video from canvas:
-        const canvasVideoStream = avatarCanvas.current.captureStream(
+        const canvasVideoStream = avatarCanvasRef.current.captureStream(
           AVATAR_CANVAS_CAPTURE_FRAME_RATE
         );
         const canvasVideoTrack = canvasVideoStream.getVideoTracks()[0];
@@ -653,7 +653,7 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Canvas for avatar of GLTF format.                               */}
       {/*//*-----------------------------------------------------------------*/}
-      <canvas id="avatarCanvas" ref={avatarCanvas}></canvas>
+      <canvas id="avatarCanvas" ref={avatarCanvasRef}></canvas>
       <Stats ref={initializeStats}></Stats>
 
       {showGuideCanvas ? (
