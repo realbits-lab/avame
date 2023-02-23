@@ -15,7 +15,7 @@ const Stats = loadable.lib(
 );
 
 function AvatarView({
-  gltfDataUrl,
+  inputGltfDataUrl,
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setTransformAvatarFunc,
@@ -57,7 +57,7 @@ function AvatarView({
   const statsLib = React.useRef();
   const currentWindowRatioRef = React.useRef(1);
   const showAvatarOptionRef = React.useRef(true);
-  const loadedGltftData = React.useRef();
+  const currentGltfData = React.useRef();
   const currentCanvasPositionRef = React.useRef(ScreenPosition.center);
   const currentAvatarPositionRef = React.useRef(ScreenPosition.center);
   const currentScreenVideoStreamRef = React.useRef();
@@ -95,35 +95,40 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
-    // console.log("call useEffect()");
-    // console.log("AvatarView useEffect gltfDataUrl: ", gltfDataUrl);
-    clock.current = new THREE.Clock();
+    async function initialize() {
+      await initializeAvatarContent({ url: inputGltfDataUrl });
 
-    if (gltfDataUrl !== currentAvatarDataUrl.current) {
-      // Call initialize function if gltfDataUrl is new.
-      initializeContent(gltfDataUrl).then(() => {
-        transformAvatar({
-          canvasPosition: undefined,
-          avatarPosition: undefined,
-          screenVideoStreamRef: currentScreenVideoStreamRef,
-          showAvatarOption: true,
-        });
+      transformAvatar({
+        canvasPosition: undefined,
+        avatarPosition: undefined,
+        screenVideoStreamRef: currentScreenVideoStreamRef,
+        showAvatarOption: true,
       });
-      currentAvatarDataUrl.current = gltfDataUrl;
+
+      currentAvatarDataUrl.current = inputGltfDataUrl;
     }
 
-    // Set get image data url and get media stream and set show avatar view function.
+    // console.log("call useEffect()");
+    // console.log("AvatarView useEffect inputGltfDataUrl: ", inputGltfDataUrl);
+    clock.current = new THREE.Clock();
+
+    if (inputGltfDataUrl !== currentAvatarDataUrl.current) {
+      //* Call initialize function if inputGltfDataUrl is new.
+      initialize();
+    }
+
+    //* Set get image data url and get media stream and set show avatar view function.
     getImageDataUrlFunc.current = getImageDataUrl;
     getMediaStreamFunc.current = getMediaStream;
     setTransformAvatarFunc.current = transformAvatar;
   }, [
-    gltfDataUrl,
+    inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
     setTransformAvatarFunc,
   ]);
 
-  const setBackgroundVideo = ({ canvasPosition, screenVideoStreamRef }) => {
+  function setBackgroundVideo({ canvasPosition, screenVideoStreamRef }) {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
     if (
       screenVideoStreamRef !== undefined &&
@@ -152,7 +157,7 @@ function AvatarView({
         avatarCanvas.current.style.border = "";
       }
     }
-  };
+  }
 
   function transformAvatar({
     canvasPosition,
@@ -273,19 +278,18 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Initialize data.
   //*---------------------------------------------------------------------------
-  async function initializeContent(url) {
-    // console.log("initializeContent function url: ", url);
+  async function initializeAvatarContent({ url }) {
+    // console.log("initializeAvatarContent function url: ", url);
 
-    makeContentInstance();
-    await loadGLTF(url);
+    makeScene();
+    await loadGLTF({ url });
   }
 
   //*---------------------------------------------------------------------------
   //* Make instances.
   //*---------------------------------------------------------------------------
-  function makeContentInstance() {
-    //* Make camera instance.
-    // Set [-1, 1] range.
+  function makeScene() {
+    //* Set window ratio.
     if (window.innerWidth !== 0) {
       currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
     } else {
@@ -298,6 +302,7 @@ function AvatarView({
     //   currentWindowRatioRef.current
     // );
 
+    //* Set camera type.
     if (currentOrbitCameraTypeRef.current === CameraType.perspective) {
       // console.log("set camera perpective.");
       orbitCameraRef.current = new THREE.PerspectiveCamera(
@@ -322,10 +327,10 @@ function AvatarView({
       );
     }
 
-    //* Make sceneRef instance.
+    //* Create scene.
     sceneRef.current = new THREE.Scene();
 
-    //* Make rendererRef instance.
+    //* Create webgl renderer.
     rendererRef.current = new THREE.WebGLRenderer({
       antialias: true,
       canvas: avatarCanvas.current,
@@ -334,21 +339,21 @@ function AvatarView({
     });
     rendererRef.current.setSize(window.innerWidth, window.innerHeight);
     rendererRef.current.setPixelRatio(window.devicePixelRatio);
-    // TODO: Test for vrm.
     // rendererRef.current.toneMapping = THREE.ACESFilmicToneMapping;
     rendererRef.current.outputEncoding = THREE.sRGBEncoding;
 
-    //* Add resize event listener.
+    //* Register window resize event.
     window.addEventListener("resize", () => {
       // console.log("-- resize event");
 
-      //* Get current window ratio.
+      //* Get window ratio.
       if (window.innerWidth !== 0) {
         currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
       } else {
         currentWindowRatioRef.current = 1;
       }
 
+      //* Get camera type.
       if (currentOrbitCameraTypeRef.current === CameraType.perspective) {
         orbitCameraRef.current.aspect = currentWindowRatioRef.current;
       } else if (
@@ -360,13 +365,14 @@ function AvatarView({
         orbitCameraRef.current.bottom = -1 * currentWindowRatioRef.current;
       }
 
+      //* Update view matrix.
       orbitCameraRef.current.updateProjectionMatrix();
 
-      //* Set renderer configuration of size and pixel ratio.
+      //* Set renderer size and pixel ratio.
       rendererRef.current.setSize(window.innerWidth, window.innerHeight);
       rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
-      //* Redraw avatar.
+      //* Set avatar position.
       transformAvatar({
         canvasPosition: currentCanvasPositionRef.current,
         avatarPosition: currentAvatarPositionRef.current,
@@ -375,26 +381,34 @@ function AvatarView({
       });
     });
 
-    // https://stackoverflow.com/questions/61020416/how-to-handle-webgl-context-lost-webgl-errors-more-gracefully-in-pixijs
-    avatarCanvas.current.addEventListener("webglcontextlost", () => {
+    //* Register webglcontextlost event.
+    //* https://stackoverflow.com/questions/61020416/how-to-handle-webgl-context-lost-webgl-errors-more-gracefully-in-pixijs
+    avatarCanvas.current.addEventListener("webglcontextlost", function () {
       // console.log("webglcontextlost event");
     });
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextrestored_event
-    avatarCanvas.current.addEventListener("webglcontextrestored", () => {
-      // Re-initialize.
-      // console.log("webglcontextrestored event");
-      sceneRef.current.clear();
-      clock.current = new THREE.Clock();
-      initializeContent(currentAvatarDataUrl.current).then(() => {
+    //* Register webglcontextrestored event.
+    //* https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextrestored_event
+    avatarCanvas.current.addEventListener(
+      "webglcontextrestored",
+      async function () {
+        //* Remove avatarscene.
+        // console.log("webglcontextrestored event");
+        sceneRef.current.clear();
+        clock.current = new THREE.Clock();
+
+        //* Initialize avatar scene.
+        await initializeAvatarContent({ url: currentAvatarDataUrl.current });
+
+        //* Set avatar position.
         transformAvatar({
           canvasPosition: currentCanvasPositionRef.current,
           avatarPosition: currentAvatarPositionRef.current,
           screenVideoStreamRef: currentScreenVideoStreamRef,
           showAvatarOption: true,
         });
-      });
-    });
+      }
+    );
 
     //* Make environment instance.
     const environment = new STDLIB.RoomEnvironment();
@@ -426,29 +440,30 @@ function AvatarView({
     // );
   }
 
-  async function loadGLTF(url) {
+  async function loadGLTF({ url }) {
     // console.log("call loadGLTF()");
     // console.log("url: ", url);
-    // Make ktx loader instance.
+
+    //* Make ktx loader instance.
     const ktx2Loader = new STDLIB.KTX2Loader()
       .setTranscoderPath("js/libs/basis/")
       .detectSupport(rendererRef.current);
 
-    // Make gltf loader instance.
+    //* Make gltf loader instance.
     const gltfLoader = new STDLIB.GLTFLoader()
       .setKTX2Loader(ktx2Loader)
       .setMeshoptDecoder(STDLIB.MeshoptDecoder);
 
-    // Show gltf loading circle.
+    //* Show gltf loading circle.
     // console.log("Loading visible when gltf loading started.");
     setShowGltfLoadingProgress("visible");
 
-    // Install GLTFLoader plugin
+    //* Register VRM plugin
     gltfLoader.register((parser) => {
       return new ThreeVrm.VRMLoaderPlugin(parser);
     });
 
-    // Load gltf data.
+    //* Load gltf data.
     gltfLoader.load(
       url,
       function (gltf) {
@@ -459,11 +474,11 @@ function AvatarView({
           // console.log("currentVrmRef.current: ", currentVrmRef.current);
           // ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
-          // Rotate model 180deg to face camera
+          //* Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
           // ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
 
-          // Add vrm model to scene.
+          //* Add vrm model to scene.
           // currentVrmRef.current.humanoid.autoUpdateHumanBones = false;
           sceneRef.current.add(currentVrmRef.current.scene);
           // console.log(
@@ -471,7 +486,7 @@ function AvatarView({
           //   currentVrmRef.current.scene
           // );
 
-          // Create light.
+          //* Create light.
           const light = new THREE.DirectionalLight(0xffffff);
           light.position.set(1.0, 1.0, 1.0).normalize();
           sceneRef.current.add(light);
@@ -485,8 +500,8 @@ function AvatarView({
           // console.log("expressions: ", expressionManager.expressions);
         }
 
-        // Keep gltf data to loadedGltfData variable.
-        loadedGltftData.current = gltf;
+        //* Keep gltf data to loadedGltfData variable.
+        currentGltfData.current = gltf;
 
         //* Set animation loop.
         rendererRef.current.setAnimationLoop(() => {
@@ -507,7 +522,7 @@ function AvatarView({
         });
 
         //* Set camera setting.
-        adjustCamera({ gltf: loadedGltftData.current });
+        adjustCamera({ gltf: currentGltfData.current });
 
         // console.log("Loading hidden when gltf loaidng finished.");
         setShowGltfLoadingProgress("hidden");
@@ -545,7 +560,7 @@ function AvatarView({
       orbitCameraRef.current.position.set(
         camera.position.x,
         camera.position.y,
-        camera.position.z,
+        camera.position.z
       );
       orbitCameraRef.current.setRotationFromQuaternion(camera.quaternion);
 
