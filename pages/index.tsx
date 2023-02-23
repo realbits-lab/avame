@@ -8,6 +8,7 @@ import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import AvatarView from "../components/AvatarView";
+import Demo from "../components/Demo";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
@@ -97,6 +98,7 @@ const Service = () => {
     setAvatarUrl(element.metadata.realbits.vrm_url);
   }
 
+  // return <Demo />;
   return (
     <>
       {/* //*----------------------------------------------------------------*/}

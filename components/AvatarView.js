@@ -3,11 +3,14 @@ import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
 import loadable from "@loadable/component";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Backdrop from "@mui/material/Backdrop";
 import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
 import { humanFileSize } from "rent-market";
 import HolisticData from "./HolisticData";
-const Stats = loadable.lib(
+const StatsWithNoSSR = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
   {
     ssr: false,
@@ -49,6 +52,9 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.
   //*---------------------------------------------------------------------------
+  const backdropRef = React.useRef();
+  const sourceVideoRef = React.useRef();
+  const v3dWebRef = React.useRef();
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
@@ -96,6 +102,22 @@ function AvatarView({
 
   React.useEffect(() => {
     async function initialize() {
+      const V3DWeb = await import("v3d-web/dist/src");
+      console.log("V3DWeb: ", V3DWeb);
+      v3dWebRef.current = new V3DWeb.V3DWeb(
+        "testfiles/7198176664607455952.vrm",
+        sourceVideoRef.current,
+        avatarCanvasRef.current,
+        guideCanvasRef.current,
+        null,
+        {
+          locateFile: (file) => {
+            return `/holistic/${file}`;
+          },
+        },
+        backdropRef.current
+      );
+
       await initializeAvatarContent({ url: inputGltfDataUrl });
 
       setAvatarPosition({
@@ -180,10 +202,11 @@ function AvatarView({
       currentScreenVideoStreamRef.current = screenVideoStreamRef.current;
     }
 
-    setBackgroundVideo({
-      canvasPosition: currentCanvasPositionRef.current,
-      screenVideoStreamRef: screenVideoStreamRef,
-    });
+    //* TODO: Block for a while.
+    // setBackgroundVideo({
+    //   canvasPosition: currentCanvasPositionRef.current,
+    //   screenVideoStreamRef: screenVideoStreamRef,
+    // });
 
     if (showAvatarOption === false) {
       //* Remove the found mesh to sceneRef.
@@ -279,14 +302,30 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url }) {
-    // console.log("initializeAvatarContent function url: ", url);
+    console.log("call initializeAvatarContent()");
+    console.log("url: ", url);
 
-    makeScene();
-    await loadGLTF({ url });
+    //* TODO: Block for a while.
+    // makeScene();
+    // await loadGltf({ url });
+
+    // v3dWebRef.current = new V3DWeb(
+    //   "testfiles/7198176664607455952.vrm",
+    //   sourceVideoRef.current,
+    //   avatarCanvasRef.current,
+    //   guideCanvasRef.current,
+    //   null,
+    //   {
+    //     locateFile: (file) => {
+    //       return `/holistic/${file}`;
+    //     },
+    //   },
+    //   backdropRef.current
+    // );
   }
 
   //*---------------------------------------------------------------------------
-  //* Make instances.
+  //* Make scene with three js.
   //*---------------------------------------------------------------------------
   function makeScene() {
     //* Set window ratio.
@@ -440,8 +479,8 @@ function AvatarView({
     // );
   }
 
-  async function loadGLTF({ url }) {
-    // console.log("call loadGLTF()");
+  async function loadGltf({ url }) {
+    // console.log("call loadGltf()");
     // console.log("url: ", url);
 
     //* Make ktx loader instance.
@@ -640,6 +679,7 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       <video
         id="sourceVideo"
+        ref={sourceVideoRef}
         style={{ display: "none" }}
         autoPlay={true}
         playsInline={true}
@@ -654,7 +694,12 @@ function AvatarView({
       {/*//* Canvas for avatar of GLTF format.                               */}
       {/*//*-----------------------------------------------------------------*/}
       <canvas id="avatarCanvas" ref={avatarCanvasRef}></canvas>
-      <Stats ref={initializeStats}></Stats>
+      <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
+      <div ref={backdropRef}>
+        <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </div>
 
       {showGuideCanvas ? (
         <Box
