@@ -44,7 +44,7 @@ const My = ({
   inputMyRentNFTArray,
   inputBlockchainNetwork,
   setWriteToastMessage,
-  web3modalSelectedChain,
+  selectedChain,
   wagmiIsConnected,
 }) => {
   // * -------------------------------------------------------------------------
@@ -104,7 +104,7 @@ const My = ({
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("inputMyRentNFTArray: ", inputMyRentNFTArray);
     // console.log("inputBlockchainNetwork: ", inputBlockchainNetwork);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
+    // console.log("selectedChain: ", selectedChain);
     // console.log("wagmiIsConnected: ", wagmiIsConnected);
 
     if (inputRentMarket) {
@@ -548,11 +548,7 @@ const My = ({
     // console.log("collectionArray: ", collectionArray);
     // console.log("inputMyRegisteredNFTArray: ", inputMyRegisteredNFTArray);
     // console.log("myRentNFTArray: ", myRentNFTArray);
-    // console.log("web3modalSelectedChain: ", web3modalSelectedChain);
-    // console.log(
-    //   "web3modalSelectedChain.network: ",
-    //   web3modalSelectedChain.network
-    // );
+    // console.log("selectedChain: ", selectedChain);
     // console.log(
     //   "getChainName({ chainId: inputBlockchainNetwork }): ",
     //   getChainName({ chainId: inputBlockchainNetwork })
@@ -561,8 +557,8 @@ const My = ({
 
     if (
       wagmiIsConnected === false ||
-      web3modalSelectedChain === undefined ||
-      getChainName({ chainId: web3modalSelectedChain.id }) !==
+      selectedChain === undefined ||
+      getChainName({ chainId: selectedChain.name }) !==
         getChainName({ chainId: inputBlockchainNetwork })
     ) {
       return (
@@ -581,8 +577,8 @@ const My = ({
 
     if (
       wagmiIsConnected === true &&
-      web3modalSelectedChain &&
-      getChainName({ chainId: web3modalSelectedChain.id }) ===
+      selectedChain &&
+      getChainName({ chainId: selectedChain.name }) ===
         getChainName({ chainId: inputBlockchainNetwork })
     ) {
       if (
