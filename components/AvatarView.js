@@ -2,6 +2,7 @@ import React from "react";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
+import { Color3, Vector3 } from "@babylonjs/core/Maths";
 import loadable from "@loadable/component";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -102,22 +103,6 @@ function AvatarView({
 
   React.useEffect(() => {
     async function initialize() {
-      const V3DWeb = await import("v3d-web/dist/src");
-      console.log("V3DWeb: ", V3DWeb);
-      v3dWebRef.current = new V3DWeb.V3DWeb(
-        "testfiles/7198176664607455952.vrm",
-        sourceVideoRef.current,
-        avatarCanvasRef.current,
-        guideCanvasRef.current,
-        null,
-        {
-          locateFile: (file) => {
-            return `/holistic/${file}`;
-          },
-        },
-        backdropRef.current
-      );
-
       await initializeAvatarContent({ url: inputGltfDataUrl });
 
       setAvatarPosition({
@@ -309,19 +294,32 @@ function AvatarView({
     // makeScene();
     // await loadGltf({ url });
 
-    // v3dWebRef.current = new V3DWeb(
-    //   "testfiles/7198176664607455952.vrm",
-    //   sourceVideoRef.current,
-    //   avatarCanvasRef.current,
-    //   guideCanvasRef.current,
-    //   null,
-    //   {
-    //     locateFile: (file) => {
-    //       return `/holistic/${file}`;
-    //     },
-    //   },
-    //   backdropRef.current
-    // );
+    const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
+    // console.log("V3DWebLibrary: ", V3DWebLibrary);
+    v3dWebRef.current = new V3DWebLibrary.V3DWeb(
+      "testfiles/7198176664607455952.vrm",
+      sourceVideoRef.current,
+      avatarCanvasRef.current,
+      guideCanvasRef.current,
+      null,
+      {
+        locateFile: (file) => {
+          return `/holistic/${file}`;
+        },
+      },
+      backdropRef.current,
+      () => {
+        const v3DCore = v3dWebRef.current.v3DCore;
+        console.log("v3DCore: ", v3DCore);
+        // v3DCore._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
+
+        //* Set light.
+        v3DCore.addAmbientLight(new Color3(0, 0, 0));
+
+        //* Set background.
+        v3DCore.setBackgroundColor(Color3.FromHexString("#ffffff"));
+      }
+    );
   }
 
   //*---------------------------------------------------------------------------
@@ -693,7 +691,11 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Canvas for avatar of GLTF format.                               */}
       {/*//*-----------------------------------------------------------------*/}
-      <canvas id="avatarCanvas" ref={avatarCanvasRef}></canvas>
+      <canvas
+        id="avatarCanvas"
+        className="avatarCanvas"
+        ref={avatarCanvasRef}
+      />
       <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
       <div ref={backdropRef}>
         <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>

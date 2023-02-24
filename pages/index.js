@@ -162,7 +162,7 @@ const Service = () => {
         {/*//*-----------------------------------------------------------------*/}
         {/*//* Video chat component.                                           */}
         {/*//*-----------------------------------------------------------------*/}
-        <VideoChat
+        {/* <VideoChat
           // VideoChat -> AvatarView call for new Remon.
           inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
           // VideoChat -> AvatarView call for changing avatar canvas position.
@@ -170,7 +170,7 @@ const Service = () => {
           // ScreenView -> VideoChat call for setting background screen.
           inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
           rentMarketRef={rentMarketRef}
-        />
+        /> */}
       </WagmiConfig>
 
       <Web3Modal

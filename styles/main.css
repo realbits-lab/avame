@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -39,9 +39,9 @@ embed,
 object {
     display: block;
     vertical-align: middle;
-}
+} */
 
-.outer_container {
+/* .outer_container {
     position: absolute;
     width: 100%;
     max-height: 100%;
@@ -66,7 +66,7 @@ object {
     width: 100vw;
     justify-content: center;
     align-items: center;
-}
+} */
 
 .output_canvas {
     width: 100vw;
@@ -76,7 +76,7 @@ object {
     z-index: 0;
 }
 
-.video_output_canvas {
+/* .video_output_canvas {
     width: 20vw;
     max-height: 30vh;
     position: fixed;
@@ -85,4 +85,4 @@ object {
     background: #3d3d3d;
     opacity: 0.8;
     z-index: 1;
-}
+} */

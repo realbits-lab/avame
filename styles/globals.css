@@ -102,3 +102,11 @@ a {
 .w3m-modal.w3m-overlay.w3m-open {
   z-index: 2000 !important;
 }
+
+.avatarCanvas {
+    width: 100vw;
+    display: block;
+    position: relative;
+    height: 100vh;
+    z-index: 0;
+}
