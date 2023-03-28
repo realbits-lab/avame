@@ -13,8 +13,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@babylonjs/core": "^5.0.0",
-    "@babylonjs/inspector": "^5.0.0",
+    "@babylonjs/core": "5.19.0",
+    "@babylonjs/gui": "5.19.0",
+    "@babylonjs/gui-editor": "5.19.0",
+    "@babylonjs/inspector": "5.19.0",
+    "@babylonjs/loaders": "5.19.0",
+    "@babylonjs/materials": "5.19.0",
+    "@babylonjs/serializers": "5.19.0",
     "@connectlive/connectlive-web-sdk": "^2.2.4",
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",
@@ -43,6 +48,7 @@
     "@web3modal/react": "^2.2.2",
     "alchemy-sdk": "^2.4.0",
     "axios": "^1.2.1",
+    "babylonjs-gltf2interface": "5.0.0",
     "bufferutil": "^4.0.7",
     "chroma-js": "^2.4.2",
     "comlink": "^4.4.1",
