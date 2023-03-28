@@ -73,8 +73,8 @@
     "typescript": "4.9.4",
     "utf-8-validate": "^5.0.10",
     "uuid": "^9.0.0",
-    "v3d-core-realbits": "^0.0.1",
-    "v3d-web-realbits": "^0.0.5",
+    "v3d-core-realbits": "^0.0.4",
+    "v3d-web-realbits": "^0.0.9",
     "wagmi": "^0.11.0"
   }
 }
