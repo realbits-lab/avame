@@ -31,7 +31,7 @@ import RoomList from "./RoomList";
 
 function VideoChat({
   inputGetMediaStreamFuncRef,
-  inputSetTransformAvatarFuncRef,
+  inputSetAvatarPositionFuncRef,
   inputSetBackgroundScreenFuncRef,
   rentMarketRef,
 }) {
@@ -58,7 +58,7 @@ function VideoChat({
   //* Define input copied variables.
   //*---------------------------------------------------------------------------
   const getMediaStreamFuncRef = React.useRef();
-  const setTransformAvatarFuncRef = React.useRef();
+  const setAvatarPositionFuncRef = React.useRef();
 
   //*---------------------------------------------------------------------------
   //* Define enum variables.
@@ -221,7 +221,7 @@ function VideoChat({
 
     //* Set function reference.
     getMediaStreamFuncRef.current = inputGetMediaStreamFuncRef.current;
-    setTransformAvatarFuncRef.current = inputSetTransformAvatarFuncRef.current;
+    setAvatarPositionFuncRef.current = inputSetAvatarPositionFuncRef.current;
     inputSetBackgroundScreenFuncRef.current = setBackgroundScreen;
 
     console.log("process.env: ", process.env);
@@ -232,7 +232,7 @@ function VideoChat({
     }
   }, [
     inputGetMediaStreamFuncRef,
-    inputSetTransformAvatarFuncRef,
+    inputSetAvatarPositionFuncRef,
     inputSetBackgroundScreenFuncRef,
   ]);
 
@@ -717,7 +717,7 @@ function VideoChat({
     }
 
     // 2. Move avatar canvas to the right-bottom side.
-    setTransformAvatarFuncRef.current({
+    setAvatarPositionFuncRef.current({
       canvasPosition: ScreenPosition.rightTop,
       avatarPosition: ScreenPosition.center,
       screenVideoStreamRef: backgroundStreamRef,
@@ -747,7 +747,7 @@ function VideoChat({
     }
 
     //* Move avatar canvas to the right-bottom side.
-    setTransformAvatarFuncRef.current({
+    setAvatarPositionFuncRef.current({
       canvasPosition: ScreenPosition.center,
       avatarPosition: ScreenPosition.center,
       screenVideoStreamRef: backgroundStreamRef,
@@ -843,7 +843,7 @@ function VideoChat({
 
     //* Call transform avatar function.
     // console.log("avatarTransformOption: ", avatarTransformOption);
-    setTransformAvatarFuncRef.current(avatarTransformOption);
+    setAvatarPositionFuncRef.current(avatarTransformOption);
   }
 
   return (

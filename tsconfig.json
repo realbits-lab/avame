@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/twitter/auth.js", "pages/api/twitter/callback.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/twitter/auth.js", "pages/api/twitter/callback.js", "pages/index.js"],
   "exclude": ["node_modules"]
 }

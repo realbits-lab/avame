@@ -2,12 +2,16 @@ import React from "react";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
+import { Color3, Vector3 } from "@babylonjs/core/Maths";
 import loadable from "@loadable/component";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Backdrop from "@mui/material/Backdrop";
 import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
 import { humanFileSize } from "rent-market";
 import HolisticData from "./HolisticData";
-const Stats = loadable.lib(
+const StatsWithNoSSR = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
   {
     ssr: false,
@@ -15,10 +19,10 @@ const Stats = loadable.lib(
 );
 
 function AvatarView({
-  gltfDataUrl,
+  inputGltfDataUrl,
   getImageDataUrlFunc,
   getMediaStreamFunc,
-  setTransformAvatarFunc,
+  setAvatarPositionFunc,
   showGuideCanvas = false,
   showFrameStats = false,
 }) {
@@ -49,6 +53,9 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Mutable variable with useRef.
   //*---------------------------------------------------------------------------
+  const backdropRef = React.useRef();
+  const sourceVideoRef = React.useRef();
+  const v3dWebRef = React.useRef();
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
@@ -57,7 +64,7 @@ function AvatarView({
   const statsLib = React.useRef();
   const currentWindowRatioRef = React.useRef(1);
   const showAvatarOptionRef = React.useRef(true);
-  const loadedGltftData = React.useRef();
+  const currentGltfData = React.useRef();
   const currentCanvasPositionRef = React.useRef(ScreenPosition.center);
   const currentAvatarPositionRef = React.useRef(ScreenPosition.center);
   const currentScreenVideoStreamRef = React.useRef();
@@ -87,7 +94,7 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* useRef, useState variables.
   //*---------------------------------------------------------------------------
-  const avatarCanvas = React.useRef(null);
+  const avatarCanvasRef = React.useRef(null);
   const currentAvatarDataUrl = React.useRef();
   const guideCanvasRef = React.useRef();
   const AVATAR_CANVAS_CAPTURE_FRAME_RATE = 20;
@@ -95,35 +102,40 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
-    // console.log("call useEffect()");
-    // console.log("AvatarView useEffect gltfDataUrl: ", gltfDataUrl);
-    clock.current = new THREE.Clock();
+    async function initialize() {
+      await initializeAvatarContent({ url: inputGltfDataUrl });
 
-    if (gltfDataUrl !== currentAvatarDataUrl.current) {
-      // Call initialize function if gltfDataUrl is new.
-      initializeContent(gltfDataUrl).then(() => {
-        transformAvatar({
-          canvasPosition: undefined,
-          avatarPosition: undefined,
-          screenVideoStreamRef: currentScreenVideoStreamRef,
-          showAvatarOption: true,
-        });
+      setAvatarPosition({
+        canvasPosition: undefined,
+        avatarPosition: undefined,
+        screenVideoStreamRef: currentScreenVideoStreamRef,
+        showAvatarOption: true,
       });
-      currentAvatarDataUrl.current = gltfDataUrl;
+
+      currentAvatarDataUrl.current = inputGltfDataUrl;
     }
 
-    // Set get image data url and get media stream and set show avatar view function.
+    // console.log("call useEffect()");
+    // console.log("AvatarView useEffect inputGltfDataUrl: ", inputGltfDataUrl);
+    clock.current = new THREE.Clock();
+
+    if (inputGltfDataUrl !== currentAvatarDataUrl.current) {
+      //* Call initialize function if inputGltfDataUrl is new.
+      initialize();
+    }
+
+    //* Set get image data url and get media stream and set show avatar view function.
     getImageDataUrlFunc.current = getImageDataUrl;
     getMediaStreamFunc.current = getMediaStream;
-    setTransformAvatarFunc.current = transformAvatar;
+    setAvatarPositionFunc.current = setAvatarPosition;
   }, [
-    gltfDataUrl,
+    inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
-    setTransformAvatarFunc,
+    setAvatarPositionFunc,
   ]);
 
-  const setBackgroundVideo = ({ canvasPosition, screenVideoStreamRef }) => {
+  function setBackgroundVideo({ canvasPosition, screenVideoStreamRef }) {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
     if (
       screenVideoStreamRef !== undefined &&
@@ -148,19 +160,19 @@ function AvatarView({
       // console.log("textureVideoBackground: ", textureVideoBackground);
     } else {
       sceneRef.current.background = new THREE.Color(WHITE_COLOR_HEX);
-      if (avatarCanvas.current) {
-        avatarCanvas.current.style.border = "";
+      if (avatarCanvasRef.current) {
+        avatarCanvasRef.current.style.border = "";
       }
     }
-  };
+  }
 
-  function transformAvatar({
+  function setAvatarPosition({
     canvasPosition,
     avatarPosition,
     screenVideoStreamRef,
     showAvatarOption,
   }) {
-    // console.log("call transformAvatar()");
+    // console.log("call setAvatarPosition()");
     // Keep data for webgl lost event and restore.
     if (canvasPosition !== undefined) {
       currentCanvasPositionRef.current = canvasPosition;
@@ -175,10 +187,11 @@ function AvatarView({
       currentScreenVideoStreamRef.current = screenVideoStreamRef.current;
     }
 
-    setBackgroundVideo({
-      canvasPosition: currentCanvasPositionRef.current,
-      screenVideoStreamRef: screenVideoStreamRef,
-    });
+    //* TODO: Block for a while.
+    // setBackgroundVideo({
+    //   canvasPosition: currentCanvasPositionRef.current,
+    //   screenVideoStreamRef: screenVideoStreamRef,
+    // });
 
     if (showAvatarOption === false) {
       //* Remove the found mesh to sceneRef.
@@ -215,23 +228,23 @@ function AvatarView({
       case canvasPosition === ScreenPosition.center &&
         avatarPosition === ScreenPosition.center:
       default:
-        avatarCanvas.current.style.position = "absolute";
-        avatarCanvas.current.style.zIndex = Z_INDEX.avatarCanvasCenter;
-        avatarCanvas.current.style.width = "100%";
-        avatarCanvas.current.style.height = "100%";
-        avatarCanvas.current.style.right = "0px";
-        avatarCanvas.current.style.top = "0px";
+        avatarCanvasRef.current.style.position = "absolute";
+        avatarCanvasRef.current.style.zIndex = Z_INDEX.avatarCanvasCenter;
+        avatarCanvasRef.current.style.width = "100%";
+        avatarCanvasRef.current.style.height = "100%";
+        avatarCanvasRef.current.style.right = "0px";
+        avatarCanvasRef.current.style.top = "0px";
         break;
 
       case canvasPosition === ScreenPosition.rightTop &&
         avatarPosition === ScreenPosition.center:
-        avatarCanvas.current.style.position = "absolute";
-        avatarCanvas.current.style.zIndex = 100;
-        avatarCanvas.current.style.width = "25%";
-        avatarCanvas.current.style.height = "25%";
-        avatarCanvas.current.style.right = "20px";
-        avatarCanvas.current.style.top = "20px";
-        avatarCanvas.current.style.boxShadow = "10px 10px 20px 1px grey";
+        avatarCanvasRef.current.style.position = "absolute";
+        avatarCanvasRef.current.style.zIndex = 100;
+        avatarCanvasRef.current.style.width = "25%";
+        avatarCanvasRef.current.style.height = "25%";
+        avatarCanvasRef.current.style.right = "20px";
+        avatarCanvasRef.current.style.top = "20px";
+        avatarCanvasRef.current.style.boxShadow = "10px 10px 20px 1px grey";
         break;
     }
   }
@@ -256,7 +269,7 @@ function AvatarView({
     const resizedContext = resizedCanvas.getContext("2d");
 
     //* Get an original canvas.
-    const avatarCanvasElement = document.getElementById("avatarCanvas");
+    const avatarCanvasElement = document.getElementById("avatarCanvasRef");
     resizedContext.drawImage(
       avatarCanvasElement,
       0,
@@ -273,19 +286,48 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Initialize data.
   //*---------------------------------------------------------------------------
-  async function initializeContent(url) {
-    // console.log("initializeContent function url: ", url);
+  async function initializeAvatarContent({ url }) {
+    console.log("call initializeAvatarContent()");
+    console.log("url: ", url);
 
-    makeContentInstance();
-    await loadGLTF(url);
+    //* TODO: Block for a while.
+    // makeScene();
+    // await loadGltf({ url });
+
+    const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
+    // console.log("V3DWebLibrary: ", V3DWebLibrary);
+    v3dWebRef.current = new V3DWebLibrary.V3DWeb(
+      // "testfiles/7198176664607455952.vrm",
+      "testfiles/default.vrm",
+      sourceVideoRef.current,
+      avatarCanvasRef.current,
+      guideCanvasRef.current,
+      null,
+      {
+        locateFile: (file) => {
+          return `/holistic/${file}`;
+        },
+      },
+      backdropRef.current,
+      () => {
+        const v3DCore = v3dWebRef.current.v3DCore;
+        console.log("v3DCore: ", v3DCore);
+        // v3DCore._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
+
+        //* Set light.
+        v3DCore.addAmbientLight(new Color3(0, 0, 0));
+
+        //* Set background.
+        v3DCore.setBackgroundColor(Color3.FromHexString("#ffffff"));
+      }
+    );
   }
 
   //*---------------------------------------------------------------------------
-  //* Make instances.
+  //* Make scene with three js.
   //*---------------------------------------------------------------------------
-  function makeContentInstance() {
-    //* Make camera instance.
-    // Set [-1, 1] range.
+  function makeScene() {
+    //* Set window ratio.
     if (window.innerWidth !== 0) {
       currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
     } else {
@@ -298,6 +340,7 @@ function AvatarView({
     //   currentWindowRatioRef.current
     // );
 
+    //* Set camera type.
     if (currentOrbitCameraTypeRef.current === CameraType.perspective) {
       // console.log("set camera perpective.");
       orbitCameraRef.current = new THREE.PerspectiveCamera(
@@ -322,33 +365,33 @@ function AvatarView({
       );
     }
 
-    //* Make sceneRef instance.
+    //* Create scene.
     sceneRef.current = new THREE.Scene();
 
-    //* Make rendererRef instance.
+    //* Create webgl renderer.
     rendererRef.current = new THREE.WebGLRenderer({
       antialias: true,
-      canvas: avatarCanvas.current,
+      canvas: avatarCanvasRef.current,
       preserveDrawingBuffer: true,
       alpha: true,
     });
     rendererRef.current.setSize(window.innerWidth, window.innerHeight);
     rendererRef.current.setPixelRatio(window.devicePixelRatio);
-    // TODO: Test for vrm.
     // rendererRef.current.toneMapping = THREE.ACESFilmicToneMapping;
     rendererRef.current.outputEncoding = THREE.sRGBEncoding;
 
-    //* Add resize event listener.
+    //* Register window resize event.
     window.addEventListener("resize", () => {
       // console.log("-- resize event");
 
-      //* Get current window ratio.
+      //* Get window ratio.
       if (window.innerWidth !== 0) {
         currentWindowRatioRef.current = window.innerWidth / window.innerHeight;
       } else {
         currentWindowRatioRef.current = 1;
       }
 
+      //* Get camera type.
       if (currentOrbitCameraTypeRef.current === CameraType.perspective) {
         orbitCameraRef.current.aspect = currentWindowRatioRef.current;
       } else if (
@@ -360,14 +403,15 @@ function AvatarView({
         orbitCameraRef.current.bottom = -1 * currentWindowRatioRef.current;
       }
 
+      //* Update view matrix.
       orbitCameraRef.current.updateProjectionMatrix();
 
-      //* Set renderer configuration of size and pixel ratio.
+      //* Set renderer size and pixel ratio.
       rendererRef.current.setSize(window.innerWidth, window.innerHeight);
       rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
-      //* Redraw avatar.
-      transformAvatar({
+      //* Set avatar position.
+      setAvatarPosition({
         canvasPosition: currentCanvasPositionRef.current,
         avatarPosition: currentAvatarPositionRef.current,
         screenVideoStreamRef: currentScreenVideoStreamRef,
@@ -375,26 +419,34 @@ function AvatarView({
       });
     });
 
-    // https://stackoverflow.com/questions/61020416/how-to-handle-webgl-context-lost-webgl-errors-more-gracefully-in-pixijs
-    avatarCanvas.current.addEventListener("webglcontextlost", () => {
+    //* Register webglcontextlost event.
+    //* https://stackoverflow.com/questions/61020416/how-to-handle-webgl-context-lost-webgl-errors-more-gracefully-in-pixijs
+    avatarCanvasRef.current.addEventListener("webglcontextlost", function () {
       // console.log("webglcontextlost event");
     });
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextrestored_event
-    avatarCanvas.current.addEventListener("webglcontextrestored", () => {
-      // Re-initialize.
-      // console.log("webglcontextrestored event");
-      sceneRef.current.clear();
-      clock.current = new THREE.Clock();
-      initializeContent(currentAvatarDataUrl.current).then(() => {
-        transformAvatar({
+    //* Register webglcontextrestored event.
+    //* https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextrestored_event
+    avatarCanvasRef.current.addEventListener(
+      "webglcontextrestored",
+      async function () {
+        //* Remove avatarscene.
+        // console.log("webglcontextrestored event");
+        sceneRef.current.clear();
+        clock.current = new THREE.Clock();
+
+        //* Initialize avatar scene.
+        await initializeAvatarContent({ url: currentAvatarDataUrl.current });
+
+        //* Set avatar position.
+        setAvatarPosition({
           canvasPosition: currentCanvasPositionRef.current,
           avatarPosition: currentAvatarPositionRef.current,
           screenVideoStreamRef: currentScreenVideoStreamRef,
           showAvatarOption: true,
         });
-      });
-    });
+      }
+    );
 
     //* Make environment instance.
     const environment = new STDLIB.RoomEnvironment();
@@ -426,29 +478,30 @@ function AvatarView({
     // );
   }
 
-  async function loadGLTF(url) {
-    // console.log("call loadGLTF()");
+  async function loadGltf({ url }) {
+    // console.log("call loadGltf()");
     // console.log("url: ", url);
-    // Make ktx loader instance.
+
+    //* Make ktx loader instance.
     const ktx2Loader = new STDLIB.KTX2Loader()
       .setTranscoderPath("js/libs/basis/")
       .detectSupport(rendererRef.current);
 
-    // Make gltf loader instance.
+    //* Make gltf loader instance.
     const gltfLoader = new STDLIB.GLTFLoader()
       .setKTX2Loader(ktx2Loader)
       .setMeshoptDecoder(STDLIB.MeshoptDecoder);
 
-    // Show gltf loading circle.
+    //* Show gltf loading circle.
     // console.log("Loading visible when gltf loading started.");
     setShowGltfLoadingProgress("visible");
 
-    // Install GLTFLoader plugin
+    //* Register VRM plugin
     gltfLoader.register((parser) => {
       return new ThreeVrm.VRMLoaderPlugin(parser);
     });
 
-    // Load gltf data.
+    //* Load gltf data.
     gltfLoader.load(
       url,
       function (gltf) {
@@ -459,11 +512,11 @@ function AvatarView({
           // console.log("currentVrmRef.current: ", currentVrmRef.current);
           // ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
-          // Rotate model 180deg to face camera
+          //* Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
           // ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
 
-          // Add vrm model to scene.
+          //* Add vrm model to scene.
           // currentVrmRef.current.humanoid.autoUpdateHumanBones = false;
           sceneRef.current.add(currentVrmRef.current.scene);
           // console.log(
@@ -471,7 +524,7 @@ function AvatarView({
           //   currentVrmRef.current.scene
           // );
 
-          // Create light.
+          //* Create light.
           const light = new THREE.DirectionalLight(0xffffff);
           light.position.set(1.0, 1.0, 1.0).normalize();
           sceneRef.current.add(light);
@@ -485,8 +538,8 @@ function AvatarView({
           // console.log("expressions: ", expressionManager.expressions);
         }
 
-        // Keep gltf data to loadedGltfData variable.
-        loadedGltftData.current = gltf;
+        //* Keep gltf data to loadedGltfData variable.
+        currentGltfData.current = gltf;
 
         //* Set animation loop.
         rendererRef.current.setAnimationLoop(() => {
@@ -507,7 +560,7 @@ function AvatarView({
         });
 
         //* Set camera setting.
-        adjustCamera({ gltf: loadedGltftData.current });
+        adjustCamera({ gltf: currentGltfData.current });
 
         // console.log("Loading hidden when gltf loaidng finished.");
         setShowGltfLoadingProgress("hidden");
@@ -545,7 +598,7 @@ function AvatarView({
       orbitCameraRef.current.position.set(
         camera.position.x,
         camera.position.y,
-        camera.position.z,
+        camera.position.z
       );
       orbitCameraRef.current.setRotationFromQuaternion(camera.quaternion);
 
@@ -572,9 +625,9 @@ function AvatarView({
         //* Extract audio track:
         const audioTrack = originalUserMedia.getAudioTracks()[0];
 
-        // console.log("avatarCanvas.current: ", avatarCanvas.current);
+        // console.log("avatarCanvasRef.current: ", avatarCanvasRef.current);
         //* Get video from canvas:
-        const canvasVideoStream = avatarCanvas.current.captureStream(
+        const canvasVideoStream = avatarCanvasRef.current.captureStream(
           AVATAR_CANVAS_CAPTURE_FRAME_RATE
         );
         const canvasVideoTrack = canvasVideoStream.getVideoTracks()[0];
@@ -625,6 +678,7 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       <video
         id="sourceVideo"
+        ref={sourceVideoRef}
         style={{ display: "none" }}
         autoPlay={true}
         playsInline={true}
@@ -638,8 +692,17 @@ function AvatarView({
       {/*//*-----------------------------------------------------------------*/}
       {/*//* Canvas for avatar of GLTF format.                               */}
       {/*//*-----------------------------------------------------------------*/}
-      <canvas id="avatarCanvas" ref={avatarCanvas}></canvas>
-      <Stats ref={initializeStats}></Stats>
+      <canvas
+        id="avatarCanvas"
+        className="avatarCanvas"
+        ref={avatarCanvasRef}
+      />
+      <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
+      <div ref={backdropRef}>
+        <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </div>
 
       {showGuideCanvas ? (
         <Box
@@ -660,7 +723,7 @@ function AvatarView({
         </Box>
       ) : null}
 
-      <HolisticData currentVrmRef={currentVrmRef} />
+      {/* <HolisticData currentVrmRef={currentVrmRef} /> */}
 
       {/*//*-----------------------------------------------------------------*/}
       {/*//* GLTF loading progress circle.                                   */}

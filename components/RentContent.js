@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  Web3Button,
-  Web3NetworkSwitch,
-  useWeb3ModalNetwork,
-} from "@web3modal/react";
+import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { RentMarket, RBSnackbar, AlertSeverity } from "rent-market";
 import My from "./My";
 import Market from "./Market";
@@ -29,11 +25,8 @@ const RentContent = ({
   //* --------------------------------------------------------------------------
   //* Web3 hook variables.
   //* --------------------------------------------------------------------------
-  const { selectedChain, setSelectedChain } = useWeb3ModalNetwork();
-  // console.log("selectedChain: ", selectedChain);
+  const { chain, chains } = useNetwork();
   const { address, isConnected } = useAccount();
-  // console.log("address: ", address);
-  // console.log("isConnected: ", isConnected);
 
   //* --------------------------------------------------------------------------
   //* Rent market variables.
@@ -138,7 +131,6 @@ const RentContent = ({
     openMarketFuncRef,
     address,
     isConnected,
-    selectedChain,
   ]);
 
   function onEventFunc(message) {
@@ -251,7 +243,7 @@ const RentContent = ({
             inputMyRentNFTArray={myRentNFTArray}
             inputBlockchainNetwork={blockchainNetwork}
             setWriteToastMessage={setWriteToastMessage}
-            web3modalSelectedChain={selectedChain}
+            selectedChain={chain}
             wagmiIsConnected={isConnected}
           />
         </Grid>
