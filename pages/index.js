@@ -18,7 +18,7 @@ const Service = () => {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
-  const [avatarUrl, setAvatarUrl] = React.useState("default.vrm");
+  const [avatarUrl, setAvatarUrl] = React.useState("1.vrm");
 
   //*---------------------------------------------------------------------------
   //* Variable references.

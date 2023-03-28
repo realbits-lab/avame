@@ -297,8 +297,8 @@ function AvatarView({
     const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
     // console.log("V3DWebLibrary: ", V3DWebLibrary);
     v3dWebRef.current = new V3DWebLibrary.V3DWeb(
-      "testfiles/7198176664607455952.vrm",
-      // "default.vrm",
+      // "testfiles/7198176664607455952.vrm",
+      "testfiles/default.vrm",
       sourceVideoRef.current,
       avatarCanvasRef.current,
       guideCanvasRef.current,
