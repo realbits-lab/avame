@@ -2,9 +2,9 @@ const withProgressBar = require("next-progressbar");
 const WebpackBar = require("webpackbar");
 
 const nextConfig = withProgressBar({
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
   reactStrictMode: false,
   // transpilePackages: ["kalidokit", "rent-market", "v3d-core-realbits"],
   // transpilePackages: ["kalidokit", "rent-market"],
