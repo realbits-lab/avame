@@ -6,7 +6,6 @@ const nextConfig = withProgressBar({
   //   ignoreDuringBuilds: true,
   // },
   reactStrictMode: false,
-  // transpilePackages: ["kalidokit", "rent-market", "v3d-core-realbits"],
   // transpilePackages: ["kalidokit", "rent-market"],
   transpilePackages: ["kalidokit"],
   webpack: (config) => {
