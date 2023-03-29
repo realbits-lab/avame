@@ -369,3 +369,30 @@ export const readToastMessageState = selector({
     return toastMessageState;
   },
 });
+
+export const getErrorDescription = ({ errorString }) => {
+  const errorCode = {
+    RM1: "The same element is already request.",
+    RM2: "The same element is already register.",
+    RM3: "No element in register.",
+    RM4: "Sender is not the owner of NFT.",
+    RM5: "Sender is not the owner of NFT or the owner of rentMarket.",
+    RM6: "No register for this service address.",
+    RM7: "No register eata for this NFT.",
+    RM8: "Transaction value is not same as the rent fee.",
+    RM9: "Already rented.",
+    RM10: "No rent data in renteeDataMap for this NFT.",
+    RM11: "msg.sender should be same as renteeAddress.",
+    RM12: "Sum should be 100.",
+    RM13: "msg.sender should be zero, because of erc20 payment.",
+    RM14: "Failed to recipient.call.",
+    RM15: "msg.sender should be same as renteeAddress or the owner of rentMarket.",
+    RM16: "The current block number is under rent start + rent duraiont block.",
+    RM17: "Sender is not the recipient or the owner of rentMarket.",
+    RM18: "IERC20 approve function call failed.",
+    RM19: "IERC20 transferFrom function call failed.",
+    RM20: "Fee token address is not registered.",
+  };
+
+  return errorCode[errorString];
+};

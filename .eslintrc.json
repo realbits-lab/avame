@@ -1,3 +1,9 @@
 {
+  "ignorePatterns": ["**/node_modules/**"],
   "extends": "next/core-web-vitals"
+  // "rules": {
+  //   "react-hooks/exhaustive-deps": "off",
+  //   "react/no-find-dom-node": "off",
+  //   "react/display-name": "off"
+  // }
 }
