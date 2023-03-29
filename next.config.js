@@ -2,6 +2,7 @@ const withProgressBar = require("next-progressbar");
 const WebpackBar = require("webpackbar");
 
 const nextConfig = withProgressBar({
+	//* TODO: Handle eslint for next build.
   eslint: {
     ignoreDuringBuilds: true,
   },
