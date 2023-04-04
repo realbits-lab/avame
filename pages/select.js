@@ -214,6 +214,7 @@ function SelectPage({ collectionUri }) {
 
     const maxActiveStep = Math.ceil(traitList.length / 4);
 
+    //* TODO: Fix rotation bug.
     return (
       <>
         <Grid container>
@@ -234,8 +235,8 @@ function SelectPage({ collectionUri }) {
                         component="img"
                         image={`${baseUrl}/${trait}/${traitValue}.png`}
                         onClick={function () {
-                          // const glbUrl = `${baseUrl}/${trait}/${traitValue}.glb`;
-                          const glbUrl = `${traitValue}.glb`;
+                          const glbUrl = `${baseUrl}/${trait}/${traitValue}.glb`;
+                          // const glbUrl = `${traitValue}.glb`;
                           const v3dCore = getV3dCoreFuncRef.current();
 
                           SceneLoader.ImportMesh(
@@ -248,7 +249,7 @@ function SelectPage({ collectionUri }) {
                               particleSystems,
                               skeletons
                             ) {
-                              console.log("skeletons: ", skeletons);
+                              // console.log("skeletons: ", skeletons);
                               //* If there're already pre-added meshes, remove them all.
                               if (traitMeshListRef.current[trait]) {
                                 traitMeshListRef.current[trait].map((mesh) => {
@@ -264,10 +265,10 @@ function SelectPage({ collectionUri }) {
                               let headBone;
                               let headSkeleton;
                               v3dCore.scene.skeletons.map((skeleton) => {
-                                console.log("skeleton: ", skeleton);
+                                // console.log("skeleton: ", skeleton);
                                 skeleton.bones.map((bone) => {
                                   if (bone.name === "J_Bip_C_Head") {
-                                    console.log("bone: ", bone);
+                                    // console.log("bone: ", bone);
                                     headSkeleton = skeleton;
                                     headBone = bone;
                                   }
@@ -278,33 +279,47 @@ function SelectPage({ collectionUri }) {
                               //* Add new mesh list to scene.
                               const baseMesh = v3dCore.scene.meshes[0];
                               headSkeleton = v3dCore.scene.skeletons[0];
-                              console.log(
-                                "v3dCore.scene.meshes: ",
-                                v3dCore.scene.meshes
-                              );
-                              console.log("baseMesh: ", baseMesh);
-                              console.log("headSkeleton: ", headSkeleton);
-                              console.log("headBone: ", headBone);
-                              const transformNode = new BABYLON.TransformNode(
-                                "node",
-                                v3dCore.scene
-                              );
-                              console.log("transformNode: ", transformNode);
-
-                              // const box = BABYLON.CreateBox("boxy", {
-                              //   size: 0.5,
-                              // });
-                              // box.position = new BABYLON.Vector3(0, 0, 0);
-                              // box.parent = transformNode;
+                              // console.log(
+                              //   "v3dCore.scene.meshes: ",
+                              //   v3dCore.scene.meshes
+                              // );
+                              // console.log("baseMesh: ", baseMesh);
+                              // console.log("headSkeleton: ", headSkeleton);
+                              // console.log("headBone: ", headBone);
 
                               meshes.map((mesh) => {
                                 // v3dCore.scene.addMesh(mesh, true);
                                 traitMeshListRef.current[trait].push(mesh);
                                 mesh.position = new BABYLON.Vector3(0, 0, 0);
-                                mesh.parent = transformNode;
-                                mesh.isVisible = true;
-                                console.log("mesh: ", mesh);
-                                transformNode.attachToBone(headBone, baseMesh);
+                                // mesh.parent = transformNode;
+                                // mesh.isVisible = true;
+                                // console.log("mesh: ", mesh);
+
+                                //* Calculate the difference between mesh absolute position and head bone absolute position.
+                                const meshAbsolutePosition =
+                                  mesh.getAbsolutePosition();
+                                const headBoneAbsolutePosition =
+                                  headBone.getAbsolutePosition();
+                                const diffAbsolutePosition =
+                                  meshAbsolutePosition.subtract(
+                                    headBoneAbsolutePosition
+                                  );
+                                // console.log(
+                                //   "meshAbsolutePosition: ",
+                                //   meshAbsolutePosition
+                                // );
+                                // console.log(
+                                //   "headBoneAbsolutePosition: ",
+                                //   headBoneAbsolutePosition
+                                // );
+                                // console.log(
+                                //   "diffAbsolutePosition: ",
+                                //   diffAbsolutePosition
+                                // );
+
+                                mesh.setAbsolutePosition(diffAbsolutePosition);
+                                mesh.parent = headBone;
+                                // transformNode.attachToBone(headBone, baseMesh);
                               });
                             }
                           );
