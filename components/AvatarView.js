@@ -297,8 +297,7 @@ function AvatarView({
     const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
     // console.log("V3DWebLibrary: ", V3DWebLibrary);
     v3dWebRef.current = new V3DWebLibrary.V3DWeb(
-      // "testfiles/7198176664607455952.vrm",
-      "testfiles/default.vrm",
+      url,
       sourceVideoRef.current,
       avatarCanvasRef.current,
       guideCanvasRef.current,
@@ -321,6 +320,10 @@ function AvatarView({
         v3DCore.setBackgroundColor(Color3.FromHexString("#ffffff"));
       }
     );
+
+    window.addEventListener("resize", () => {
+      console.log("-- resize event");
+    });
   }
 
   //*---------------------------------------------------------------------------
@@ -671,6 +674,7 @@ function AvatarView({
   // righ-top avatar canvas : 100
   // button : 100
   // dialog : > 100
+  //* TODO: Set the size of avatarCanvas.
   return (
     <>
       {/*//*-----------------------------------------------------------------*/}

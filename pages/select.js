@@ -6,11 +6,13 @@
 
 import React from "react";
 import axios from "axios";
+import { styled } from "@mui/system";
+import { tooltipClasses } from "@mui/material/Tooltip";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
+import Tooltip from "@mui/material/Tooltip";
 import CardMedia from "@mui/material/CardMedia";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -20,9 +22,14 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Fab from "@mui/material/Fab";
 import MobileStepper from "@mui/material/MobileStepper";
+import IconButton from "@mui/material/IconButton";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import PersonIcon from "@mui/icons-material/Person";
+import CloseIcon from "@mui/icons-material/Close";
+import AvatarView from "../components/AvatarView";
 
 function SelectPage({ collectionUri }) {
   //* TODO: Get from json data.
@@ -32,7 +39,13 @@ function SelectPage({ collectionUri }) {
   const selectedTraitRef = React.useRef();
   const [selectedValue, setSelectedValue] = React.useState();
   const [selectedData, setSelectedData] = React.useState();
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(true);
+  const [avatarUrl, setAvatarUrl] = React.useState(
+    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
+  );
+  const getImageDataUrl = React.useRef();
+  const getMediaStreamFuncRef = React.useRef();
+  const setAvatarPositionFuncRef = React.useRef();
 
   //* Handle tab index.
   const [value, setValue] = React.useState(0);
@@ -133,6 +146,17 @@ function SelectPage({ collectionUri }) {
     );
   }
 
+  const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.white,
+      color: "rgba(0, 0, 0, 0.87)",
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }));
+
   function a11yProps(index) {
     return {
       id: `full-width-tab-${index}`,
@@ -200,10 +224,11 @@ function SelectPage({ collectionUri }) {
 
                 if (Math.floor(idx / 4) === activeStep) {
                   return (
-                    <Grid item xs={6} key={idx}>
+                    <Grid item xs={3} key={idx}>
                       <CardMedia
                         component="img"
                         image={`${imageUrl}/${trait}/${traitValue}.png`}
+                        sx={{ width: "80%", height: "80%" }}
                       />
                     </Grid>
                   );
@@ -244,10 +269,12 @@ function SelectPage({ collectionUri }) {
     );
   }
 
-  function TraitListTabPage({ data }) {
+  function TraitListTabPage() {
     return (
       <>
-        <Box sx={{ bgcolor: "background.paper", width: "100vw" }}>
+        <Box
+          sx={{ bgcolor: "background.paper", width: "100%", height: "100%" }}
+        >
           <AppBar position="static">
             <Tabs
               value={value}
@@ -265,11 +292,11 @@ function SelectPage({ collectionUri }) {
                     key={idx}
                     onClick={() => {
                       selectedTraitRef.current = trait;
-                      activeStepListRef.current.map(function (data) {
+                      activeStepListRef.current.map(function (e) {
                         // console.log("trait: ", trait);
                         // console.log("data: ", data);
-                        if (data.trait === trait) {
-                          setActiveStep(data.step);
+                        if (e.trait === trait) {
+                          setActiveStep(e.step);
                         }
                       });
                     }}
@@ -361,29 +388,43 @@ function SelectPage({ collectionUri }) {
       <Dialog
         open={openDialog}
         onClose={() => {
-          fetchSelectedData();
           setOpenDialog(false);
         }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          style: {
+            backgroundColor: "transparent",
+          },
+          sx: {
+            position: "fixed",
+            bottom: 10,
+            left: 10,
+            width: "90vw",
+            height: "50vh",
+          },
+        }}
       >
-        <DialogTitle id="alert-dialog-title">SELECT</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <SelectContent />
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              fetchSelectedData();
+        <DialogTitle id="alert-dialog-title">
+          <Typography color={(theme) => theme.palette.grey[800]}>
+            Select clothes and accessories.
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={function () {
               setOpenDialog(false);
             }}
-            autoFocus
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
           >
-            Close
-          </Button>
-        </DialogActions>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <TraitListTabPage />
+        </DialogContent>
       </Dialog>
     );
   };
@@ -398,19 +439,51 @@ function SelectPage({ collectionUri }) {
         alignItems="flex-start"
       >
         <Grid item>
-          <Card>
-            <CardMedia
-              component="img"
-              image="https://picsum.photos/200"
-              sx={{ objectFit: "contain", width: "100vw", height: "50vh" }}
-            />
-          </Card>
+          <AvatarView
+            inputGltfDataUrl={avatarUrl}
+            getImageDataUrlFunc={getImageDataUrl}
+            // VideoChat -> AvatarView call for new Remon.
+            // TakeVideo -> AvatarView call for recording video.
+            getMediaStreamFunc={getMediaStreamFuncRef}
+            // VideoChat -> AvatarView call for changing avatar canvas position.
+            // ScreenView -> AvatarView call for changing avatar canvas position.
+            setAvatarPositionFunc={setAvatarPositionFuncRef}
+          />
         </Grid>
         <Grid item>
-          <TraitListTabPage data={selectedData} />
           <SelectDialog />
         </Grid>
       </Grid>
+
+      <Box
+        sx={{
+          zIndex: 100,
+          position: "absolute",
+          top: 0,
+          right: 0,
+          m: 1,
+          p: 1,
+        }}
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-end"
+        alignItems="flex-end"
+      >
+        {/*//*--------------------------------------------------------------*/}
+        {/*//* My menu.                                                     */}
+        {/*//*--------------------------------------------------------------*/}
+        <Fab
+          color="primary"
+          onClick={() => {
+            setOpenDialog(true);
+          }}
+          sx={{ m: 1 }}
+        >
+          <LightTooltip title="My Content" placement="left">
+            <PersonIcon color="secondary" />
+          </LightTooltip>
+        </Fab>
+      </Box>
     </>
   );
 }
