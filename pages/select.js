@@ -29,7 +29,7 @@ function SelectPage({ collectionUri }) {
   const imageUrl =
     "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection";
   const [attributes, setAttributes] = React.useState({});
-  const [selectedTrait, setSelectedTrait] = React.useState();
+  const selectedTraitRef = React.useRef();
   const [selectedValue, setSelectedValue] = React.useState();
   const [selectedData, setSelectedData] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -44,15 +44,35 @@ function SelectPage({ collectionUri }) {
   }
 
   //* Handle trait stepper.
-  const [activeStepData, setActiveStepData] = React.useState();
+  const [activeStep, setActiveStep] = React.useState(0);
+  const activeStepListRef = React.useRef([]);
   function handleNext() {
-    setActiveStepData(function (prevActiveStep) {
-      return { trait: prevActiveStep.trait, step: prevActiveStep.step + 1 };
+    setActiveStep(function (prevActiveStep) {
+      // console.log("selectedTraitRef.current: ", selectedTraitRef.current);
+      let step;
+      activeStepListRef.current.map(function (e) {
+        if (e.trait === selectedTraitRef.current) {
+          e.step = e.step + 1;
+          step = e.step;
+        }
+      });
+      // console.log("step: ", step);
+      return step;
     });
   }
   function handleBack() {
-    setActiveStepData(function (prevActiveStep) {
-      return { trait: prevActiveStep.trait, step: prevActiveStep.step - 1 };
+    setActiveStep(function (prevActiveStep) {
+      // console.log("selectedTraitRef.current: ", selectedTraitRef.current);
+      let step;
+      activeStepListRef.current.map(function (e) {
+        if (e.trait === selectedTraitRef.current) {
+          e.step = e.step - 1;
+          if (e.step < 0) e.step = 0;
+          step = e.step;
+        }
+      });
+      // console.log("step: ", step);
+      return step;
     });
   }
 
@@ -71,15 +91,24 @@ function SelectPage({ collectionUri }) {
         axios
           .get(testCollectionUri)
           .then(async function (testCollectionUriResult) {
-            // console.log(
-            //   "testCollectionUriResult.data.attributes: ",
-            //   testCollectionUriResult.data.attributes
-            // );
+            console.log(
+              "testCollectionUriResult.data.attributes: ",
+              testCollectionUriResult.data.attributes
+            );
+
+            Object.keys(testCollectionUriResult.data.attributes).map(function (
+              trait,
+              idx
+            ) {
+              if (idx === 0) selectedTraitRef.current = trait;
+            });
+
             setAttributes(testCollectionUriResult.data.attributes);
+            activeStepListRef.current = [];
             Object.keys(testCollectionUriResult.data.attributes).map(function (
               trait
             ) {
-              setActiveStepData({ trait: trait, step: 0 });
+              activeStepListRef.current.push({ trait: trait, step: 0 });
             });
           });
       }
@@ -117,13 +146,13 @@ function SelectPage({ collectionUri }) {
 
   function fetchSelectedData() {
     console.log("call fetchSelectedData()");
-    console.log("selectedTrait: ", selectedTrait);
+    console.log("selectedTraitRef.current: ", selectedTraitRef.current);
     console.log("selectedValue: ", selectedValue);
 
     axios
       .get("/api/get-register-data-list", {
         params: {
-          type: selectedTrait,
+          type: selectedTraitRef.current,
           value: selectedValue,
         },
       })
@@ -152,7 +181,7 @@ function SelectPage({ collectionUri }) {
     );
   }
 
-  function SelectTraitPage({ traitType, traitList }) {
+  function SelectTraitPage({ trait, traitList }) {
     //* Check data is empty.
     if (Array.isArray(traitList) === false || traitList.length === 0) {
       return <Typography>No trait list data</Typography>;
@@ -161,33 +190,63 @@ function SelectPage({ collectionUri }) {
     const maxActiveStep = Math.ceil(traitList.length / 4);
 
     return (
-      <MobileStepper
-        variant="dots"
-        steps={maxActiveStep}
-        position="static"
-        activeStep={activeStepData.step}
-        sx={{ flexGrow: 1 }}
-        nextButton={
-          <Button
-            size="small"
-            onClick={handleNext}
-            disabled={activeStepData.step === maxActiveStep - 1}
-          >
-            Next
-            <KeyboardArrowRight />
-          </Button>
-        }
-        backButton={
-          <Button
-            size="small"
-            onClick={handleBack}
-            disabled={activeStepData.step === 0}
-          >
-            <KeyboardArrowLeft />
-            Back
-          </Button>
-        }
-      />
+      <>
+        <Grid container>
+          {Object.entries(attributes).map(function ([key, value]) {
+            if (key === trait) {
+              return value.map(function (traitValue, idx) {
+                // console.log(
+                //   "trait image url: ",
+                //   `${imageUrl}/${trait}/${traitValue}.png`
+                // );
+                // console.log("trait: ", trait);
+                // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
+
+                if (Math.floor(idx / 4) === activeStep) {
+                  return (
+                    <Grid item xs={6} key={idx}>
+                      <Card>
+                        <CardMedia
+                          component="img"
+                          image={`${imageUrl}/${trait}/${traitValue}.png`}
+                        />
+                      </Card>
+                    </Grid>
+                  );
+                }
+              });
+            }
+          })}
+        </Grid>
+
+        <MobileStepper
+          variant="dots"
+          steps={maxActiveStep}
+          position="static"
+          activeStep={activeStep}
+          sx={{ flexGrow: 1 }}
+          nextButton={
+            <Button
+              size="small"
+              onClick={handleNext}
+              disabled={activeStep === maxActiveStep - 1}
+            >
+              Next
+              <KeyboardArrowRight />
+            </Button>
+          }
+          backButton={
+            <Button
+              size="small"
+              onClick={handleBack}
+              disabled={activeStep === 0}
+            >
+              <KeyboardArrowLeft />
+              Back
+            </Button>
+          }
+        />
+      </>
     );
   }
 
@@ -211,20 +270,27 @@ function SelectPage({ collectionUri }) {
                     {...a11yProps(idx)}
                     key={idx}
                     onClick={() => {
-                      setSelectedTrait(trait);
+                      selectedTraitRef.current = trait;
+                      activeStepListRef.current.map(function (data) {
+                        console.log("trait: ", trait);
+                        console.log("data: ", data);
+                        if (data.trait === trait) {
+                          setActiveStep(data.step);
+                        }
+                      });
                     }}
                   />
                 );
               })}
             </Tabs>
           </AppBar>
-          {Object.entries(attributes).map(([traitType, traitList], idx) => {
-            // console.log("traitType: ", traitType);
+          {Object.entries(attributes).map(([trait, traitList], idx) => {
+            // console.log("trait: ", trait);
             // console.log("traitList: ", traitList);
 
             return (
               <TabPanel value={value} index={idx} key={idx}>
-                <SelectTraitPage traitType={traitType} traitList={traitList} />
+                <SelectTraitPage trait={trait} traitList={traitList} />
               </TabPanel>
             );
           })}
@@ -242,7 +308,7 @@ function SelectPage({ collectionUri }) {
               <Grid item key={idx}>
                 <Button
                   onClick={() => {
-                    setSelectedTrait(trait);
+                    selectedTraitRef.current = trait;
                     setOpenDialog(true);
                   }}
                 >
@@ -261,18 +327,18 @@ function SelectPage({ collectionUri }) {
     return (
       <>
         <Grid container spacing={2}>
-          {Object.entries(attributes).map(([traitType, values] = entry) => {
-            console.log("traitType: ", traitType);
+          {Object.entries(attributes).map(([trait, values] = entry) => {
+            console.log("trait: ", trait);
             console.log("values: ", values);
-            if (traitType === selectedTrait) {
+            if (trait === selectedTraitRef.current) {
               return values.map((value) => {
                 console.log("value: ", value);
                 return (
-                  <Grid item key={`${traitType}/${value}`}>
+                  <Grid item key={`${trait}/${value}`}>
                     <Button
                       size="small"
                       variant="contained"
-                      key={`${traitType}/${value}`}
+                      key={`${trait}/${value}`}
                       sx={{ m: "2px" }}
                       onClick={() => {
                         setSelectedValue(value);
@@ -289,7 +355,7 @@ function SelectPage({ collectionUri }) {
         <Box sx={{ width: "90vw", height: "90vh" }}>
           <CardMedia
             component="img"
-            image={`${imageUrl}/${selectedTrait}/${selectedValue}.png`}
+            image={`${imageUrl}/${selectedTraitRef.current}/${selectedValue}.png`}
           />
         </Box>
       </>
