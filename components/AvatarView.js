@@ -20,6 +20,7 @@ const StatsWithNoSSR = loadable.lib(
 
 function AvatarView({
   inputGltfDataUrl,
+  getV3dCoreFuncRef,
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setAvatarPositionFunc,
@@ -56,6 +57,7 @@ function AvatarView({
   const backdropRef = React.useRef();
   const sourceVideoRef = React.useRef();
   const v3dWebRef = React.useRef();
+  const v3dCoreRef = React.useRef();
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
@@ -128,12 +130,17 @@ function AvatarView({
     getImageDataUrlFunc.current = getImageDataUrl;
     getMediaStreamFunc.current = getMediaStream;
     setAvatarPositionFunc.current = setAvatarPosition;
+    getV3dCoreFuncRef.current = getV3dCoreFunc;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
     setAvatarPositionFunc,
   ]);
+
+  function getV3dCoreFunc() {
+    return v3dCoreRef.current;
+  }
 
   function setBackgroundVideo({ canvasPosition, screenVideoStreamRef }) {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
@@ -309,15 +316,15 @@ function AvatarView({
       },
       backdropRef.current,
       () => {
-        const v3DCore = v3dWebRef.current.v3DCore;
-        console.log("v3DCore: ", v3DCore);
-        // v3DCore._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
+        v3dCoreRef.current = v3dWebRef.current.v3DCore;
+        console.log("v3dCoreRef.current: ", v3dCoreRef.current);
+        // v3dCoreRef.current._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
 
         //* Set light.
-        v3DCore.addAmbientLight(new Color3(0, 0, 0));
+        v3dCoreRef.current.addAmbientLight(new Color3(0, 0, 0));
 
         //* Set background.
-        v3DCore.setBackgroundColor(Color3.FromHexString("#ffffff"));
+        v3dCoreRef.current.setBackgroundColor(Color3.FromHexString("#ffffff"));
       }
     );
 

@@ -6,6 +6,9 @@
 
 import React from "react";
 import axios from "axios";
+import * as BABYLON from "@babylonjs/core";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { styled } from "@mui/system";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import AppBar from "@mui/material/AppBar";
@@ -17,8 +20,6 @@ import CardMedia from "@mui/material/CardMedia";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -33,7 +34,7 @@ import AvatarView from "../components/AvatarView";
 
 function SelectPage({ collectionUri }) {
   //* TODO: Get from json data.
-  const imageUrl =
+  const baseUrl =
     "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection";
   const [attributes, setAttributes] = React.useState({});
   const selectedTraitRef = React.useRef();
@@ -46,6 +47,10 @@ function SelectPage({ collectionUri }) {
   const getImageDataUrl = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
   const setAvatarPositionFuncRef = React.useRef();
+  const getV3dCoreFuncRef = React.useRef();
+  const traitMeshListRef = React.useRef({});
+  const bodyMeshListRef = React.useRef([]);
+  const bodyMaterialListRef = React.useRef([]);
 
   //* Handle tab index.
   const [value, setValue] = React.useState(0);
@@ -217,7 +222,7 @@ function SelectPage({ collectionUri }) {
               return value.map(function (traitValue, idx) {
                 // console.log(
                 //   "trait image url: ",
-                //   `${imageUrl}/${trait}/${traitValue}.png`
+                //   `${baseUrl}/${trait}/${traitValue}.png`
                 // );
                 // console.log("trait: ", trait);
                 // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
@@ -227,7 +232,83 @@ function SelectPage({ collectionUri }) {
                     <Grid item xs={3} key={idx}>
                       <CardMedia
                         component="img"
-                        image={`${imageUrl}/${trait}/${traitValue}.png`}
+                        image={`${baseUrl}/${trait}/${traitValue}.png`}
+                        onClick={function () {
+                          // const glbUrl = `${baseUrl}/${trait}/${traitValue}.glb`;
+                          const glbUrl = `${traitValue}.glb`;
+                          const v3dCore = getV3dCoreFuncRef.current();
+
+                          SceneLoader.ImportMesh(
+                            trait,
+                            glbUrl,
+                            "",
+                            v3dCore.scene,
+                            async function (
+                              meshes,
+                              particleSystems,
+                              skeletons
+                            ) {
+                              console.log("skeletons: ", skeletons);
+                              //* If there're already pre-added meshes, remove them all.
+                              if (traitMeshListRef.current[trait]) {
+                                traitMeshListRef.current[trait].map((mesh) => {
+                                  mesh.dispose();
+                                  mesh = null;
+                                });
+                              }
+
+                              //* Initialize trait mesh list.
+                              traitMeshListRef.current[trait] = [];
+
+                              //* Find the head bone.
+                              let headBone;
+                              let headSkeleton;
+                              v3dCore.scene.skeletons.map((skeleton) => {
+                                console.log("skeleton: ", skeleton);
+                                skeleton.bones.map((bone) => {
+                                  if (bone.name === "J_Bip_C_Head") {
+                                    console.log("bone: ", bone);
+                                    headSkeleton = skeleton;
+                                    headBone = bone;
+                                  }
+                                });
+                              });
+
+                              //* Set parent of mesh to head bone.
+                              //* Add new mesh list to scene.
+                              const baseMesh = v3dCore.scene.meshes[0];
+                              headSkeleton = v3dCore.scene.skeletons[0];
+                              console.log(
+                                "v3dCore.scene.meshes: ",
+                                v3dCore.scene.meshes
+                              );
+                              console.log("baseMesh: ", baseMesh);
+                              console.log("headSkeleton: ", headSkeleton);
+                              console.log("headBone: ", headBone);
+                              const transformNode = new BABYLON.TransformNode(
+                                "node",
+                                v3dCore.scene
+                              );
+                              console.log("transformNode: ", transformNode);
+
+                              // const box = BABYLON.CreateBox("boxy", {
+                              //   size: 0.5,
+                              // });
+                              // box.position = new BABYLON.Vector3(0, 0, 0);
+                              // box.parent = transformNode;
+
+                              meshes.map((mesh) => {
+                                // v3dCore.scene.addMesh(mesh, true);
+                                traitMeshListRef.current[trait].push(mesh);
+                                mesh.position = new BABYLON.Vector3(0, 0, 0);
+                                mesh.parent = transformNode;
+                                mesh.isVisible = true;
+                                console.log("mesh: ", mesh);
+                                transformNode.attachToBone(headBone, baseMesh);
+                              });
+                            }
+                          );
+                        }}
                         sx={{ width: "80%", height: "80%" }}
                       />
                     </Grid>
@@ -376,7 +457,7 @@ function SelectPage({ collectionUri }) {
         <Box sx={{ width: "90vw", height: "90vh" }}>
           <CardMedia
             component="img"
-            image={`${imageUrl}/${selectedTraitRef.current}/${selectedValue}.png`}
+            image={`${baseUrl}/${selectedTraitRef.current}/${selectedValue}.png`}
           />
         </Box>
       </>
@@ -441,6 +522,7 @@ function SelectPage({ collectionUri }) {
         <Grid item>
           <AvatarView
             inputGltfDataUrl={avatarUrl}
+            getV3dCoreFuncRef={getV3dCoreFuncRef}
             getImageDataUrlFunc={getImageDataUrl}
             // VideoChat -> AvatarView call for new Remon.
             // TakeVideo -> AvatarView call for recording video.
