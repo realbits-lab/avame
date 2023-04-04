@@ -128,11 +128,7 @@ function SelectPage({ collectionUri }) {
         aria-labelledby={`full-width-tab-${index}`}
         {...other}
       >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
+        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
       </div>
     );
   }
@@ -183,9 +179,9 @@ function SelectPage({ collectionUri }) {
 
   function SelectTraitPage({ trait, traitList }) {
     //* Check data is empty.
-    if (Array.isArray(traitList) === false || traitList.length === 0) {
-      return <Typography>No trait list data</Typography>;
-    }
+    // if (Array.isArray(traitList) === false || traitList.length === 0) {
+    //   return <Typography>No trait list data</Typography>;
+    // }
 
     const maxActiveStep = Math.ceil(traitList.length / 4);
 
@@ -205,12 +201,10 @@ function SelectPage({ collectionUri }) {
                 if (Math.floor(idx / 4) === activeStep) {
                   return (
                     <Grid item xs={6} key={idx}>
-                      <Card>
-                        <CardMedia
-                          component="img"
-                          image={`${imageUrl}/${trait}/${traitValue}.png`}
-                        />
-                      </Card>
+                      <CardMedia
+                        component="img"
+                        image={`${imageUrl}/${trait}/${traitValue}.png`}
+                      />
                     </Grid>
                   );
                 }
