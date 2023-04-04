@@ -6,9 +6,11 @@
 
 import React from "react";
 import axios from "axios";
+import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -16,6 +18,28 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
 
 function SelectPage({ collectionUri }) {
   //* TODO: Get from json data.
@@ -26,6 +50,15 @@ function SelectPage({ collectionUri }) {
   const [selectedValue, setSelectedValue] = React.useState("");
   const [selectedData, setSelectedData] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
+
+  //* Handle tab index.
+  const [value, setValue] = React.useState(0);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+  const handleChangeIndex = (index) => {
+    setValue(index);
+  };
 
   React.useEffect(
     function () {
@@ -53,6 +86,13 @@ function SelectPage({ collectionUri }) {
     },
     [collectionUri]
   );
+
+  function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      "aria-controls": `full-width-tabpanel-${index}`,
+    };
+  }
 
   function fetchSelectedData() {
     console.log("call fetchSelectedData()");
@@ -87,6 +127,36 @@ function SelectPage({ collectionUri }) {
         {data.map((data, idx) => {
           return <Typography key={idx}>{data.name}</Typography>;
         })}
+      </>
+    );
+  };
+
+  const TraitListTabPage = ({ data }) => {
+    return (
+      <>
+        <Box sx={{ bgcolor: "background.paper", width: "100vw" }}>
+          <AppBar position="static">
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="secondary"
+              textColor="inherit"
+              variant="fullWidth"
+              aria-label="full width tabs example"
+            >
+              {Object.keys(attributes).map((traitType, idx) => {
+                return <Tab label={traitType} {...a11yProps(idx)} key={idx} />;
+              })}
+            </Tabs>
+          </AppBar>
+          {Object.keys(attributes).map((traitType, idx) => {
+            return (
+              <TabPanel value={value} index={idx} key={idx}>
+                {traitType}
+              </TabPanel>
+            );
+          })}
+        </Box>
       </>
     );
   };
@@ -188,8 +258,27 @@ function SelectPage({ collectionUri }) {
 
   return (
     <>
-      <TraitListPage data={selectedData} />
-      <SelectDialog />
+      <Grid
+        container
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        alignItems="flex-start"
+      >
+        <Grid item>
+          <Card>
+            <CardMedia
+              component="img"
+              image="https://picsum.photos/200"
+              sx={{ objectFit: "contain", width: "100vw", height: "50vh" }}
+            />
+          </Card>
+        </Grid>
+        <Grid item>
+          <TraitListTabPage data={selectedData} />
+          <SelectDialog />
+        </Grid>
+      </Grid>
     </>
   );
 }
