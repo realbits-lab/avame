@@ -91,10 +91,10 @@ function SelectPage({ collectionUri }) {
         axios
           .get(testCollectionUri)
           .then(async function (testCollectionUriResult) {
-            console.log(
-              "testCollectionUriResult.data.attributes: ",
-              testCollectionUriResult.data.attributes
-            );
+            // console.log(
+            //   "testCollectionUriResult.data.attributes: ",
+            //   testCollectionUriResult.data.attributes
+            // );
 
             Object.keys(testCollectionUriResult.data.attributes).map(function (
               trait,
@@ -141,9 +141,9 @@ function SelectPage({ collectionUri }) {
   }
 
   function fetchSelectedData() {
-    console.log("call fetchSelectedData()");
-    console.log("selectedTraitRef.current: ", selectedTraitRef.current);
-    console.log("selectedValue: ", selectedValue);
+    // console.log("call fetchSelectedData()");
+    // console.log("selectedTraitRef.current: ", selectedTraitRef.current);
+    // console.log("selectedValue: ", selectedValue);
 
     axios
       .get("/api/get-register-data-list", {
@@ -153,8 +153,8 @@ function SelectPage({ collectionUri }) {
         },
       })
       .then((result) => {
-        console.log("result: ", result);
-        console.log("result.data.data: ", result.data.data);
+        // console.log("result: ", result);
+        // console.log("result.data.data: ", result.data.data);
         setSelectedData(result.data.data);
       })
       .catch((error) => console.error(error));
@@ -266,8 +266,8 @@ function SelectPage({ collectionUri }) {
                     onClick={() => {
                       selectedTraitRef.current = trait;
                       activeStepListRef.current.map(function (data) {
-                        console.log("trait: ", trait);
-                        console.log("data: ", data);
+                        // console.log("trait: ", trait);
+                        // console.log("data: ", data);
                         if (data.trait === trait) {
                           setActiveStep(data.step);
                         }
@@ -322,11 +322,11 @@ function SelectPage({ collectionUri }) {
       <>
         <Grid container spacing={2}>
           {Object.entries(attributes).map(([trait, values] = entry) => {
-            console.log("trait: ", trait);
-            console.log("values: ", values);
+            // console.log("trait: ", trait);
+            // console.log("values: ", values);
             if (trait === selectedTraitRef.current) {
               return values.map((value) => {
-                console.log("value: ", value);
+                // console.log("value: ", value);
                 return (
                   <Grid item key={`${trait}/${value}`}>
                     <Button
