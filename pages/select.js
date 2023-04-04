@@ -20,45 +20,41 @@ import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
+import MobileStepper from "@mui/material/MobileStepper";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
 function SelectPage({ collectionUri }) {
   //* TODO: Get from json data.
   const imageUrl =
     "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection";
   const [attributes, setAttributes] = React.useState({});
-  const [selectedTraitType, setSelectedTraitType] = React.useState("");
-  const [selectedValue, setSelectedValue] = React.useState("");
+  const [selectedTrait, setSelectedTrait] = React.useState();
+  const [selectedValue, setSelectedValue] = React.useState();
   const [selectedData, setSelectedData] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
 
   //* Handle tab index.
   const [value, setValue] = React.useState(0);
-  const handleChange = (event, newValue) => {
+  function handleChange(event, newValue) {
     setValue(newValue);
-  };
-  const handleChangeIndex = (index) => {
+  }
+  function handleChangeIndex(index) {
     setValue(index);
-  };
+  }
+
+  //* Handle trait stepper.
+  const [activeStepData, setActiveStepData] = React.useState();
+  function handleNext() {
+    setActiveStepData(function (prevActiveStep) {
+      return { trait: prevActiveStep.trait, step: prevActiveStep.step + 1 };
+    });
+  }
+  function handleBack() {
+    setActiveStepData(function (prevActiveStep) {
+      return { trait: prevActiveStep.trait, step: prevActiveStep.step - 1 };
+    });
+  }
 
   React.useEffect(
     function () {
@@ -80,12 +76,37 @@ function SelectPage({ collectionUri }) {
             //   testCollectionUriResult.data.attributes
             // );
             setAttributes(testCollectionUriResult.data.attributes);
+            Object.keys(testCollectionUriResult.data.attributes).map(function (
+              trait
+            ) {
+              setActiveStepData({ trait: trait, step: 0 });
+            });
           });
       }
       initialize();
     },
     [collectionUri]
   );
+
+  function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
 
   function a11yProps(index) {
     return {
@@ -96,13 +117,13 @@ function SelectPage({ collectionUri }) {
 
   function fetchSelectedData() {
     console.log("call fetchSelectedData()");
-    console.log("selectedTraitType: ", selectedTraitType);
+    console.log("selectedTrait: ", selectedTrait);
     console.log("selectedValue: ", selectedValue);
 
     axios
       .get("/api/get-register-data-list", {
         params: {
-          type: selectedTraitType,
+          type: selectedTrait,
           value: selectedValue,
         },
       })
@@ -114,7 +135,7 @@ function SelectPage({ collectionUri }) {
       .catch((error) => console.error(error));
   }
 
-  const SelectDataList = ({ data }) => {
+  function SelectDataList({ data }) {
     // console.log("call SelectDataList()");
     // console.log("data: ", data);
 
@@ -129,9 +150,48 @@ function SelectPage({ collectionUri }) {
         })}
       </>
     );
-  };
+  }
 
-  const TraitListTabPage = ({ data }) => {
+  function SelectTraitPage({ traitType, traitList }) {
+    //* Check data is empty.
+    if (Array.isArray(traitList) === false || traitList.length === 0) {
+      return <Typography>No trait list data</Typography>;
+    }
+
+    const maxActiveStep = Math.ceil(traitList.length / 4);
+
+    return (
+      <MobileStepper
+        variant="dots"
+        steps={maxActiveStep}
+        position="static"
+        activeStep={activeStepData.step}
+        sx={{ flexGrow: 1 }}
+        nextButton={
+          <Button
+            size="small"
+            onClick={handleNext}
+            disabled={activeStepData.step === maxActiveStep - 1}
+          >
+            Next
+            <KeyboardArrowRight />
+          </Button>
+        }
+        backButton={
+          <Button
+            size="small"
+            onClick={handleBack}
+            disabled={activeStepData.step === 0}
+          >
+            <KeyboardArrowLeft />
+            Back
+          </Button>
+        }
+      />
+    );
+  }
+
+  function TraitListTabPage({ data }) {
     return (
       <>
         <Box sx={{ bgcolor: "background.paper", width: "100vw" }}>
@@ -144,37 +204,49 @@ function SelectPage({ collectionUri }) {
               variant="fullWidth"
               aria-label="full width tabs example"
             >
-              {Object.keys(attributes).map((traitType, idx) => {
-                return <Tab label={traitType} {...a11yProps(idx)} key={idx} />;
+              {Object.keys(attributes).map((trait, idx) => {
+                return (
+                  <Tab
+                    label={trait}
+                    {...a11yProps(idx)}
+                    key={idx}
+                    onClick={() => {
+                      setSelectedTrait(trait);
+                    }}
+                  />
+                );
               })}
             </Tabs>
           </AppBar>
-          {Object.keys(attributes).map((traitType, idx) => {
+          {Object.entries(attributes).map(([traitType, traitList], idx) => {
+            // console.log("traitType: ", traitType);
+            // console.log("traitList: ", traitList);
+
             return (
               <TabPanel value={value} index={idx} key={idx}>
-                {traitType}
+                <SelectTraitPage traitType={traitType} traitList={traitList} />
               </TabPanel>
             );
           })}
         </Box>
       </>
     );
-  };
+  }
 
-  const TraitListPage = ({ data }) => {
+  function TraitListPage({ data }) {
     return (
       <>
         <Grid container>
-          {Object.keys(attributes).map((traitType, idx) => {
+          {Object.keys(attributes).map((trait, idx) => {
             return (
               <Grid item key={idx}>
                 <Button
                   onClick={() => {
-                    setSelectedTraitType(traitType);
+                    setSelectedTrait(trait);
                     setOpenDialog(true);
                   }}
                 >
-                  {traitType}
+                  {trait}
                 </Button>
               </Grid>
             );
@@ -183,7 +255,7 @@ function SelectPage({ collectionUri }) {
         <SelectDataList data={data} />
       </>
     );
-  };
+  }
 
   const SelectContent = () => {
     return (
@@ -192,7 +264,7 @@ function SelectPage({ collectionUri }) {
           {Object.entries(attributes).map(([traitType, values] = entry) => {
             console.log("traitType: ", traitType);
             console.log("values: ", values);
-            if (traitType === selectedTraitType) {
+            if (traitType === selectedTrait) {
               return values.map((value) => {
                 console.log("value: ", value);
                 return (
@@ -217,7 +289,7 @@ function SelectPage({ collectionUri }) {
         <Box sx={{ width: "90vw", height: "90vh" }}>
           <CardMedia
             component="img"
-            image={`${imageUrl}/${selectedTraitType}/${selectedValue}.png`}
+            image={`${imageUrl}/${selectedTrait}/${selectedValue}.png`}
           />
         </Box>
       </>
