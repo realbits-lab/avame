@@ -3,6 +3,7 @@ import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
 import { Color3, Vector3 } from "@babylonjs/core/Maths";
+import { Camera } from "@babylonjs/core";
 import loadable from "@loadable/component";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -26,6 +27,7 @@ function AvatarView({
   setAvatarPositionFunc,
   showGuideCanvas = false,
   showFrameStats = false,
+  useMotionCapture = true,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -105,7 +107,10 @@ function AvatarView({
 
   React.useEffect(() => {
     async function initialize() {
-      await initializeAvatarContent({ url: inputGltfDataUrl });
+      await initializeAvatarContent({
+        url: inputGltfDataUrl,
+        useMotionCapture: useMotionCapture,
+      });
 
       setAvatarPosition({
         canvasPosition: undefined,
@@ -293,7 +298,7 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Initialize data.
   //*---------------------------------------------------------------------------
-  async function initializeAvatarContent({ url }) {
+  async function initializeAvatarContent({ url, useMotionCapture }) {
     console.log("call initializeAvatarContent()");
     console.log("url: ", url);
 
@@ -315,16 +320,32 @@ function AvatarView({
         },
       },
       backdropRef.current,
+      //* Flag for whether or not to use holistic motion capture.
+      useMotionCapture,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
         console.log("v3dCoreRef.current: ", v3dCoreRef.current);
         // v3dCoreRef.current._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
 
-        //* Set light.
-        v3dCoreRef.current.addAmbientLight(new Color3(0, 0, 0));
-
         //* Set background.
-        v3dCoreRef.current.setBackgroundColor(Color3.FromHexString("#ffffff"));
+        v3dCoreRef.current.setBackgroundColor(Color3.White());
+
+        const vrmManager = v3dCoreRef.current.getVRMManagerByURI(url);
+
+        //* Set camera.
+        const mainCamera = v3dCoreRef.current.mainCamera;
+        console.log("mainCamera: ", mainCamera);
+        mainCamera.setPosition(new Vector3(0, 1.05, 4.5));
+        mainCamera.setTarget(
+          vrmManager.rootMesh
+            .getWorldMatrix()
+            .getTranslation()
+            .subtractFromFloats(0, 0, 0)
+        );
+        mainCamera.fovMode = Camera.FOVMODE_HORIZONTAL_FIXED;
+
+        //* Set light.
+        v3dCoreRef.current.addAmbientLight(new Color3(1, 1, 1));
       }
     );
 

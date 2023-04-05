@@ -6,6 +6,7 @@
 
 import React from "react";
 import axios from "axios";
+import * as BABYLON from "@babylonjs/core";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { styled } from "@mui/system";
 import { tooltipClasses } from "@mui/material/Tooltip";
@@ -35,10 +36,8 @@ function SelectPage() {
   const collectionUrl =
     // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
     "https://clothes-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
-
   // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
   const [avatarUrl, setAvatarUrl] = React.useState();
-
   const [attributes, setAttributes] = React.useState({});
   const selectedTraitRef = React.useRef();
   const [selectedValue, setSelectedValue] = React.useState();
@@ -107,11 +106,13 @@ function SelectPage() {
       } catch (error) {
         console.error(error);
       }
-      console.log("response.data: ", response.data);
+      // console.log("response.data: ", response.data);
 
       //* Get avatar base model url.
       //* TODO: Handle no data error case.
-      setAvatarUrl(response.data.base_model.vrm_url);
+      //* TODO: Test.
+      // setAvatarUrl(response.data.base_model.vrm_url);
+      setAvatarUrl("testfiles/base.vrm");
 
       //* Set the first trait as the selected trait.
       Object.keys(response.data.attributes).map(function (trait, idx) {
@@ -239,7 +240,13 @@ function SelectPage() {
                         "",
                         v3dCore.scene,
                         async function (meshes, particleSystems, skeletons) {
+                          // console.log(
+                          //   "v3dCore.scene.meshes: ",
+                          //   v3dCore.scene.meshes
+                          // );
+                          // console.log("meshes: ", meshes);
                           // console.log("skeletons: ", skeletons);
+
                           //* If there're already pre-added meshes, remove them all.
                           if (traitMeshListRef.current[inputTrait]) {
                             traitMeshListRef.current[inputTrait].map((mesh) => {
@@ -252,14 +259,28 @@ function SelectPage() {
                           traitMeshListRef.current[inputTrait] = [];
 
                           //* Find the head bone.
-                          let headBone;
+                          let parentBone;
                           v3dCore.scene.skeletons.map((skeleton) => {
                             // console.log("skeleton: ", skeleton);
+
                             skeleton.bones.map((bone) => {
-                              console.log("bone.name: ", bone.name);
-                              if (bone.name === "J_Bip_C_Hips") {
+                              // console.log("bone.name: ", bone.name);
+                              //* TODO: Use head bone for accessory and hips bone for clothes.
+                              if (
+                                inputTrait !== "body_top" &&
+                                inputTrait !== "body_bottom" &&
+                                bone.name === "J_Bip_C_Head"
+                              ) {
+                                parentBone = bone;
+                              }
+
+                              if (
+                                (inputTrait === "body_top" ||
+                                  inputTrait === "body_bottom") &&
+                                bone.name === "J_Bip_C_Hips"
+                              ) {
                                 // console.log("bone: ", bone);
-                                headBone = bone;
+                                parentBone = bone;
                               }
                             });
                           });
@@ -271,7 +292,7 @@ function SelectPage() {
                             const meshAbsolutePosition =
                               mesh.getAbsolutePosition();
                             const headBoneAbsolutePosition =
-                              headBone.getAbsolutePosition();
+                              parentBone.getAbsolutePosition();
                             const diffAbsolutePosition =
                               meshAbsolutePosition.subtract(
                                 headBoneAbsolutePosition
@@ -289,8 +310,17 @@ function SelectPage() {
                             //   diffAbsolutePosition
                             // );
 
-                            mesh.setAbsolutePosition(diffAbsolutePosition);
-                            mesh.parent = headBone;
+                            //* Set the position of mesh by difference between mesh and head bone.
+                            // mesh.setAbsolutePosition(diffAbsolutePosition);
+
+                            //* Set the parent of mesh to head bone in case of accessory.
+                            // mesh.parent = parentBone;
+
+                            // const result = BABYLON.Mesh.MergeMeshes([
+                            //   ...v3dCore.scene.meshes,
+                            //   mesh,
+                            // ]);
+                            // console.log("result: ", result);
                           });
                         }
                       );
@@ -451,6 +481,7 @@ function SelectPage() {
             // VideoChat -> AvatarView call for changing avatar canvas position.
             // ScreenView -> AvatarView call for changing avatar canvas position.
             setAvatarPositionFunc={setAvatarPositionFuncRef}
+            useMotionCapture={false}
           />
         </Grid>
         <Grid item>
