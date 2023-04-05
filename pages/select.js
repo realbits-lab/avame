@@ -208,9 +208,9 @@ function SelectPage({ collectionUri }) {
   }
 
   function SelectTraitPage({ inputTrait, inputTraitList }) {
-    console.log("call SelectTraitPage()");
-    console.log("inputTrait: ", inputTrait);
-    console.log("inputTraitList: ", inputTraitList);
+    // console.log("call SelectTraitPage()");
+    // console.log("inputTrait: ", inputTrait);
+    // console.log("inputTraitList: ", inputTraitList);
 
     //* Check data is empty.
     if (
