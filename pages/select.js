@@ -256,7 +256,8 @@ function SelectPage() {
                           v3dCore.scene.skeletons.map((skeleton) => {
                             // console.log("skeleton: ", skeleton);
                             skeleton.bones.map((bone) => {
-                              if (bone.name === "J_Bip_C_Head") {
+                              console.log("bone.name: ", bone.name);
+                              if (bone.name === "J_Bip_C_Hips") {
                                 // console.log("bone: ", bone);
                                 headBone = bone;
                               }
