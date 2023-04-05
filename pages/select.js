@@ -6,9 +6,7 @@
 
 import React from "react";
 import axios from "axios";
-import * as BABYLON from "@babylonjs/core";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { styled } from "@mui/system";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import AppBar from "@mui/material/AppBar";
@@ -32,18 +30,20 @@ import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
 import AvatarView from "../components/AvatarView";
 
-function SelectPage({ collectionUri }) {
+function SelectPage() {
   //* TODO: Get from json data.
-  const baseUrl =
-    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection";
+  const collectionUrl =
+    // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
+    "https://clothes-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
+
+  // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
+  const [avatarUrl, setAvatarUrl] = React.useState();
+
   const [attributes, setAttributes] = React.useState({});
   const selectedTraitRef = React.useRef();
   const [selectedValue, setSelectedValue] = React.useState();
   const [selectedData, setSelectedData] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(true);
-  const [avatarUrl, setAvatarUrl] = React.useState(
-    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
-  );
   const getImageDataUrl = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
   const setAvatarPositionFuncRef = React.useRef();
@@ -94,47 +94,41 @@ function SelectPage({ collectionUri }) {
     });
   }
 
-  React.useEffect(
-    function () {
-      // console.log("call useEffect()");
+  React.useEffect(function () {
+    // console.log("call useEffect()");
 
-      async function initialize() {
-        // console.log("call initialize()");
+    async function initialize() {
+      // console.log("call initialize()");
 
-        //* Get trait list from collection uri.
-        let attrArrayResult = [];
-        const testCollectionUri =
-          "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
-
-        const testCollectionUriResult = await axios.get(testCollectionUri);
-        // console.log(
-        //   "testCollectionUriResult.data.attributes: ",
-        //   testCollectionUriResult.data.attributes
-        // );
-
-        //* Set the first trait as the selected trait.
-        Object.keys(testCollectionUriResult.data.attributes).map(function (
-          trait,
-          idx
-        ) {
-          if (idx === 0) selectedTraitRef.current = trait;
-        });
-
-        //* Set attributes variable.
-        setAttributes(testCollectionUriResult.data.attributes);
-
-        //* Reset and initialize active step for the each trait mobile stepper as zero.
-        activeStepListRef.current = [];
-        Object.keys(testCollectionUriResult.data.attributes).map(function (
-          trait
-        ) {
-          activeStepListRef.current.push({ trait: trait, step: 0 });
-        });
+      //* Get trait list from collection uri.
+      let response;
+      try {
+        response = await axios.get(collectionUrl);
+      } catch (error) {
+        console.error(error);
       }
-      initialize();
-    },
-    [collectionUri]
-  );
+      console.log("response.data: ", response.data);
+
+      //* Get avatar base model url.
+      //* TODO: Handle no data error case.
+      setAvatarUrl(response.data.base_model.vrm_url);
+
+      //* Set the first trait as the selected trait.
+      Object.keys(response.data.attributes).map(function (trait, idx) {
+        if (idx === 0) selectedTraitRef.current = trait;
+      });
+
+      //* Set attributes variable.
+      setAttributes(response.data.attributes);
+
+      //* Reset and initialize active step for the each trait mobile stepper as zero.
+      activeStepListRef.current = [];
+      Object.keys(response.data.attributes).map(function (trait) {
+        activeStepListRef.current.push({ trait: trait, step: 0 });
+      });
+    }
+    initialize();
+  }, []);
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -240,7 +234,7 @@ function SelectPage({ collectionUri }) {
                       const v3dCore = getV3dCoreFuncRef.current();
 
                       SceneLoader.ImportMesh(
-                        inputTrait,
+                        null,
                         glbUrl,
                         "",
                         v3dCore.scene,
@@ -390,69 +384,6 @@ function SelectPage({ collectionUri }) {
     );
   }
 
-  function TraitListPage({ data }) {
-    return (
-      <>
-        <Grid container>
-          {Object.keys(attributes).map((trait, idx) => {
-            return (
-              <Grid item key={idx}>
-                <Button
-                  onClick={() => {
-                    selectedTraitRef.current = trait;
-                    setOpenDialog(true);
-                  }}
-                >
-                  {trait}
-                </Button>
-              </Grid>
-            );
-          })}
-        </Grid>
-        <SelectDataList data={data} />
-      </>
-    );
-  }
-
-  const SelectContent = () => {
-    return (
-      <>
-        <Grid container spacing={2}>
-          {Object.entries(attributes).map(([trait, values] = entry) => {
-            // console.log("trait: ", trait);
-            // console.log("values: ", values);
-            if (trait === selectedTraitRef.current) {
-              return values.map((value) => {
-                // console.log("value: ", value);
-                return (
-                  <Grid item key={`${trait}/${value}`}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      key={`${trait}/${value}`}
-                      sx={{ m: "2px" }}
-                      onClick={() => {
-                        setSelectedValue(value);
-                      }}
-                    >
-                      {value}
-                    </Button>
-                  </Grid>
-                );
-              });
-            }
-          })}
-        </Grid>
-        <Box sx={{ width: "90vw", height: "90vh" }}>
-          <CardMedia
-            component="img"
-            image={`${baseUrl}/${selectedTraitRef.current}/${selectedValue}.png`}
-          />
-        </Box>
-      </>
-    );
-  };
-
   const SelectDialog = () => {
     return (
       <Dialog
@@ -473,7 +404,7 @@ function SelectPage({ collectionUri }) {
           },
         }}
       >
-        <DialogTitle id="alert-dialog-title">
+        <DialogTitle>
           <Typography color={(theme) => theme.palette.grey[800]}>
             Select clothes and accessories.
           </Typography>
@@ -540,9 +471,6 @@ function SelectPage({ collectionUri }) {
         justifyContent="flex-end"
         alignItems="flex-end"
       >
-        {/*//*--------------------------------------------------------------*/}
-        {/*//* My menu.                                                     */}
-        {/*//*--------------------------------------------------------------*/}
         <Fab
           color="primary"
           onClick={() => {

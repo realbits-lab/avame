@@ -18,7 +18,7 @@ const Service = () => {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
-  const [avatarUrl, setAvatarUrl] = React.useState("1.vrm");
+  const [avatarUrl, setAvatarUrl] = React.useState("testfiles/1.vrm");
 
   //*---------------------------------------------------------------------------
   //* Variable references.
@@ -29,6 +29,7 @@ const Service = () => {
   //* Function references.
   //*---------------------------------------------------------------------------
   const getImageDataUrl = React.useRef();
+  const getV3dCoreFuncRef = React.useRef();
   const getMediaStreamFuncRef = React.useRef();
   const setAvatarPositionFuncRef = React.useRef();
   const takePictureFuncRef = React.useRef();
@@ -123,6 +124,7 @@ const Service = () => {
         {/*//*-----------------------------------------------------------------*/}
         <AvatarView
           inputGltfDataUrl={avatarUrl}
+          getV3dCoreFuncRef={getV3dCoreFuncRef}
           getImageDataUrlFunc={getImageDataUrl}
           // VideoChat -> AvatarView call for new Remon.
           // TakeVideo -> AvatarView call for recording video.

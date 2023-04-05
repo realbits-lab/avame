@@ -102,6 +102,7 @@ const RentContent = ({
       try {
         await rentMarket.current.initializeAll();
       } catch (error) {
+        console.log("catch error: ", error);
         console.error(error);
       }
       rentMarketRef.current = rentMarket.current;
