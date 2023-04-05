@@ -104,31 +104,32 @@ function SelectPage({ collectionUri }) {
         //* Get trait list from collection uri.
         let attrArrayResult = [];
         const testCollectionUri =
-          "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection.json";
+          "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
 
-        axios
-          .get(testCollectionUri)
-          .then(async function (testCollectionUriResult) {
-            // console.log(
-            //   "testCollectionUriResult.data.attributes: ",
-            //   testCollectionUriResult.data.attributes
-            // );
+        const testCollectionUriResult = await axios.get(testCollectionUri);
+        // console.log(
+        //   "testCollectionUriResult.data.attributes: ",
+        //   testCollectionUriResult.data.attributes
+        // );
 
-            Object.keys(testCollectionUriResult.data.attributes).map(function (
-              trait,
-              idx
-            ) {
-              if (idx === 0) selectedTraitRef.current = trait;
-            });
+        //* Set the first trait as the selected trait.
+        Object.keys(testCollectionUriResult.data.attributes).map(function (
+          trait,
+          idx
+        ) {
+          if (idx === 0) selectedTraitRef.current = trait;
+        });
 
-            setAttributes(testCollectionUriResult.data.attributes);
-            activeStepListRef.current = [];
-            Object.keys(testCollectionUriResult.data.attributes).map(function (
-              trait
-            ) {
-              activeStepListRef.current.push({ trait: trait, step: 0 });
-            });
-          });
+        //* Set attributes variable.
+        setAttributes(testCollectionUriResult.data.attributes);
+
+        //* Reset and initialize active step for the each trait mobile stepper as zero.
+        activeStepListRef.current = [];
+        Object.keys(testCollectionUriResult.data.attributes).map(function (
+          trait
+        ) {
+          activeStepListRef.current.push({ trait: trait, step: 0 });
+        });
       }
       initialize();
     },
@@ -206,130 +207,103 @@ function SelectPage({ collectionUri }) {
     );
   }
 
-  function SelectTraitPage({ trait, traitList }) {
+  function SelectTraitPage({ inputTrait, inputTraitList }) {
+    console.log("call SelectTraitPage()");
+    console.log("inputTrait: ", inputTrait);
+    console.log("inputTraitList: ", inputTraitList);
+
     //* Check data is empty.
-    // if (Array.isArray(traitList) === false || traitList.length === 0) {
-    //   return <Typography>No trait list data</Typography>;
-    // }
+    if (
+      Array.isArray(inputTraitList) === false ||
+      inputTraitList.length === 0
+    ) {
+      return <Typography>No trait list data</Typography>;
+    }
 
-    const maxActiveStep = Math.ceil(traitList.length / 4);
+    const maxActiveStep = Math.ceil(inputTraitList.length / 4);
 
-    //* TODO: Fix rotation bug.
     return (
       <>
         <Grid container>
-          {Object.entries(attributes).map(function ([key, value]) {
-            if (key === trait) {
-              return value.map(function (traitValue, idx) {
-                // console.log(
-                //   "trait image url: ",
-                //   `${baseUrl}/${trait}/${traitValue}.png`
-                // );
-                // console.log("trait: ", trait);
-                // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
+          {inputTraitList.map(function (traitValue, idx) {
+            // console.log("inputTrait: ", inputTrait);
+            // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
 
-                if (Math.floor(idx / 4) === activeStep) {
-                  return (
-                    <Grid item xs={3} key={idx}>
-                      <CardMedia
-                        component="img"
-                        image={`${baseUrl}/${trait}/${traitValue}.png`}
-                        onClick={function () {
-                          const glbUrl = `${baseUrl}/${trait}/${traitValue}.glb`;
-                          // const glbUrl = `${traitValue}.glb`;
-                          const v3dCore = getV3dCoreFuncRef.current();
+            if (Math.floor(idx / 4) === activeStep) {
+              return (
+                <Grid item xs={3} key={idx}>
+                  <CardMedia
+                    component="img"
+                    image={traitValue.image_url}
+                    onClick={function () {
+                      const glbUrl = traitValue.glb_url;
+                      const v3dCore = getV3dCoreFuncRef.current();
 
-                          SceneLoader.ImportMesh(
-                            trait,
-                            glbUrl,
-                            "",
-                            v3dCore.scene,
-                            async function (
-                              meshes,
-                              particleSystems,
-                              skeletons
-                            ) {
-                              // console.log("skeletons: ", skeletons);
-                              //* If there're already pre-added meshes, remove them all.
-                              if (traitMeshListRef.current[trait]) {
-                                traitMeshListRef.current[trait].map((mesh) => {
-                                  mesh.dispose();
-                                  mesh = null;
-                                });
+                      SceneLoader.ImportMesh(
+                        inputTrait,
+                        glbUrl,
+                        "",
+                        v3dCore.scene,
+                        async function (meshes, particleSystems, skeletons) {
+                          // console.log("skeletons: ", skeletons);
+                          //* If there're already pre-added meshes, remove them all.
+                          if (traitMeshListRef.current[inputTrait]) {
+                            traitMeshListRef.current[inputTrait].map((mesh) => {
+                              mesh.dispose();
+                              mesh = null;
+                            });
+                          }
+
+                          //* Initialize  mesh list.
+                          traitMeshListRef.current[inputTrait] = [];
+
+                          //* Find the head bone.
+                          let headBone;
+                          v3dCore.scene.skeletons.map((skeleton) => {
+                            // console.log("skeleton: ", skeleton);
+                            skeleton.bones.map((bone) => {
+                              if (bone.name === "J_Bip_C_Head") {
+                                // console.log("bone: ", bone);
+                                headBone = bone;
                               }
+                            });
+                          });
 
-                              //* Initialize trait mesh list.
-                              traitMeshListRef.current[trait] = [];
+                          meshes.map((mesh) => {
+                            traitMeshListRef.current[inputTrait].push(mesh);
 
-                              //* Find the head bone.
-                              let headBone;
-                              let headSkeleton;
-                              v3dCore.scene.skeletons.map((skeleton) => {
-                                // console.log("skeleton: ", skeleton);
-                                skeleton.bones.map((bone) => {
-                                  if (bone.name === "J_Bip_C_Head") {
-                                    // console.log("bone: ", bone);
-                                    headSkeleton = skeleton;
-                                    headBone = bone;
-                                  }
-                                });
-                              });
+                            //* Calculate the difference between mesh absolute position and head bone absolute position.
+                            const meshAbsolutePosition =
+                              mesh.getAbsolutePosition();
+                            const headBoneAbsolutePosition =
+                              headBone.getAbsolutePosition();
+                            const diffAbsolutePosition =
+                              meshAbsolutePosition.subtract(
+                                headBoneAbsolutePosition
+                              );
+                            // console.log(
+                            //   "meshAbsolutePosition: ",
+                            //   meshAbsolutePosition
+                            // );
+                            // console.log(
+                            //   "headBoneAbsolutePosition: ",
+                            //   headBoneAbsolutePosition
+                            // );
+                            // console.log(
+                            //   "diffAbsolutePosition: ",
+                            //   diffAbsolutePosition
+                            // );
 
-                              //* Set parent of mesh to head bone.
-                              //* Add new mesh list to scene.
-                              const baseMesh = v3dCore.scene.meshes[0];
-                              headSkeleton = v3dCore.scene.skeletons[0];
-                              // console.log(
-                              //   "v3dCore.scene.meshes: ",
-                              //   v3dCore.scene.meshes
-                              // );
-                              // console.log("baseMesh: ", baseMesh);
-                              // console.log("headSkeleton: ", headSkeleton);
-                              // console.log("headBone: ", headBone);
-
-                              meshes.map((mesh) => {
-                                // v3dCore.scene.addMesh(mesh, true);
-                                traitMeshListRef.current[trait].push(mesh);
-                                mesh.position = new BABYLON.Vector3(0, 0, 0);
-                                // mesh.parent = transformNode;
-                                // mesh.isVisible = true;
-                                // console.log("mesh: ", mesh);
-
-                                //* Calculate the difference between mesh absolute position and head bone absolute position.
-                                const meshAbsolutePosition =
-                                  mesh.getAbsolutePosition();
-                                const headBoneAbsolutePosition =
-                                  headBone.getAbsolutePosition();
-                                const diffAbsolutePosition =
-                                  meshAbsolutePosition.subtract(
-                                    headBoneAbsolutePosition
-                                  );
-                                // console.log(
-                                //   "meshAbsolutePosition: ",
-                                //   meshAbsolutePosition
-                                // );
-                                // console.log(
-                                //   "headBoneAbsolutePosition: ",
-                                //   headBoneAbsolutePosition
-                                // );
-                                // console.log(
-                                //   "diffAbsolutePosition: ",
-                                //   diffAbsolutePosition
-                                // );
-
-                                mesh.setAbsolutePosition(diffAbsolutePosition);
-                                mesh.parent = headBone;
-                                // transformNode.attachToBone(headBone, baseMesh);
-                              });
-                            }
-                          );
-                        }}
-                        sx={{ width: "80%", height: "80%" }}
-                      />
-                    </Grid>
-                  );
-                }
-              });
+                            mesh.setAbsolutePosition(diffAbsolutePosition);
+                            mesh.parent = headBone;
+                          });
+                        }
+                      );
+                    }}
+                    sx={{ width: "80%", height: "80%" }}
+                  />
+                </Grid>
+              );
             }
           })}
         </Grid>
@@ -402,12 +376,12 @@ function SelectPage({ collectionUri }) {
             </Tabs>
           </AppBar>
           {Object.entries(attributes).map(([trait, traitList], idx) => {
-            // console.log("trait: ", trait);
-            // console.log("traitList: ", traitList);
-
             return (
               <TabPanel value={value} index={idx} key={idx}>
-                <SelectTraitPage trait={trait} traitList={traitList} />
+                <SelectTraitPage
+                  inputTrait={trait}
+                  inputTraitList={traitList}
+                />
               </TabPanel>
             );
           })}
