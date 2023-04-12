@@ -5,6 +5,17 @@ const nextConfig = {
   },
   reactStrictMode: false,
   transpilePackages: ["kalidokit", "rent-market"],
+  headers: () => [
+    {
+      source: "/",
+      headers: [
+        {
+          key: "Cache-Control",
+          value: "no-store",
+        },
+      ],
+    },
+  ],
 };
 
 module.exports = nextConfig;

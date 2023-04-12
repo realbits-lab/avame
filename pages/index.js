@@ -7,6 +7,7 @@ import {
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
@@ -45,41 +46,61 @@ const Service = () => {
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
 
-  // let chains: any[] = [];
-  let chains = [];
+  let wagmiBlockchainNetworks = [];
   if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "matic"
   ) {
-    chains = [polygon];
+    wagmiBlockchainNetworks = [polygon];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "maticmum"
   ) {
-    chains = [polygonMumbai];
+    wagmiBlockchainNetworks = [polygonMumbai];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "localhost"
   ) {
-    chains = [localhost];
+    wagmiBlockchainNetworks = [localhost];
   } else {
-    chains = [];
+    wagmiBlockchainNetworks = [];
   }
 
   // * Wagmi client
-  const { provider } = configureChains(chains, [
-    w3mProvider({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
-    }),
-  ]);
+  //* Use wallet connect configuration.
+  const { chains, provider, webSocketProvider } = configureChains(
+    wagmiBlockchainNetworks,
+    [
+      w3mProvider({
+        projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
+      }),
+    ]
+  );
+  //* Use alchemy configuration.
+  // const { chains, provider, webSocketProvider } = configureChains(
+  //   wagmiBlockchainNetworks,
+  //   [
+  //     alchemyProvider({
+  //       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "",
+  //     }),
+  //   ]
+  // );
   const wagmiClient = createClient({
     autoConnect: true,
-    connectors: w3mConnectors({ appName: "web3Modal", chains }),
+    connectors: w3mConnectors({
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
+      version: 2,
+      chains: wagmiBlockchainNetworks,
+    }),
     provider,
+    webSocketProvider,
   });
 
   // * Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
+  const ethereumClient = new EthereumClient(
+    wagmiClient,
+    wagmiBlockchainNetworks
+  );
 
   // function selectAvatarFunc(element: {
   //   metadata: {
