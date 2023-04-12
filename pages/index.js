@@ -202,7 +202,11 @@ const Service = () => {
       <Web3Modal
         projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
         ethereumClient={ethereumClient}
-        themeZIndex={20000}
+        themeVariables={{
+          "--w3m-font-family": "Roboto, sans-serif",
+          "--w3m-accent-color": "#F5841F",
+          "--w3m-z-index": 20000,
+        }}
       />
     </>
   );
