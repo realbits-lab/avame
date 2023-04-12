@@ -1,6 +1,8 @@
 import React from "react";
 import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
+import { styled } from "@mui/system";
+import { useTheme } from "@mui/material/styles";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount, useNetwork } from "wagmi";
 import { RentMarket, RBSnackbar, AlertSeverity, Market, My } from "rent-market";
@@ -9,6 +11,26 @@ import {
   writeToastMessageState,
   readToastMessageState,
 } from "./RealBitsUtil";
+
+const Main = styled("main", {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  flexGrow: 1,
+  overflow: "scroll",
+  padding: theme.spacing(1),
+  // marginLeft: `-${RENT_CONTENT_COMPONENT_DRAWER_WIDTH}px`,
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  }),
+}));
 
 const RentContent = ({
   selectAvatarFunc,
@@ -237,19 +259,19 @@ const RentContent = ({
               <Web3NetworkSwitch />
             </Grid>
           </Grid>
-          <My
-            selectAvatarFunc={selectAvatarFunc}
-            inputRentMarket={inputRentMarket}
-            inputCollectionArray={collectionArray}
-            inputServiceAddress={serviceAddress}
-            inputMyRegisteredNFTArray={myRegisteredNFTArray}
-            inputMyRentNFTArray={myRentNFTArray}
-            inputBlockchainNetwork={blockchainNetwork}
-            setWriteToastMessage={setWriteToastMessage}
-            web3modalSelectedChain={chain}
-            wagmiIsConnected={isConnected}
-          />
         </Grid>
+        <My
+          selectAvatarFunc={selectAvatarFunc}
+          inputRentMarket={inputRentMarket}
+          inputCollectionArray={collectionArray}
+          inputServiceAddress={serviceAddress}
+          inputMyRegisteredNFTArray={myRegisteredNFTArray}
+          inputMyRentNFTArray={myRentNFTArray}
+          inputBlockchainNetwork={blockchainNetwork}
+          setWriteToastMessage={setWriteToastMessage}
+          web3modalSelectedChain={chain}
+          wagmiIsConnected={isConnected}
+        />
       </RBDialog>
 
       {/*//*-----------------------------------------------------------------*/}
