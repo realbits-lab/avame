@@ -2,7 +2,6 @@ import React from "react";
 import { Web3Button, Web3NetworkSwitch } from "@web3modal/react";
 import Grid from "@mui/material/Grid";
 import { styled } from "@mui/system";
-import { useTheme } from "@mui/material/styles";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount, useNetwork } from "wagmi";
 import { RentMarket, RBSnackbar, AlertSeverity, Market, My } from "rent-market";
