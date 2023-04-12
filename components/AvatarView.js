@@ -299,8 +299,8 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url, useMotionCapture }) {
-    console.log("call initializeAvatarContent()");
-    console.log("url: ", url);
+    // console.log("call initializeAvatarContent()");
+    // console.log("url: ", url);
 
     //* TODO: Block for a while.
     // makeScene();
@@ -324,7 +324,7 @@ function AvatarView({
       useMotionCapture,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
-        console.log("v3dCoreRef.current: ", v3dCoreRef.current);
+        // console.log("v3dCoreRef.current: ", v3dCoreRef.current);
         // v3dCoreRef.current._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
 
         //* Set background.
@@ -334,7 +334,7 @@ function AvatarView({
 
         //* Set camera.
         const mainCamera = v3dCoreRef.current.mainCamera;
-        console.log("mainCamera: ", mainCamera);
+        // console.log("mainCamera: ", mainCamera);
         mainCamera.setPosition(new Vector3(0, 1.05, 4.5));
         mainCamera.setTarget(
           vrmManager.rootMesh
@@ -350,7 +350,7 @@ function AvatarView({
     );
 
     window.addEventListener("resize", () => {
-      console.log("-- resize event");
+      // console.log("-- resize event");
     });
   }
 

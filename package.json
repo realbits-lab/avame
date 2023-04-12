@@ -67,6 +67,7 @@
     "wagmi": "^0.12.7"
   },
   "devDependencies": {
+    "alchemy-sdk": "^2.7.0",
     "keccak256": "^1.0.6"
   }
 }
