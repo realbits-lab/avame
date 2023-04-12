@@ -63,7 +63,7 @@
     "typescript": "4.9.4",
     "utf-8-validate": "^5.0.10",
     "uuid": "^9.0.0",
-    "v3d-web-realbits": "^0.0.19",
+    "v3d-web-realbits": "^0.0.20",
     "wagmi": "^0.12.7"
   },
   "devDependencies": {

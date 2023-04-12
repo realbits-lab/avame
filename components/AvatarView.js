@@ -106,6 +106,9 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
+    // console.log("call useEffect()");
+    // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+
     async function initialize() {
       await initializeAvatarContent({
         url: inputGltfDataUrl,
@@ -300,12 +303,24 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url, useMotionCapture }) {
     // console.log("call initializeAvatarContent()");
+    // console.log("v3dWebRef.current: ", v3dWebRef.current);
     // console.log("url: ", url);
 
-    //* TODO: Block for a while.
+    //* TODO: Block the usage of Three.js library.
     // makeScene();
     // await loadGltf({ url });
 
+    //* If we already drew model, just change the model url.
+    if (v3dWebRef.current) {
+    	//* TODO: After two time chagne, some error will happen.
+      // v3dWebRef.current.vrmFile = url;
+      // return;
+
+			//* Close all instances.
+      v3dWebRef.current.close();
+    }
+
+    //* Use v3d-web and v3d-core with Babylon.js library.
     const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
     // console.log("V3DWebLibrary: ", V3DWebLibrary);
     v3dWebRef.current = new V3DWebLibrary.V3DWeb(
@@ -346,12 +361,13 @@ function AvatarView({
 
         //* Set light.
         v3dCoreRef.current.addAmbientLight(new Color3(1, 1, 1));
+
+        //* Add window resize event function.
+        window.addEventListener("resize", () => {
+          // console.log("-- resize event");
+        });
       }
     );
-
-    window.addEventListener("resize", () => {
-      // console.log("-- resize event");
-    });
   }
 
   //*---------------------------------------------------------------------------

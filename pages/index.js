@@ -19,7 +19,10 @@ const Service = () => {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
-  const [avatarUrl, setAvatarUrl] = React.useState("testfiles/default.vrm");
+  // const [avatarUrl, setAvatarUrl] = React.useState("testfiles/default.vrm");
+  const [avatarUrl, setAvatarUrl] = React.useState(
+    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm"
+  );
 
   //*---------------------------------------------------------------------------
   //* Variable references.
