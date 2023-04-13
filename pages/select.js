@@ -1,12 +1,12 @@
-//* Show avatar nft attributes select page.
-//* 1. Show trait type list in the top of page.
-//* 2. After user click any trait type, show dialog which display the list of trait type.
-//* 3. When user select any attribute, save that selection status.
-//* 4. Set selection data with recoil.
-
 import React from "react";
 import axios from "axios";
-import * as BABYLON from "@babylonjs/core";
+import {
+  useAccount,
+  useSigner,
+  useContract,
+  useContractRead,
+  useContractEvent,
+} from "wagmi";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { styled } from "@mui/system";
 import { tooltipClasses } from "@mui/material/Tooltip";
@@ -30,8 +30,12 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
 import AvatarView from "../components/AvatarView";
+import rentmarketABI from "../contracts/rentMarket.json";
 
 function SelectPage() {
+  const RENT_MARKET_CONTRACT_ADDRES =
+    process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+
   //* TODO: Get from json data.
   const collectionUrl =
     // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
@@ -50,6 +54,35 @@ function SelectPage() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
+
+  //* Wagmi hook functions.
+  //* Get all collection list.
+  const {
+    data: dataGetAllCollection,
+    isError: isErrorGetAllCollection,
+    isLoading: isLoadingGetAllCollection,
+    isValidating: isValidatingGetAllCollection,
+    status: statusGetAllCollection,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllCollection",
+    cacheOnBlock: true,
+    // watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
 
   //* Handle tab index.
   const [value, setValue] = React.useState(0);
@@ -93,43 +126,62 @@ function SelectPage() {
     });
   }
 
-  React.useEffect(function () {
-    // console.log("call useEffect()");
+  React.useEffect(
+    function () {
+      console.log("call useEffect()");
+      console.log("dataGetAllCollection: ", dataGetAllCollection);
 
-    async function initialize() {
-      // console.log("call initialize()");
+      async function initialize() {
+        // console.log("call initialize()");
 
-      //* Get trait list from collection uri.
-      let response;
-      try {
-        response = await axios.get(collectionUrl);
-      } catch (error) {
-        console.error(error);
+        //* Get trait list from collection uri.
+        let collectionMetadataResponse;
+        try {
+          collectionMetadataResponse = await axios.get(
+            dataGetAllCollection[0]["uri"]
+          );
+        } catch (error) {
+          console.error(error);
+        }
+        // console.log("collectionMetadataResponse.data: ", collectionMetadataResponse.data);
+
+        //* Check empty data.
+        if (!collectionMetadataResponse || !collectionMetadataResponse.data) {
+          console.error("Error: No collection list.");
+          return;
+        }
+
+        //* Set collection list.
+        const collectionMetadata = collectionMetadataResponse.data;
+        console.log("collectionMetadata: ", collectionMetadata);
+
+        //* Get avatar base model url.
+        //* TODO: Handle no data error case.
+        //* TODO: Test.
+        setAvatarUrl(collectionMetadata.base_model.vrm_url);
+        // setAvatarUrl("testfiles/base.vrm");
+
+        //* Set the first trait as the selected trait.
+        Object.keys(collectionMetadata.attributes).map(function (trait, idx) {
+          if (idx === 0) selectedTraitRef.current = trait;
+        });
+
+        //* Set attributes variable.
+        setAttributes(collectionMetadata.attributes);
+
+        //* Reset and initialize active step for the each trait mobile stepper as zero.
+        activeStepListRef.current = [];
+        Object.keys(collectionMetadata.attributes).map(function (trait) {
+          activeStepListRef.current.push({ trait: trait, step: 0 });
+        });
       }
-      // console.log("response.data: ", response.data);
 
-      //* Get avatar base model url.
-      //* TODO: Handle no data error case.
-      //* TODO: Test.
-      // setAvatarUrl(response.data.base_model.vrm_url);
-      setAvatarUrl("testfiles/base.vrm");
-
-      //* Set the first trait as the selected trait.
-      Object.keys(response.data.attributes).map(function (trait, idx) {
-        if (idx === 0) selectedTraitRef.current = trait;
-      });
-
-      //* Set attributes variable.
-      setAttributes(response.data.attributes);
-
-      //* Reset and initialize active step for the each trait mobile stepper as zero.
-      activeStepListRef.current = [];
-      Object.keys(response.data.attributes).map(function (trait) {
-        activeStepListRef.current.push({ trait: trait, step: 0 });
-      });
-    }
-    initialize();
-  }, []);
+      if (dataGetAllCollection) {
+        initialize();
+      }
+    },
+    [dataGetAllCollection]
+  );
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;

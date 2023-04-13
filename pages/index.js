@@ -129,84 +129,70 @@ const Service = () => {
       {/* //*----------------------------------------------------------------*/}
       {/* //* RentContent component.                                         */}
       {/* //*----------------------------------------------------------------*/}
-      <WagmiConfig client={wagmiClient}>
-        <RentContent
-          selectAvatarFunc={selectAvatarFunc}
-          rentMarketAddress={
-            process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
-          }
-          blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
-          testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
-          serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
-          openMyFuncRef={openMyFuncRef}
-          openMarketFuncRef={openMarketFuncRef}
-          rentMarketRef={rentMarketRef}
-        />
+      <RentContent
+        selectAvatarFunc={selectAvatarFunc}
+        rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
+        blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+        testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+        serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+        openMyFuncRef={openMyFuncRef}
+        openMarketFuncRef={openMarketFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
 
-        {/*//*-----------------------------------------------------------------*/}
-        {/*//* AvatarView component.                                           */}
-        {/*//*-----------------------------------------------------------------*/}
-        <AvatarView
-          inputGltfDataUrl={avatarUrl}
-          getV3dCoreFuncRef={getV3dCoreFuncRef}
-          getImageDataUrlFunc={getImageDataUrl}
-          // VideoChat -> AvatarView call for new Remon.
-          // TakeVideo -> AvatarView call for recording video.
-          getMediaStreamFunc={getMediaStreamFuncRef}
-          // VideoChat -> AvatarView call for changing avatar canvas position.
-          // ScreenView -> AvatarView call for changing avatar canvas position.
-          setAvatarPositionFunc={setAvatarPositionFuncRef}
-        />
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* AvatarView component.                                           */}
+      {/*//*-----------------------------------------------------------------*/}
+      <AvatarView
+        inputGltfDataUrl={avatarUrl}
+        getV3dCoreFuncRef={getV3dCoreFuncRef}
+        getImageDataUrlFunc={getImageDataUrl}
+        // VideoChat -> AvatarView call for new Remon.
+        // TakeVideo -> AvatarView call for recording video.
+        getMediaStreamFunc={getMediaStreamFuncRef}
+        // VideoChat -> AvatarView call for changing avatar canvas position.
+        // ScreenView -> AvatarView call for changing avatar canvas position.
+        setAvatarPositionFunc={setAvatarPositionFuncRef}
+      />
 
-        {/*//*-----------------------------------------------------------------*/}
-        {/*//*TakePicture component.                                           */}
-        {/*//*-----------------------------------------------------------------*/}
-        <TakePicture
-          getImageDataUrlFunc={getImageDataUrl}
-          takePictureFuncRef={takePictureFuncRef}
-          rentMarketRef={rentMarketRef}
-        />
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//*TakePicture component.                                           */}
+      {/*//*-----------------------------------------------------------------*/}
+      <TakePicture
+        getImageDataUrlFunc={getImageDataUrl}
+        takePictureFuncRef={takePictureFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
 
-        {/*//*-----------------------------------------------------------------*/}
-        {/*//* Fab menu button.                                                */}
-        {/*//*-----------------------------------------------------------------*/}
-        <ButtonMenu
-          useFab={true}
-          startScreenStreamFuncRef={startScreenStreamFuncRef}
-          stopScreenStreamFuncRef={stopScreenStreamFuncRef}
-          takePictureFuncRef={takePictureFuncRef}
-          startRecordingFuncRef={startRecordingFuncRef}
-          stopRecordingFuncRef={stopRecordingFuncRef}
-          getRecordStatusFuncRef={getRecordStatusFuncRef}
-          requestDataFuncRef={requestDataFuncRef}
-          openMyFuncRef={openMyFuncRef}
-          openMarketFuncRef={openMarketFuncRef}
-          stopScreenEventFuncRef={stopScreenEventFuncRef}
-          rentMarketRef={rentMarketRef}
-        />
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Fab menu button.                                                */}
+      {/*//*-----------------------------------------------------------------*/}
+      <ButtonMenu
+        useFab={true}
+        startScreenStreamFuncRef={startScreenStreamFuncRef}
+        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+        takePictureFuncRef={takePictureFuncRef}
+        startRecordingFuncRef={startRecordingFuncRef}
+        stopRecordingFuncRef={stopRecordingFuncRef}
+        getRecordStatusFuncRef={getRecordStatusFuncRef}
+        requestDataFuncRef={requestDataFuncRef}
+        openMyFuncRef={openMyFuncRef}
+        openMarketFuncRef={openMarketFuncRef}
+        stopScreenEventFuncRef={stopScreenEventFuncRef}
+        rentMarketRef={rentMarketRef}
+      />
 
-        {/*//*-----------------------------------------------------------------*/}
-        {/*//* Video chat component.                                           */}
-        {/*//*-----------------------------------------------------------------*/}
-        <VideoChat
-          // VideoChat -> AvatarView call for new Remon.
-          inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
-          // VideoChat -> AvatarView call for changing avatar canvas position.
-          inputSetAvatarPositionFuncRef={setAvatarPositionFuncRef}
-          // ScreenView -> VideoChat call for setting background screen.
-          inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
-          rentMarketRef={rentMarketRef}
-        />
-      </WagmiConfig>
-
-      <Web3Modal
-        projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID}
-        ethereumClient={ethereumClient}
-        themeVariables={{
-          "--w3m-font-family": "Roboto, sans-serif",
-          "--w3m-accent-color": "#F5841F",
-          "--w3m-z-index": 20000,
-        }}
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Video chat component.                                           */}
+      {/*//*-----------------------------------------------------------------*/}
+      <VideoChat
+        // VideoChat -> AvatarView call for new Remon.
+        inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
+        // VideoChat -> AvatarView call for changing avatar canvas position.
+        inputSetAvatarPositionFuncRef={setAvatarPositionFuncRef}
+        // ScreenView -> VideoChat call for setting background screen.
+        inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
+        rentMarketRef={rentMarketRef}
       />
     </>
   );
