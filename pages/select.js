@@ -8,7 +8,11 @@ import {
   useContractEvent,
 } from "wagmi";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import Image from "mui-image";
 import { styled } from "@mui/system";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
+import ImageListItemBar from "@mui/material/ImageListItemBar";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -54,6 +58,9 @@ function SelectPage() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
+  const [collectionMetadataList, setCollectionMetadataList] = React.useState(
+    []
+  );
 
   //* Wagmi hook functions.
   //* Get all collection list.
@@ -134,46 +141,34 @@ function SelectPage() {
       async function initialize() {
         // console.log("call initialize()");
 
-        //* Get trait list from collection uri.
-        let collectionMetadataResponse;
-        try {
-          collectionMetadataResponse = await axios.get(
-            dataGetAllCollection[0]["uri"]
-          );
-        } catch (error) {
-          console.error(error);
-        }
-        // console.log("collectionMetadataResponse.data: ", collectionMetadataResponse.data);
+        //* Set all collection metadata list.
+        let dataList = [];
+        const promises = dataGetAllCollection.map(async (element) => {
+          let collectionMetadataResponse;
+          try {
+            collectionMetadataResponse = await axios.get(element["uri"]);
 
-        //* Check empty data.
-        if (!collectionMetadataResponse || !collectionMetadataResponse.data) {
-          console.error("Error: No collection list.");
-          return;
-        }
+            //* Check empty data.
+            if (
+              !collectionMetadataResponse ||
+              !collectionMetadataResponse.data
+            ) {
+              console.error("Error: No collection list.");
+              return;
+            }
+          } catch (error) {
+            console.error(error);
+          }
+
+          return dataList.push(collectionMetadataResponse.data);
+        });
+        await Promise.all(promises);
+        setCollectionMetadataList(dataList);
 
         //* Set collection list.
-        const collectionMetadata = collectionMetadataResponse.data;
-        console.log("collectionMetadata: ", collectionMetadata);
-
-        //* Get avatar base model url.
-        //* TODO: Handle no data error case.
-        //* TODO: Test.
-        setAvatarUrl(collectionMetadata.base_model.vrm_url);
-        // setAvatarUrl("testfiles/base.vrm");
-
-        //* Set the first trait as the selected trait.
-        Object.keys(collectionMetadata.attributes).map(function (trait, idx) {
-          if (idx === 0) selectedTraitRef.current = trait;
-        });
-
-        //* Set attributes variable.
-        setAttributes(collectionMetadata.attributes);
-
-        //* Reset and initialize active step for the each trait mobile stepper as zero.
-        activeStepListRef.current = [];
-        Object.keys(collectionMetadata.attributes).map(function (trait) {
-          activeStepListRef.current.push({ trait: trait, step: 0 });
-        });
+        if (dataList[0]) {
+          setImageAndAttributes({ collectionMetadata: dataList[0] });
+        }
       }
 
       if (dataGetAllCollection) {
@@ -182,6 +177,25 @@ function SelectPage() {
     },
     [dataGetAllCollection]
   );
+
+  function setImageAndAttributes({ collectionMetadata }) {
+    //* Get avatar base model url.
+    setAvatarUrl(collectionMetadata.base_model.vrm_url);
+
+    //* Set the first trait as the selected trait.
+    Object.keys(collectionMetadata.attributes).map(function (trait, idx) {
+      if (idx === 0) selectedTraitRef.current = trait;
+    });
+
+    //* Set attributes variable.
+    setAttributes(collectionMetadata.attributes);
+
+    //* Reset and initialize active step for the each trait mobile stepper as zero.
+    activeStepListRef.current = [];
+    Object.keys(collectionMetadata.attributes).map(function (trait) {
+      activeStepListRef.current.push({ trait: trait, step: 0 });
+    });
+  }
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -436,7 +450,7 @@ function SelectPage() {
                   <Tab
                     label={trait}
                     {...a11yProps(idx)}
-                    key={idx}
+                    key={idx + 1}
                     onClick={() => {
                       selectedTraitRef.current = trait;
                       activeStepListRef.current.map(function (e) {
@@ -507,11 +521,42 @@ function SelectPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
+          <CollectionListPage />
           <TraitListTabPage />
         </DialogContent>
       </Dialog>
     );
   };
+
+  function CollectionListPage() {
+    return (
+      <ImageList
+        sx={{
+          gridAutoFlow: "column",
+          gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr)) !important",
+          gridAutoColumns: "minmax(160px, 1fr)",
+        }}
+      >
+        {collectionMetadataList.map((element, idx) => {
+          console.log("element: ", element);
+          return (
+            <ImageListItem
+              key={idx}
+              onClick={() => {
+                setImageAndAttributes({ collectionMetadata: element });
+              }}
+            >
+              <Image src={element.image} alt={element.name} width={100} />
+              <ImageListItemBar
+                title={element.name}
+                sx={{ width: "100px", height: "50px" }}
+              />
+            </ImageListItem>
+          );
+        })}
+      </ImageList>
+    );
+  }
 
   return (
     <>

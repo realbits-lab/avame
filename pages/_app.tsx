@@ -20,10 +20,9 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
-// Add emotion cache.
+//* Add emotion cache.
 const clientSideEmotionCache = createEmotionCache();
 
-// Add more properties.
 const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
@@ -47,7 +46,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
     wagmiBlockchainNetworks = [];
   }
 
-  // * Wagmi client
+  //* Wagmi client
   //* Use wallet connect configuration.
   const { chains, provider, webSocketProvider } = configureChains(
     wagmiBlockchainNetworks,
@@ -58,14 +57,6 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
     ]
   );
   //* Use alchemy configuration.
-  // const { chains, provider, webSocketProvider } = configureChains(
-  //   wagmiBlockchainNetworks,
-  //   [
-  //     alchemyProvider({
-  //       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "",
-  //     }),
-  //   ]
-  // );
   const wagmiClient = createClient({
     autoConnect: true,
     connectors: w3mConnectors({
@@ -77,7 +68,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
     webSocketProvider,
   });
 
-  // * Web3Modal Ethereum Client
+  //* Web3Modal ethereum client.
   const ethereumClient = new EthereumClient(
     wagmiClient,
     wagmiBlockchainNetworks
