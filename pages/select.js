@@ -135,8 +135,8 @@ function SelectPage() {
 
   React.useEffect(
     function () {
-      console.log("call useEffect()");
-      console.log("dataGetAllCollection: ", dataGetAllCollection);
+      // console.log("call useEffect()");
+      // console.log("dataGetAllCollection: ", dataGetAllCollection);
 
       async function initialize() {
         // console.log("call initialize()");
@@ -538,7 +538,7 @@ function SelectPage() {
         }}
       >
         {collectionMetadataList.map((element, idx) => {
-          console.log("element: ", element);
+          // console.log("element: ", element);
           return (
             <ImageListItem
               key={idx}
