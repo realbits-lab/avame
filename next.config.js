@@ -4,17 +4,13 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: false,
-  transpilePackages: ["kalidokit", "rent-market"],
-  headers: () => [
-    {
-      source: "/",
-      headers: [
-        {
-          key: "Cache-Control",
-          value: "no-store",
-        },
-      ],
-    },
+  transpilePackages: [
+    "kalidokit",
+    "rent-market",
+    "v3d-web-realbits",
+    "v3d-core-realbits",
+    "@babylonjs/core",
+    "babylon-mtoon-material",
   ],
 };
 
