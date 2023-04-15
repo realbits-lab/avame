@@ -138,7 +138,7 @@ function VideoChat({
     snackbarValue;
 
   React.useEffect(() => {
-    console.log("call useEffect()");
+    // console.log("call useEffect()");
 
     async function checkAuth() {
       // console.log("call checkAuth()");
@@ -224,7 +224,7 @@ function VideoChat({
     setAvatarPositionFuncRef.current = inputSetAvatarPositionFuncRef.current;
     inputSetBackgroundScreenFuncRef.current = setBackgroundScreen;
 
-    console.log("process.env: ", process.env);
+    // console.log("process.env: ", process.env);
     if (process.env.NODE_ENV === "production") {
       setShowVideoChatButton(false);
     } else {

@@ -3,6 +3,7 @@ import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
 import { Color3, Vector3 } from "@babylonjs/core/Maths";
+import { Camera } from "@babylonjs/core";
 import loadable from "@loadable/component";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -20,11 +21,13 @@ const StatsWithNoSSR = loadable.lib(
 
 function AvatarView({
   inputGltfDataUrl,
+  getV3dCoreFuncRef,
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setAvatarPositionFunc,
   showGuideCanvas = false,
   showFrameStats = false,
+  useMotionCapture = true,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -56,6 +59,7 @@ function AvatarView({
   const backdropRef = React.useRef();
   const sourceVideoRef = React.useRef();
   const v3dWebRef = React.useRef();
+  const v3dCoreRef = React.useRef();
   const rendererRef = React.useRef();
   const sceneRef = React.useRef();
   const deltaRef = React.useRef(0);
@@ -102,8 +106,14 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
+    // console.log("call useEffect()");
+    // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+
     async function initialize() {
-      await initializeAvatarContent({ url: inputGltfDataUrl });
+      await initializeAvatarContent({
+        url: inputGltfDataUrl,
+        useMotionCapture: useMotionCapture,
+      });
 
       setAvatarPosition({
         canvasPosition: undefined,
@@ -128,12 +138,17 @@ function AvatarView({
     getImageDataUrlFunc.current = getImageDataUrl;
     getMediaStreamFunc.current = getMediaStream;
     setAvatarPositionFunc.current = setAvatarPosition;
+    getV3dCoreFuncRef.current = getV3dCoreFunc;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
     setAvatarPositionFunc,
   ]);
+
+  function getV3dCoreFunc() {
+    return v3dCoreRef.current;
+  }
 
   function setBackgroundVideo({ canvasPosition, screenVideoStreamRef }) {
     // console.log("screenVideoStreamRef: ", screenVideoStreamRef);
@@ -286,19 +301,30 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Initialize data.
   //*---------------------------------------------------------------------------
-  async function initializeAvatarContent({ url }) {
-    console.log("call initializeAvatarContent()");
-    console.log("url: ", url);
+  async function initializeAvatarContent({ url, useMotionCapture }) {
+    // console.log("call initializeAvatarContent()");
+    // console.log("v3dWebRef.current: ", v3dWebRef.current);
+    // console.log("url: ", url);
 
-    //* TODO: Block for a while.
+    //* TODO: Block the usage of Three.js library.
     // makeScene();
     // await loadGltf({ url });
 
+    //* If we already drew model, just change the model url.
+    if (v3dWebRef.current) {
+      //* TODO: After two time chagne, some error will happen.
+      // v3dWebRef.current.vrmFile = url;
+      // return;
+
+      //* Close all instances.
+      v3dWebRef.current.close();
+    }
+
+    //* Use v3d-web and v3d-core with Babylon.js library.
     const V3DWebLibrary = await import("v3d-web-realbits/dist/src");
     // console.log("V3DWebLibrary: ", V3DWebLibrary);
     v3dWebRef.current = new V3DWebLibrary.V3DWeb(
-      // "testfiles/7198176664607455952.vrm",
-      "testfiles/default.vrm",
+      url,
       sourceVideoRef.current,
       avatarCanvasRef.current,
       guideCanvasRef.current,
@@ -309,16 +335,15 @@ function AvatarView({
         },
       },
       backdropRef.current,
+      //* Flag for whether or not to use holistic motion capture.
+      useMotionCapture,
       () => {
-        const v3DCore = v3dWebRef.current.v3DCore;
-        console.log("v3DCore: ", v3DCore);
-        // v3DCore._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
+        v3dCoreRef.current = v3dWebRef.current.v3DCore;
 
-        //* Set light.
-        v3DCore.addAmbientLight(new Color3(0, 0, 0));
-
-        //* Set background.
-        v3DCore.setBackgroundColor(Color3.FromHexString("#ffffff"));
+        //* Add window resize event function.
+        window.addEventListener("resize", () => {
+          // console.log("-- resize event");
+        });
       }
     );
   }
@@ -551,11 +576,11 @@ function AvatarView({
             // console.log("render");
             renderAvatar();
             deltaRef.current = deltaRef.current % INTERVAL.current;
+          }
 
-            if (showFrameStats === true) {
-              //* Update stat.
-              statsLib.current.update();
-            }
+          if (showFrameStats === true) {
+            //* Update stat.
+            statsLib.current.update();
           }
         });
 
@@ -671,6 +696,7 @@ function AvatarView({
   // righ-top avatar canvas : 100
   // button : 100
   // dialog : > 100
+  //* TODO: Set the size of avatarCanvas.
   return (
     <>
       {/*//*-----------------------------------------------------------------*/}
@@ -706,17 +732,17 @@ function AvatarView({
 
       {showGuideCanvas ? (
         <Box
-          width="160px"
-          height="120px"
+          width="100px"
+          height="100px"
           border={0}
-          borderColor="secondary.main"
+          borderColor="primary.main"
           sx={{
             top: 0,
-            left: 0,
+            right: 100,
             zIndex: Z_INDEX.dialog,
             position: "absolute",
             display: "flex",
-            transform: "scale(-1, 1)",
+            // transform: "scale(-1, 1)",
           }}
         >
           <canvas id="guideCanvas" ref={guideCanvasRef} />
