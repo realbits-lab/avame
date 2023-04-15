@@ -300,6 +300,7 @@ function SelectPage() {
                       const glbUrl = traitValue.glb_url;
                       const v3dCore = getV3dCoreFuncRef.current();
 
+                      //* Import mesh from glb.
                       SceneLoader.ImportMesh(
                         null,
                         glbUrl,

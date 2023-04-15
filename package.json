@@ -64,11 +64,12 @@
     "typescript": "4.9.4",
     "utf-8-validate": "^5.0.10",
     "uuid": "^9.0.0",
-    "v3d-web-realbits": "^0.0.20",
+    "v3d-web-realbits": "^0.0.21",
     "wagmi": "^0.12.7"
   },
   "devDependencies": {
     "alchemy-sdk": "^2.7.0",
-    "keccak256": "^1.0.6"
+    "keccak256": "^1.0.6",
+    "v3d-core-realbits": "^0.0.8"
   }
 }

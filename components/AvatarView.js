@@ -312,11 +312,11 @@ function AvatarView({
 
     //* If we already drew model, just change the model url.
     if (v3dWebRef.current) {
-    	//* TODO: After two time chagne, some error will happen.
+      //* TODO: After two time chagne, some error will happen.
       // v3dWebRef.current.vrmFile = url;
       // return;
 
-			//* Close all instances.
+      //* Close all instances.
       v3dWebRef.current.close();
     }
 
@@ -346,17 +346,18 @@ function AvatarView({
         v3dCoreRef.current.setBackgroundColor(Color3.White());
 
         const vrmManager = v3dCoreRef.current.getVRMManagerByURI(url);
+        // console.log("vrmManager: ", vrmManager);
+        // console.log("vrmManager.cameras: ", vrmManager.cameras);
+        let firstPersonCameraPosition =
+          vrmManager.getFirstPersonCameraPosition();
+        // console.log("firstPersonCameraPosition: ", firstPersonCameraPosition);
 
+				//* TODO: Get camera from vrm.
         //* Set camera.
         const mainCamera = v3dCoreRef.current.mainCamera;
-        // console.log("mainCamera: ", mainCamera);
-        mainCamera.setPosition(new Vector3(0, 1.05, 4.5));
-        mainCamera.setTarget(
-          vrmManager.rootMesh
-            .getWorldMatrix()
-            .getTranslation()
-            .subtractFromFloats(0, 0, 0)
-        );
+        firstPersonCameraPosition.z += 0.5;
+        mainCamera.setPosition(firstPersonCameraPosition);
+        mainCamera.setTarget(firstPersonCameraPosition);
         mainCamera.fovMode = Camera.FOVMODE_HORIZONTAL_FIXED;
 
         //* Set light.
