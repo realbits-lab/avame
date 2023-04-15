@@ -153,6 +153,9 @@ const Service = () => {
         // VideoChat -> AvatarView call for changing avatar canvas position.
         // ScreenView -> AvatarView call for changing avatar canvas position.
         setAvatarPositionFunc={setAvatarPositionFuncRef}
+        showGuideCanvas={true}
+        showFrameStats={false}
+        useMotionCapture={true}
       />
 
       {/*//*-----------------------------------------------------------------*/}

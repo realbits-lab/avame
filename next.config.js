@@ -9,9 +9,15 @@ const nextConfig = {
     "rent-market",
     "v3d-web-realbits",
     "v3d-core-realbits",
-    "@babylonjs/core",
-    "babylon-mtoon-material",
   ],
+  webpack: (config, options) => {
+    config.module.rules.push({
+      test: /\.(glsl|vs|fs|vert|frag)$/,
+      use: ["raw-loader", "glslify-loader"],
+    });
+
+    return config;
+  },
 };
 
 module.exports = nextConfig;

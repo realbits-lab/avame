@@ -339,29 +339,6 @@ function AvatarView({
       useMotionCapture,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
-        // console.log("v3dCoreRef.current: ", v3dCoreRef.current);
-        // v3dCoreRef.current._mainCamera.setPosition(new Vector3(0, 1.05, 3.5));
-
-        //* Set background.
-        v3dCoreRef.current.setBackgroundColor(Color3.White());
-
-        const vrmManager = v3dCoreRef.current.getVRMManagerByURI(url);
-        // console.log("vrmManager: ", vrmManager);
-        // console.log("vrmManager.cameras: ", vrmManager.cameras);
-        let firstPersonCameraPosition =
-          vrmManager.getFirstPersonCameraPosition();
-        // console.log("firstPersonCameraPosition: ", firstPersonCameraPosition);
-
-				//* TODO: Get camera from vrm.
-        //* Set camera.
-        const mainCamera = v3dCoreRef.current.mainCamera;
-        firstPersonCameraPosition.z += 0.5;
-        mainCamera.setPosition(firstPersonCameraPosition);
-        mainCamera.setTarget(firstPersonCameraPosition);
-        mainCamera.fovMode = Camera.FOVMODE_HORIZONTAL_FIXED;
-
-        //* Set light.
-        v3dCoreRef.current.addAmbientLight(new Color3(1, 1, 1));
 
         //* Add window resize event function.
         window.addEventListener("resize", () => {
@@ -599,11 +576,11 @@ function AvatarView({
             // console.log("render");
             renderAvatar();
             deltaRef.current = deltaRef.current % INTERVAL.current;
+          }
 
-            if (showFrameStats === true) {
-              //* Update stat.
-              statsLib.current.update();
-            }
+          if (showFrameStats === true) {
+            //* Update stat.
+            statsLib.current.update();
           }
         });
 
@@ -755,17 +732,17 @@ function AvatarView({
 
       {showGuideCanvas ? (
         <Box
-          width="160px"
-          height="120px"
+          width="100px"
+          height="100px"
           border={0}
-          borderColor="secondary.main"
+          borderColor="primary.main"
           sx={{
             top: 0,
-            left: 0,
+            right: 100,
             zIndex: Z_INDEX.dialog,
             position: "absolute",
             display: "flex",
-            transform: "scale(-1, 1)",
+            // transform: "scale(-1, 1)",
           }}
         >
           <canvas id="guideCanvas" ref={guideCanvasRef} />
