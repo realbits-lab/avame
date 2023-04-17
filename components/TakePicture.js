@@ -99,11 +99,21 @@ const TakePicture = ({
   }
 
   function takePicture() {
+    console.log("call takePicture()");
+
     //* Get image data url from AvatarView component by calling function.
     const responseImageDataUrl = getImageDataUrlFunc.current();
+    console.log("responseImageDataUrl: ", responseImageDataUrl);
+
+    const avatarCanvasElement = document.getElementById("avatarCanvas");
+    console.log("avatarCanvasElement: ", avatarCanvasElement);
+
+    const dataUrl = avatarCanvasElement.toDataURL();
+    console.log("dataUrl: ", dataUrl);
 
     //* Set image data url.
-    setImageDataUrl(responseImageDataUrl);
+    // setImageDataUrl(responseImageDataUrl);
+    setImageDataUrl(dataUrl);
 
     //* Open picture dialog.
     setOpenDialog(true);

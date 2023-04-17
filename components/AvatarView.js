@@ -2,6 +2,7 @@ import React from "react";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
+import * as BABYLON from "@babylonjs/core";
 import { Color3, Vector3 } from "@babylonjs/core/Maths";
 import { Camera } from "@babylonjs/core";
 import loadable from "@loadable/component";
@@ -274,6 +275,10 @@ function AvatarView({
   }
 
   function getImageDataUrl() {
+    console.log("call getImageDataUrl()");
+
+    return avatarCanvasRef.current.toDataURL();
+
     //* Make a temporary canvas for a static size.
     const resizedCanvas = document.createElement("canvas");
     // console.log("resizedCanvas: ", resizedCanvas);
@@ -285,14 +290,18 @@ function AvatarView({
 
     //* Get an original canvas.
     const avatarCanvasElement = document.getElementById("avatarCanvas");
+    console.log("avatarCanvasElement: ", avatarCanvasElement);
+
     resizedContext.drawImage(
-      avatarCanvasElement,
+      // avatarCanvasElement,
+      avatarCanvasRef.current,
       0,
       0,
       resizedCanvas.width,
       resizedCanvas.height
     );
     const myResizedData = resizedCanvas.toDataURL();
+    console.log("myResizedData: ", myResizedData);
 
     // return avatarCanvasElement.toDataURL();
     return myResizedData;
