@@ -29,10 +29,7 @@ function RentNft({ imageUrl, nftAddress, tokenId }) {
   //*---------------------------------------------------------------------------
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
-  const PROMPT_NFT_CONTRACT_ADDRESS =
-    process.env.NEXT_PUBLIC_PROMPT_NFT_CONTRACT_ADDRESS;
-  const SERVICE_ACCOUNT_ADDRESS =
-    process.env.NEXT_PUBLIC_SERVICE_ACCOUNT_ADDRESS;
+  const SERVICE_OWNER_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS;
 
   //* Wagmi hook functions.
   const {
@@ -66,7 +63,7 @@ function RentNft({ imageUrl, nftAddress, tokenId }) {
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "rentNFT",
-    args: [PROMPT_NFT_CONTRACT_ADDRESS, tokenId, SERVICE_ACCOUNT_ADDRESS],
+    args: [nftAddress, tokenId, SERVICE_OWNER_ADDRESS],
   });
   const contractWrite = useContractWrite(config);
 
