@@ -1,9 +1,11 @@
 import React from "react";
 import axios from "axios";
 import { useContractRead } from "wagmi";
+import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import Image from "mui-image";
 import { styled } from "@mui/system";
+import CardMedia from "@mui/material/CardMedia";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
@@ -13,7 +15,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
-import CardMedia from "@mui/material/CardMedia";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -27,10 +28,19 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
+import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
+import { RBSnackbar, AlertSeverity } from "rent-market";
 import AvatarView from "../components/AvatarView";
+import RentNft from "../components/RentNft";
 import rentmarketABI from "../contracts/rentMarket.json";
+import {
+  RBDialog,
+  writeToastMessageState,
+  readToastMessageState,
+} from "./RealBitsUtil";
 
 function AvatarSelect() {
+  const FIND_NFT_WITH_METADATA_API_URL = "/api/find-nft-with-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
 
@@ -52,9 +62,12 @@ function AvatarSelect() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
+  const selectedTraitListRef = React.useRef({});
+  const [rentNftList, setRentNftList] = React.useState([]);
   const [collectionMetadataList, setCollectionMetadataList] = React.useState(
     []
   );
+  const [openRentDialog, setOpenRentDialog] = React.useState(false);
 
   //* Wagmi hook functions.
   //* Get all collection list.
@@ -126,6 +139,34 @@ function AvatarSelect() {
       return step;
     });
   }
+
+  //* --------------------------------------------------------------------------
+  //* Snackbar variables.
+  //* --------------------------------------------------------------------------
+  const [writeToastMessageLoadable, setWriteToastMessage] =
+    useRecoilStateLoadable(writeToastMessageState);
+  const writeToastMessage =
+    writeToastMessageLoadable?.state === "hasValue"
+      ? writeToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
+
+  const readToastMessageLoadable = useRecoilValueLoadable(
+    readToastMessageState
+  );
+  const readToastMessage =
+    readToastMessageLoadable?.state === "hasValue"
+      ? readToastMessageLoadable.contents
+      : {
+          snackbarSeverity: AlertSeverity.info,
+          snackbarMessage: "",
+          snackbarTime: new Date(),
+          snackbarOpen: true,
+        };
 
   React.useEffect(
     function () {
@@ -225,21 +266,29 @@ function AvatarSelect() {
     };
   }
 
-  function findNftWithMetadata() {
-    //* TODO: Shoul send trait key/value list.
-    axios
-      .get("/api/find-nft-with-metadata", {
-        params: {
-          traitType: selectedTraitRef.current,
-          traitValue: selectedValue,
+  async function findNftWithMetadata() {
+    // console.log("call findNftWithMetadata()");
+    // console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
+
+    let result;
+    try {
+      result = await fetch(FIND_NFT_WITH_METADATA_API_URL, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      })
-      .then((result) => {
-        // console.log("result: ", result);
-        // console.log("result.data.data: ", result.data.data);
-        setSelectedData(result.data.data);
-      })
-      .catch((error) => console.error(error));
+        body: JSON.stringify(selectedTraitListRef.current),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    // console.log("result: ", result);
+
+    const resultJson = await result.json();
+    // console.log("resultJson: ", resultJson);
+
+    return resultJson.data;
   }
 
   function fetchSelectedData() {
@@ -299,6 +348,7 @@ function AvatarSelect() {
         <Grid container>
           {inputTraitList.map(function (traitValue, idx) {
             // console.log("inputTrait: ", inputTrait);
+            // console.log("traitValue: ", traitValue);
             // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
 
             if (Math.floor(idx / 4) === activeStep) {
@@ -308,6 +358,10 @@ function AvatarSelect() {
                     component="img"
                     image={traitValue.image_url}
                     onClick={function () {
+                      //* Add selected trait type and value.
+                      selectedTraitListRef.current[inputTrait] =
+                        traitValue.name;
+
                       const glbUrl = traitValue.glb_url;
                       const v3dCore = getV3dCoreFuncRef.current();
 
@@ -619,11 +673,91 @@ function AvatarSelect() {
           }}
           sx={{ m: 1 }}
         >
-          <LightTooltip title="My Content" placement="left">
+          <LightTooltip title="Select Cloth" placement="left">
             <PersonIcon color="secondary" />
           </LightTooltip>
         </Fab>
+        <Fab
+          color="primary"
+          onClick={async () => {
+            const result = await findNftWithMetadata();
+            // console.log("result: ", result);
+
+            //* Show rent dialog.
+            setRentNftList(result);
+            setOpenRentDialog(true);
+          }}
+          sx={{ m: 1 }}
+        >
+          <LightTooltip title="Rent Avatar" placement="left">
+            <LocalGroceryStoreIcon color="secondary" />
+          </LightTooltip>
+        </Fab>
       </Box>
+
+      <RBDialog
+        inputOpenRBDialog={openRentDialog}
+        inputSetOpenRBDialogFunc={setOpenRentDialog}
+        inputTitle={"Rent Avatar"}
+        transparent={true}
+      >
+        <Box
+          sx={
+            {
+              // zIndex: 100,
+              // position: "absolute",
+              // top: 0,
+              // right: 0,
+              // m: 1,
+              // p: 1,
+            }
+          }
+          display="flex"
+          flexDirection="column"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          {rentNftList.map((element, idx) => {
+            // console.log("element: ", element);
+
+            return (
+              <RentNft
+                key={idx}
+                imageUrl={element.imageUrl}
+                nftAddress={element.nftAddress}
+                tokenId={element.tokenId}
+              />
+            );
+            // return (
+            //   <Card key={idx}>
+            //     <CardMedia
+            //       component="img"
+            //       image={element.imageUrl}
+            //       alt="Preview image"
+            //     />
+            //     <CardContent>
+            //       <Typography variant="caption" color="text.secondary">
+            //         {element.name}
+            //       </Typography>
+            //     </CardContent>
+            //     <CardActions sx={{ justifyContent: "space-around" }}>
+            //       <Button>Rent</Button>
+            //     </CardActions>
+            //   </Card>
+            // );
+          })}
+        </Box>
+      </RBDialog>
+
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//* Toast message.                                                  */}
+      {/*//*-----------------------------------------------------------------*/}
+      <RBSnackbar
+        open={readToastMessage.snackbarOpen}
+        message={readToastMessage.snackbarMessage}
+        severity={readToastMessage.snackbarSeverity}
+        currentTime={readToastMessage.snackbarTime}
+      />
     </>
   );
 }

@@ -4,8 +4,8 @@ async function handler(req, res) {
   console.log("call /find-nft-with-metadata");
 
   //* Check method error.
-  if (req.method !== "GET") {
-    res.status(500).json({ error: "Unavailable method. Support only GET." });
+  if (req.method !== "POST") {
+    res.status(500).json({ error: "Unavailable method. Support only POST." });
     return;
   }
 
@@ -14,34 +14,22 @@ async function handler(req, res) {
   await prisma.$connect();
 
   //* Check query.
-  const traitType = req.query.traitType;
-  const traitValue = req.query.traitValue;
-  console.log("traitType: ", traitType);
-  console.log("traitValue: ", traitValue);
-  if (!traitType || !traitValue) {
+  console.log("req.body: ", req.body);
+  // const traitList = req.query.traitList;
+  const traitList = req.body;
+  console.log("traitList: ", traitList);
+
+  //* Check query error.
+  if (!traitList) {
     await prisma.$disconnect();
     return res.status(500).json({ error: "nok" });
   }
 
   try {
     let findManyResult;
-    switch (type) {
-      case "top":
-        findManyResult = await prisma.avatar.findMany({
-          where: {
-            top: value,
-          },
-        });
-        break;
-
-      case "middle":
-        findManyResult = await prisma.avatar.findMany({
-          where: {
-            middle: value,
-          },
-        });
-        break;
-    }
+    findManyResult = await prisma.avatar.findMany({
+      where: traitList,
+    });
     console.log("findManyResult: ", findManyResult);
 
     if (findManyResult === null) {
