@@ -281,10 +281,12 @@ export const RBDialog = ({
   children,
   transparent,
 }) => {
+  // console.log("call RBDialog");
+  // console.log("chlidren: ", children);
+
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  // console.log("call RBDialog");
   // console.log("inputOpenRBDialog: ", inputOpenRBDialog);
   // console.log("inputTitle: ", inputTitle);
   const [openRBDialog, setOpenRBDialog] = React.useState(false);

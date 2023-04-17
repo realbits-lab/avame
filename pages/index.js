@@ -19,6 +19,7 @@ const Service = () => {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
+  //* TODO: Change later.
   // const [avatarUrl, setAvatarUrl] = React.useState("testfiles/default.vrm");
   const [avatarUrl, setAvatarUrl] = React.useState(
     "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm"
@@ -99,20 +100,12 @@ const Service = () => {
     webSocketProvider,
   });
 
-  // * Web3Modal Ethereum Client
+  //* Web3Modal Ethereum Client
   const ethereumClient = new EthereumClient(
     wagmiClient,
     wagmiBlockchainNetworks
   );
 
-  // function selectAvatarFunc(element: {
-  //   metadata: {
-  //     realbits: {
-  //       glb_url: React.SetStateAction<string>,
-  //       vrm_url: React.SetStateAction<string>,
-  //     },
-  //   },
-  // }) {
   function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
     // console.log("element.metadata: ", element.metadata);

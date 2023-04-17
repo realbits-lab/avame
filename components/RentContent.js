@@ -10,6 +10,7 @@ import {
   writeToastMessageState,
   readToastMessageState,
 } from "./RealBitsUtil";
+import AvatarSelect from "./AvatarSelect";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
@@ -68,6 +69,7 @@ const RentContent = ({
   //* --------------------------------------------------------------------------
   const [openMyDialog, setOpenMyDialog] = React.useState(false);
   const [openMarketDialog, setOpenMarketDialog] = React.useState(false);
+  const [openClothDialog, setOpenClothDialog] = React.useState(false);
   const [windowWidth, setWindowWidth] = React.useState();
   const [windowHeight, setWindowHeight] = React.useState();
 
@@ -206,8 +208,32 @@ const RentContent = ({
     setOpenMarketDialog(true);
   }
 
+  function openCloth() {
+    setOpenClothDialog(true);
+  }
+
   return (
     <div>
+      {/*//*-----------------------------------------------------------------*/}
+      {/*//*  Show cloth content list.                                      */}
+      {/*//*-----------------------------------------------------------------*/}
+      <RBDialog
+        inputOpenRBDialog={openClothDialog}
+        inputSetOpenRBDialogFunc={setOpenClothDialog}
+        inputTitle={"Select Cloth"}
+        transparent={true}
+      >
+        <Grid container direction="row" justifyContent="space-around">
+          <Grid item>
+            <Web3Button />
+          </Grid>
+          <Grid item>
+            <Web3NetworkSwitch />
+          </Grid>
+        </Grid>
+        <AvatarSelect />
+      </RBDialog>
+
       {/*//*-----------------------------------------------------------------*/}
       {/*//*  Show market content list.                                      */}
       {/*//*-----------------------------------------------------------------*/}
