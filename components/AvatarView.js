@@ -284,7 +284,7 @@ function AvatarView({
     const resizedContext = resizedCanvas.getContext("2d");
 
     //* Get an original canvas.
-    const avatarCanvasElement = document.getElementById("avatarCanvasRef");
+    const avatarCanvasElement = document.getElementById("avatarCanvas");
     resizedContext.drawImage(
       avatarCanvasElement,
       0,
