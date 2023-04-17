@@ -36,7 +36,13 @@ export default function Select() {
         justifyContent="flex-end"
         alignItems="flex-end"
       >
-        <Fab color="primary" onClick={() => {}} sx={{ m: 1 }}>
+        <Fab
+          color="primary"
+          onClick={() => {
+            router.push("/");
+          }}
+          sx={{ m: 1 }}
+        >
           <LightTooltip title="My Content" placement="left">
             <HomeIcon color="secondary" />
           </LightTooltip>
