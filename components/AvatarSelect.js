@@ -225,6 +225,23 @@ function AvatarSelect() {
     };
   }
 
+  function findNftWithMetadata() {
+    //* TODO: Shoul send trait key/value list.
+    axios
+      .get("/api/find-nft-with-metadata", {
+        params: {
+          traitType: selectedTraitRef.current,
+          traitValue: selectedValue,
+        },
+      })
+      .then((result) => {
+        // console.log("result: ", result);
+        // console.log("result.data.data: ", result.data.data);
+        setSelectedData(result.data.data);
+      })
+      .catch((error) => console.error(error));
+  }
+
   function fetchSelectedData() {
     // console.log("call fetchSelectedData()");
     // console.log("selectedTraitRef.current: ", selectedTraitRef.current);
