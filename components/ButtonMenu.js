@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
@@ -15,8 +16,9 @@ import { tooltipClasses } from "@mui/material/Tooltip";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import PersonIcon from '@mui/icons-material/Person';
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import PersonIcon from "@mui/icons-material/Person";
+import CheckroomIcon from "@mui/icons-material/Checkroom";
 import {
   humanFileSize,
   RBSnackbar,
@@ -52,7 +54,9 @@ const ButtonMenu = ({
   //*---------------------------------------------------------------------------
   //* Variables.
   //*---------------------------------------------------------------------------
+  const router = useRouter();
   const fabActions = [
+    { icon: <CheckroomIcon color="primary" />, name: "Cloth" },
     { icon: <PersonIcon color="primary" />, name: "My" },
     { icon: <StorefrontIcon color="primary" />, name: "Market" },
     // { icon: <ScreenShareIcon color="secondary" />, name: "Screen" },
@@ -186,6 +190,8 @@ const ButtonMenu = ({
                     openMyFuncRef.current();
                   } else if (action.name === "Market") {
                     openMarketFuncRef.current();
+                  } else if (action.name === "Cloth") {
+                    router.push("/select");
                   }
 
                   event.stopPropagation();
@@ -325,7 +331,7 @@ const ButtonMenu = ({
               onClick={async () => {
                 // console.log("rentMarketRef.current: ", rentMarketRef.current);
 
-								//* TODO: Put address.
+                //* TODO: Put address.
                 const response = await isUserAllowed({
                   rentMarket: rentMarketRef.current,
                 });
