@@ -12,7 +12,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  console.log("call /api/chat/validate");
+  // console.log("call /api/chat/validate");
 
   //* TODO: Check this is user is ok to isOwnerOrRenter in rent-market contract.
   const isAdmin = req?.query?.admin === "true";
