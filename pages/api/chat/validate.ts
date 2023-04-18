@@ -13,10 +13,10 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  console.log("call /api/chat/validate");
+  // console.log("call /api/chat/validate");
 
   const { authorization } = req.headers;
-  console.log("authorization:", authorization);
+  // console.log("authorization:", authorization);
 
   // * -------------------------------------------------------------------------
   // * Check authorization header.

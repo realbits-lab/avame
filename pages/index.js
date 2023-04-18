@@ -1,19 +1,9 @@
 import React from "react";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider,
-} from "@web3modal/ethereum";
-import { Web3Modal } from "@web3modal/react";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { polygon, polygonMumbai, localhost } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 import AvatarView from "../components/AvatarView";
 import TakePicture from "../components/TakePicture";
 import RentContent from "../components/RentContent";
 import ButtonMenu from "../components/ButtonMenu";
 import VideoChat from "../components/VideoChat";
-import { getChainName } from "../components/RealBitsUtil";
 
 const Service = () => {
   //*---------------------------------------------------------------------------
@@ -49,62 +39,6 @@ const Service = () => {
   const setBackgroundScreenFuncRef = React.useRef();
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
-
-  let wagmiBlockchainNetworks = [];
-  if (
-    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
-    "matic"
-  ) {
-    wagmiBlockchainNetworks = [polygon];
-  } else if (
-    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
-    "maticmum"
-  ) {
-    wagmiBlockchainNetworks = [polygonMumbai];
-  } else if (
-    getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
-    "localhost"
-  ) {
-    wagmiBlockchainNetworks = [localhost];
-  } else {
-    wagmiBlockchainNetworks = [];
-  }
-
-  // * Wagmi client
-  //* Use wallet connect configuration.
-  const { chains, provider, webSocketProvider } = configureChains(
-    wagmiBlockchainNetworks,
-    [
-      w3mProvider({
-        projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
-      }),
-    ]
-  );
-  //* Use alchemy configuration.
-  // const { chains, provider, webSocketProvider } = configureChains(
-  //   wagmiBlockchainNetworks,
-  //   [
-  //     alchemyProvider({
-  //       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY ?? "",
-  //     }),
-  //   ]
-  // );
-  const wagmiClient = createClient({
-    autoConnect: true,
-    connectors: w3mConnectors({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
-      version: 2,
-      chains: wagmiBlockchainNetworks,
-    }),
-    provider,
-    webSocketProvider,
-  });
-
-  //* Web3Modal Ethereum Client
-  const ethereumClient = new EthereumClient(
-    wagmiClient,
-    wagmiBlockchainNetworks
-  );
 
   function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
@@ -146,7 +80,7 @@ const Service = () => {
         // VideoChat -> AvatarView call for changing avatar canvas position.
         // ScreenView -> AvatarView call for changing avatar canvas position.
         setAvatarPositionFunc={setAvatarPositionFuncRef}
-        showGuideCanvas={true}
+        showGuideCanvas={false}
         showFrameStats={false}
         useMotionCapture={true}
       />

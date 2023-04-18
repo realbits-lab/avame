@@ -702,7 +702,7 @@ function VideoChat({
     // console.log("screenStreamVideoRef: ", screenStreamVideoRef);
     let backgroundStreamRef;
 
-    // 1. Move remote video to center and show.
+    //* Move remote video to center and show.
     remoteVideoRef.current.style.position = "absolute";
     remoteVideoRef.current.style.zIndex = 5;
     remoteVideoRef.current.style.width = "100%";
@@ -716,7 +716,7 @@ function VideoChat({
       backgroundStreamRef = localCameraStreamVideoRef;
     }
 
-    // 2. Move avatar canvas to the right-bottom side.
+    //* Move avatar canvas to the right-bottom side.
     setAvatarPositionFuncRef.current({
       canvasPosition: ScreenPosition.rightTop,
       avatarPosition: ScreenPosition.center,
@@ -916,9 +916,9 @@ function VideoChat({
           ) : null}
 
           {/*//*-------------------------------------------------------------*/}
-          {/*//* Toggle button.                                              */}
+          {/*//* TODO: Hanle toggle button later.                            */}
           {/*//*-------------------------------------------------------------*/}
-          {isMobile === false ? (
+          {/* {isMobile === false ? (
             <ListItem>
               <Fab
                 color="primary"
@@ -945,7 +945,7 @@ function VideoChat({
                 )}
               </Fab>
             </ListItem>
-          ) : null}
+          ) : null} */}
         </List>
       </Box>
 

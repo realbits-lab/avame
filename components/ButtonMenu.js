@@ -61,7 +61,7 @@ const ButtonMenu = ({
     { icon: <StorefrontIcon color="primary" />, name: "Market" },
     // { icon: <ScreenShareIcon color="secondary" />, name: "Screen" },
     // { icon: <OndemandVideoIcon color="secondary" />, name: "Video" },
-    { icon: <CameraAltIcon color="primary" />, name: "Image" },
+    // { icon: <CameraAltIcon color="primary" />, name: "Image" },
   ];
   //* TODO: For testing, set default status to true.
   const [openSpeedDial, setOpenSpeedDial] = React.useState(false);
