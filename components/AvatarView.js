@@ -28,7 +28,7 @@ function AvatarView({
   setAvatarPositionFunc,
   showGuideCanvas = false,
   showFrameStats = false,
-  useMotionCapture = true,
+  useMotionUpdate = true,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -113,7 +113,7 @@ function AvatarView({
     async function initialize() {
       await initializeAvatarContent({
         url: inputGltfDataUrl,
-        useMotionCapture: useMotionCapture,
+        useMotionUpdate: useMotionUpdate,
       });
 
       setAvatarPosition({
@@ -310,7 +310,7 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   //* Initialize data.
   //*---------------------------------------------------------------------------
-  async function initializeAvatarContent({ url, useMotionCapture }) {
+  async function initializeAvatarContent({ url, useMotionUpdate }) {
     // console.log("call initializeAvatarContent()");
     // console.log("v3dWebRef.current: ", v3dWebRef.current);
     // console.log("url: ", url);
@@ -340,12 +340,13 @@ function AvatarView({
       null,
       {
         locateFile: (file) => {
+          console.log("file: ", file);
           return `/holistic/${file}`;
         },
       },
       backdropRef.current,
       //* Flag for whether or not to use holistic motion capture.
-      useMotionCapture,
+      useMotionUpdate,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
 
@@ -720,8 +721,8 @@ function AvatarView({
         muted={true}
         loop={true}
         preload={"auto"}
-        width="1280px"
-        height="720px"
+        // width="1280px"
+        // height="720px"
       ></video>
 
       {/*//*-----------------------------------------------------------------*/}

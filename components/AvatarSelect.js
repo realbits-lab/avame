@@ -644,7 +644,7 @@ function AvatarSelect() {
             // VideoChat -> AvatarView call for changing avatar canvas position.
             // ScreenView -> AvatarView call for changing avatar canvas position.
             setAvatarPositionFunc={setAvatarPositionFuncRef}
-            useMotionCapture={false}
+            useMotionUpdate={false}
           />
         </Grid>
         <Grid item>
