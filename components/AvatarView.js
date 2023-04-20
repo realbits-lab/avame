@@ -1,10 +1,8 @@
 import React from "react";
+import { isMobile } from "react-device-detect";
 import * as THREE from "three";
 import * as ThreeVrm from "@pixiv/three-vrm";
 import * as STDLIB from "three-stdlib";
-import * as BABYLON from "@babylonjs/core";
-import { Color3, Vector3 } from "@babylonjs/core/Maths";
-import { Camera } from "@babylonjs/core";
 import loadable from "@loadable/component";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -340,13 +338,16 @@ function AvatarView({
       null,
       {
         locateFile: (file) => {
-          console.log("file: ", file);
-          return `/holistic/${file}`;
+          // console.log("file: ", file);
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+          // return `/holistic/${file}`;
         },
       },
       backdropRef.current,
       //* Flag for whether or not to use holistic motion capture.
       useMotionUpdate,
+      //* Use a face mesh option in case of mobile case.
+      isMobile,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
 

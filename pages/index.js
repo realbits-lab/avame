@@ -82,7 +82,7 @@ const Service = () => {
         setAvatarPositionFunc={setAvatarPositionFuncRef}
         showGuideCanvas={true}
         showFrameStats={false}
-        useMotionUpdate={false}
+        useMotionUpdate={true}
       />
 
       {/*//*-----------------------------------------------------------------*/}
