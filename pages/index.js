@@ -10,10 +10,10 @@ const Service = () => {
   //* Constant variables.
   //*---------------------------------------------------------------------------
   //* TODO: Change later.
-  // const [avatarUrl, setAvatarUrl] = React.useState("testfiles/default.vrm");
-  const [avatarUrl, setAvatarUrl] = React.useState(
-    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm"
-  );
+  // const DEFAULT_MODEL_PATH = "default.vrm";
+  const DEFAULT_MODEL_PATH =
+    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
+  const [avatarUrl, setAvatarUrl] = React.useState(DEFAULT_MODEL_PATH);
 
   //*---------------------------------------------------------------------------
   //* Variable references.
