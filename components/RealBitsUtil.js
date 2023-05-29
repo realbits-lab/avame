@@ -270,6 +270,7 @@ export const Z_INDEX = {
   avatarCanvasRightTop: 50,
   button: 100,
   dialog: 200,
+  chatMessage: 500,
 };
 
 export const RBDialog = ({

@@ -1,18 +1,21 @@
 import React from "react";
-import AvatarView from "../components/AvatarView";
-import TakePicture from "../components/TakePicture";
-import RentContent from "../components/RentContent";
-import ButtonMenu from "../components/ButtonMenu";
-import VideoChat from "../components/VideoChat";
+import Box from "@mui/material/Box";
+import AvatarView from "@/components/AvatarView";
+import TakePicture from "@/components/TakePicture";
+import RentContent from "@/components/RentContent";
+import ButtonMenu from "@/components/ButtonMenu";
+import VideoChat from "@/components/VideoChat";
+import ChatMessage from "@/components/ChatMessage";
 
-const Service = () => {
+export default function Service() {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
+  const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
   //* TODO: Change later.
-  // const DEFAULT_MODEL_PATH = "1.vrm";
-  const DEFAULT_MODEL_PATH =
-    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
+  const DEFAULT_MODEL_PATH = "default.vrm";
+  // const DEFAULT_MODEL_PATH =
+  //   "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
   const [avatarUrl, setAvatarUrl] = React.useState(DEFAULT_MODEL_PATH);
 
   //*---------------------------------------------------------------------------
@@ -39,6 +42,7 @@ const Service = () => {
   const setBackgroundScreenFuncRef = React.useRef();
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
+  const setAvatarExpressionFuncRef = React.useRef();
 
   function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
@@ -51,81 +55,157 @@ const Service = () => {
     setAvatarUrl(element.metadata.realbits.vrm_url);
   }
 
-  return (
-    <>
-      {/* //*----------------------------------------------------------------*/}
-      {/* //* RentContent component.                                         */}
-      {/* //*----------------------------------------------------------------*/}
-      <RentContent
-        selectAvatarFunc={selectAvatarFunc}
-        rentMarketAddress={process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS}
-        blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
-        testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
-        serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+  function buildAvaMeService() {
+    return (
+      <>
+        {/* //*----------------------------------------------------------------*/}
+        {/* //* ChatMessage component.                                         */}
+        {/* //*----------------------------------------------------------------*/}
+        <ChatMessage setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}/>
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* AvatarView component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <AvatarView
-        inputGltfDataUrl={avatarUrl}
-        getV3dCoreFuncRef={getV3dCoreFuncRef}
-        getImageDataUrlFunc={getImageDataUrl}
-        // VideoChat -> AvatarView call for new Remon.
-        // TakeVideo -> AvatarView call for recording video.
-        getMediaStreamFunc={getMediaStreamFuncRef}
-        // VideoChat -> AvatarView call for changing avatar canvas position.
-        // ScreenView -> AvatarView call for changing avatar canvas position.
-        setAvatarPositionFunc={setAvatarPositionFuncRef}
-        showGuideCanvas={true}
-        showFrameStats={false}
-        useMotionUpdate={true}
-      />
+        {/* //*----------------------------------------------------------------*/}
+        {/* //* RentContent component.                                         */}
+        {/* //*----------------------------------------------------------------*/}
+        {/* <RentContent
+          selectAvatarFunc={selectAvatarFunc}
+          rentMarketAddress={
+            process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
+          }
+          blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+          testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+          serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          rentMarketRef={rentMarketRef}
+        /> */}
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//*TakePicture component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <TakePicture
-        getImageDataUrlFunc={getImageDataUrl}
-        takePictureFuncRef={takePictureFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* AvatarView component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <AvatarView
+          showGuideCanvas={false}
+          showFrameStats={false}
+          useMotionUpdate={false}
+          inputGltfDataUrl={avatarUrl}
+          getV3dCoreFuncRef={getV3dCoreFuncRef}
+          getImageDataUrlFunc={getImageDataUrl}
+          // VideoChat -> AvatarView call for new Remon.
+          // TakeVideo -> AvatarView call for recording video.
+          getMediaStreamFunc={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          // ScreenView -> AvatarView call for changing avatar canvas position.
+          setAvatarPositionFunc={setAvatarPositionFuncRef}
+          setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}
+        />
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* Fab menu button.                                                */}
-      {/*//*-----------------------------------------------------------------*/}
-      <ButtonMenu
-        useFab={true}
-        startScreenStreamFuncRef={startScreenStreamFuncRef}
-        stopScreenStreamFuncRef={stopScreenStreamFuncRef}
-        takePictureFuncRef={takePictureFuncRef}
-        startRecordingFuncRef={startRecordingFuncRef}
-        stopRecordingFuncRef={stopRecordingFuncRef}
-        getRecordStatusFuncRef={getRecordStatusFuncRef}
-        requestDataFuncRef={requestDataFuncRef}
-        openMyFuncRef={openMyFuncRef}
-        openMarketFuncRef={openMarketFuncRef}
-        stopScreenEventFuncRef={stopScreenEventFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Fab menu button.                                                */}
+        {/*//*-----------------------------------------------------------------*/}
+        {/* <ButtonMenu
+          useFab={true}
+          startScreenStreamFuncRef={startScreenStreamFuncRef}
+          stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+          takePictureFuncRef={takePictureFuncRef}
+          startRecordingFuncRef={startRecordingFuncRef}
+          stopRecordingFuncRef={stopRecordingFuncRef}
+          getRecordStatusFuncRef={getRecordStatusFuncRef}
+          requestDataFuncRef={requestDataFuncRef}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          stopScreenEventFuncRef={stopScreenEventFuncRef}
+          rentMarketRef={rentMarketRef}
+        /> */}
+      </>
+    );
+  }
 
-      {/*//*-----------------------------------------------------------------*/}
-      {/*//* Video chat component.                                           */}
-      {/*//*-----------------------------------------------------------------*/}
-      <VideoChat
-        // VideoChat -> AvatarView call for new Remon.
-        inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
-        // VideoChat -> AvatarView call for changing avatar canvas position.
-        inputSetAvatarPositionFuncRef={setAvatarPositionFuncRef}
-        // ScreenView -> VideoChat call for setting background screen.
-        inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
-        rentMarketRef={rentMarketRef}
-      />
-    </>
-  );
-};
+  function buildAvaChatService() {
+    return (
+      <>
+        {/* //*----------------------------------------------------------------*/}
+        {/* //* RentContent component.                                         */}
+        {/* //*----------------------------------------------------------------*/}
+        <RentContent
+          selectAvatarFunc={selectAvatarFunc}
+          rentMarketAddress={
+            process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS
+          }
+          blockchainNetwork={process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK}
+          testNftAddress={process.env.NEXT_PUBLIC_LOCAL_NFT_CONTRACT_ADDRESS}
+          serviceAddress={process.env.NEXT_PUBLIC_SERVICE_OWNER_ADDRESS}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
 
-export default Service;
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* AvatarView component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <AvatarView
+          inputGltfDataUrl={avatarUrl}
+          getV3dCoreFuncRef={getV3dCoreFuncRef}
+          getImageDataUrlFunc={getImageDataUrl}
+          // VideoChat -> AvatarView call for new Remon.
+          // TakeVideo -> AvatarView call for recording video.
+          getMediaStreamFunc={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          // ScreenView -> AvatarView call for changing avatar canvas position.
+          setAvatarPositionFunc={setAvatarPositionFuncRef}
+          showGuideCanvas={true}
+          showFrameStats={false}
+          useMotionUpdate={true}
+        />
+
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//*TakePicture component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <TakePicture
+          getImageDataUrlFunc={getImageDataUrl}
+          takePictureFuncRef={takePictureFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Fab menu button.                                                */}
+        {/*//*-----------------------------------------------------------------*/}
+        <ButtonMenu
+          useFab={true}
+          startScreenStreamFuncRef={startScreenStreamFuncRef}
+          stopScreenStreamFuncRef={stopScreenStreamFuncRef}
+          takePictureFuncRef={takePictureFuncRef}
+          startRecordingFuncRef={startRecordingFuncRef}
+          stopRecordingFuncRef={stopRecordingFuncRef}
+          getRecordStatusFuncRef={getRecordStatusFuncRef}
+          requestDataFuncRef={requestDataFuncRef}
+          openMyFuncRef={openMyFuncRef}
+          openMarketFuncRef={openMarketFuncRef}
+          stopScreenEventFuncRef={stopScreenEventFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+
+        {/*//*-----------------------------------------------------------------*/}
+        {/*//* Video chat component.                                           */}
+        {/*//*-----------------------------------------------------------------*/}
+        <VideoChat
+          // VideoChat -> AvatarView call for new Remon.
+          inputGetMediaStreamFuncRef={getMediaStreamFuncRef}
+          // VideoChat -> AvatarView call for changing avatar canvas position.
+          inputSetAvatarPositionFuncRef={setAvatarPositionFuncRef}
+          // ScreenView -> VideoChat call for setting background screen.
+          inputSetBackgroundScreenFuncRef={setBackgroundScreenFuncRef}
+          rentMarketRef={rentMarketRef}
+        />
+      </>
+    );
+  }
+
+  switch (SERVICE_MODE) {
+    case "avame":
+      console.log("call buildAvaMeService()");
+      return buildAvaMeService();
+
+    case "avachat":
+    default:
+      return buildAvaChatService();
+  }
+}
