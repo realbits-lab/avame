@@ -27,6 +27,7 @@ function AvatarView({
   showGuideCanvas = false,
   showFrameStats = false,
   useMotionUpdate = true,
+  setAvatarExpressionFuncRef,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -138,6 +139,7 @@ function AvatarView({
     getMediaStreamFunc.current = getMediaStream;
     setAvatarPositionFunc.current = setAvatarPosition;
     getV3dCoreFuncRef.current = getV3dCoreFunc;
+    setAvatarExpressionFuncRef.current = setAvatarExpression;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
@@ -303,6 +305,75 @@ function AvatarView({
 
     // return avatarCanvasElement.toDataURL();
     return myResizedData;
+  }
+
+  function resetExpressions() {
+    const vrmManager = v3dCoreRef.current.getVRMManagerByURI("default.vrm");
+    vrmManager.morphing("Neutral", 0);
+    vrmManager.morphing("Happy", 0);
+    vrmManager.morphing("Joy", 0);
+    vrmManager.morphing("Angry", 0);
+    vrmManager.morphing("Sad", 0);
+    vrmManager.morphing("Sorrow", 0);
+    vrmManager.morphing("Relaxed", 0);
+    vrmManager.morphing("Fun", 0);
+    vrmManager.morphing("Surprised", 0);
+  }
+
+  function setAvatarExpression({ expression }) {
+    console.log("call setAvatarExpression()");
+    console.log("expression: ", expression);
+    console.log("typeof expression: ", typeof expression);
+
+    if (v3dCoreRef.current) {
+      console.log("v3dCoreRef.current: ", v3dCoreRef.current);
+      const vrmManager = v3dCoreRef.current.getVRMManagerByURI("default.vrm");
+      console.log("vrmManager: ", vrmManager);
+
+      // Update expression
+      resetExpressions();
+      switch (expression) {
+        case "Neutral": // fall through
+        default:
+          vrmManager.morphing("Neutral", 1);
+          break;
+
+        case "Happy":
+          vrmManager.morphing("Happy", 1);
+          vrmManager.morphing("Joy", 1);
+          break;
+
+        case "Joy":
+          vrmManager.morphing("Joy", 1);
+          break;
+
+        case "Angry":
+          vrmManager.morphing("Angry", 1);
+          break;
+
+        case "Sad":
+          vrmManager.morphing("Sad", 1);
+          vrmManager.morphing("Sorrow", 1);
+          break;
+
+        case "Sorrow":
+          vrmManager.morphing("Sorrow", 1);
+          break;
+
+        case "Relaxed":
+          vrmManager.morphing("Relaxed", 1);
+          vrmManager.morphing("Fun", 1);
+          break;
+
+        case "Fun":
+          vrmManager.morphing("Fun", 1);
+          break;
+
+        case "Surprised":
+          vrmManager.morphing("Surprised", 1);
+          break;
+      }
+    }
   }
 
   //*---------------------------------------------------------------------------

@@ -13,9 +13,9 @@ export default function Service() {
   //*---------------------------------------------------------------------------
   const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
   //* TODO: Change later.
-  // const DEFAULT_MODEL_PATH = "1.vrm";
-  const DEFAULT_MODEL_PATH =
-    "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
+  const DEFAULT_MODEL_PATH = "default.vrm";
+  // const DEFAULT_MODEL_PATH =
+  //   "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
   const [avatarUrl, setAvatarUrl] = React.useState(DEFAULT_MODEL_PATH);
 
   //*---------------------------------------------------------------------------
@@ -42,6 +42,7 @@ export default function Service() {
   const setBackgroundScreenFuncRef = React.useRef();
   const setBackgroundVideoFuncRef = React.useRef();
   const stopScreenEventFuncRef = React.useRef();
+  const setAvatarExpressionFuncRef = React.useRef();
 
   function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
@@ -60,7 +61,7 @@ export default function Service() {
         {/* //*----------------------------------------------------------------*/}
         {/* //* ChatMessage component.                                         */}
         {/* //*----------------------------------------------------------------*/}
-        <ChatMessage />
+        <ChatMessage setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}/>
 
         {/* //*----------------------------------------------------------------*/}
         {/* //* RentContent component.                                         */}
@@ -94,6 +95,7 @@ export default function Service() {
           // VideoChat -> AvatarView call for changing avatar canvas position.
           // ScreenView -> AvatarView call for changing avatar canvas position.
           setAvatarPositionFunc={setAvatarPositionFuncRef}
+          setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}
         />
 
         {/*//*-----------------------------------------------------------------*/}
