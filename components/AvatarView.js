@@ -139,7 +139,9 @@ function AvatarView({
     getMediaStreamFunc.current = getMediaStream;
     setAvatarPositionFunc.current = setAvatarPosition;
     getV3dCoreFuncRef.current = getV3dCoreFunc;
-    setAvatarExpressionFuncRef.current = setAvatarExpression;
+    if (setAvatarExpressionFuncRef) {
+      setAvatarExpressionFuncRef.current = setAvatarExpression;
+    }
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
