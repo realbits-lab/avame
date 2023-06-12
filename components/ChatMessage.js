@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import MenuIcon from "@mui/icons-material/Menu";
+import MicIcon from "@mui/icons-material/Mic";
 import SearchIcon from "@mui/icons-material/Search";
 import SendIcon from "@mui/icons-material/Send";
 import { Z_INDEX } from "@/components/RealBitsUtil";
@@ -17,10 +18,19 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
   const [chatLog, setChatLog] = React.useState([]);
   const messageInputRef = React.useRef();
   const isMessageInputFocusedRef = React.useRef(false);
+  const [speechRecognition, setSpeechRecognition] = React.useState();
+  const [isMicRecording, setIsMicRecording] = React.useState(false);
 
-  const captureSlashKeyDown = React.useCallback((event) => {
-    // console.log("event.key: ", event.key);
+  const captureKeyDown = React.useCallback((event) => {
+    console.log("event.key: ", event.key);
     // console.log("document.activeElement: ", document.activeElement);
+    if (event.key === "Tab") {
+      if (isMessageInputFocusedRef.current === false) {
+        event.preventDefault();
+        handleClickMicButton();
+      }
+    }
+
     if (event.key === "/") {
       if (isMessageInputFocusedRef.current === false) {
         event.preventDefault();
@@ -29,80 +39,19 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
     }
   }, []);
 
-  React.useEffect(
-    function () {
-      document.addEventListener("keydown", captureSlashKeyDown, false);
+  const handleClickMicButton = React.useCallback(() => {
+    console.log("call handleClickMicButton()");
 
-      return () => {
-        document.removeEventListener("keydown", captureSlashKeyDown, false);
-      };
-    },
-    [captureSlashKeyDown]
-  );
+    if (isMicRecording) {
+      speechRecognition?.abort();
+      setIsMicRecording(false);
 
-  async function getChatResponseStream(messages) {
-    const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_KEY;
-
-    //* Set api key and send message to openai API.
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_KEY}`,
-    };
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      headers: headers,
-      method: "POST",
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-        stream: true,
-        max_tokens: 200,
-      }),
-    });
-
-    const reader = res.body?.getReader();
-
-    //* Check response error.
-    if (res.status !== 200 || !reader) {
-      throw new Error("Something went wrong");
+      return;
     }
 
-    //* Handle stream response.
-    const stream = new ReadableStream({
-      async start(controller) {
-        const decoder = new TextDecoder("utf-8");
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const data = decoder.decode(value);
-            const chunks = data
-              .split("data:")
-              .filter((val) => !!val && val.trim() !== "[DONE]");
-
-            for (const chunk of chunks) {
-              const json = JSON.parse(chunk);
-              const messagePiece = json.choices[0].delta.content;
-              if (!!messagePiece) {
-                controller.enqueue(messagePiece);
-              }
-            }
-          }
-        } catch (error) {
-          controller.error(error);
-        } finally {
-          reader.releaseLock();
-          controller.close();
-        }
-      },
-    });
-
-    return stream;
-  }
-
-  function sleep(ms) {
-    return new Promise((r) => setTimeout(r, ms));
-  }
+    speechRecognition?.start();
+    setIsMicRecording(true);
+  }, [isMicRecording, speechRecognition]);
 
   const handleSendChat = React.useCallback(
     async function (message) {
@@ -274,6 +223,116 @@ Let's start the conversation.`;
     [chatLog, setAvatarExpressionFuncRef]
   );
 
+  const handleRecognitionResult = React.useCallback(
+    (event) => {
+      const text = event.results[0][0].transcript;
+      setChatMessage(text);
+
+      if (event.results[0].isFinal) {
+        setChatMessage(text);
+        handleSendChat(text);
+      }
+    },
+    [handleSendChat]
+  );
+
+  const handleRecognitionEnd = React.useCallback(() => {
+    setIsMicRecording(false);
+  }, []);
+
+  React.useEffect(() => {
+    const SpeechRecognition =
+      window.webkitSpeechRecognition || window.SpeechRecognition;
+
+    if (!SpeechRecognition) {
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.addEventListener("result", handleRecognitionResult);
+    recognition.addEventListener("end", handleRecognitionEnd);
+
+    setSpeechRecognition(recognition);
+  }, [handleRecognitionResult, handleRecognitionEnd]);
+
+  React.useEffect(
+    function () {
+      document.addEventListener("keydown", captureKeyDown, false);
+
+      return () => {
+        document.removeEventListener("keydown", captureKeyDown, false);
+      };
+    },
+    [captureKeyDown]
+  );
+
+  async function getChatResponseStream(messages) {
+    const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_KEY;
+
+    //* Set api key and send message to openai API.
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_KEY}`,
+    };
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      headers: headers,
+      method: "POST",
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+        stream: true,
+        max_tokens: 200,
+      }),
+    });
+
+    const reader = res.body?.getReader();
+
+    //* Check response error.
+    if (res.status !== 200 || !reader) {
+      throw new Error("Something went wrong");
+    }
+
+    //* Handle stream response.
+    const stream = new ReadableStream({
+      async start(controller) {
+        const decoder = new TextDecoder("utf-8");
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const data = decoder.decode(value);
+            const chunks = data
+              .split("data:")
+              .filter((val) => !!val && val.trim() !== "[DONE]");
+
+            for (const chunk of chunks) {
+              const json = JSON.parse(chunk);
+              const messagePiece = json.choices[0].delta.content;
+              if (!!messagePiece) {
+                controller.enqueue(messagePiece);
+              }
+            }
+          }
+        } catch (error) {
+          controller.error(error);
+        } finally {
+          reader.releaseLock();
+          controller.close();
+        }
+      },
+    });
+
+    return stream;
+  }
+
+  function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
   return (
     <Box sx={{ zIndex: Z_INDEX.chatMessage, position: "absolute" }}>
       <Box position="fixed" bottom={0}>
@@ -308,8 +367,8 @@ Let's start the conversation.`;
             width: "95vw",
           }}
         >
-          <IconButton sx={{ p: "10px" }} aria-label="menu">
-            <MenuIcon />
+          <IconButton sx={{ p: "10px" }} onClick={handleClickMicButton}>
+            <MicIcon />
           </IconButton>
           <InputBase
             sx={{ ml: 1, flex: 1 }}
