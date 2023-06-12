@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useContractRead } from "wagmi";
+import { Network, Alchemy } from "alchemy-sdk";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import Image from "mui-image";
@@ -26,29 +27,35 @@ import MobileStepper from "@mui/material/MobileStepper";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
+import CheckroomIcon from "@mui/icons-material/Checkroom";
 import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import { RBSnackbar, AlertSeverity } from "rent-market";
-import AvatarView from "../components/AvatarView";
-import RentNft from "../components/RentNft";
-import rentmarketABI from "../contracts/rentMarket.json";
+import AvatarView from "@/components/AvatarView";
+import RentNft from "@/components/RentNft";
 import {
   RBDialog,
   writeToastMessageState,
   readToastMessageState,
-} from "./RealBitsUtil";
+} from "@/components/RealBitsUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
 function AvatarSelect() {
   const FIND_NFT_WITH_METADATA_API_URL = "/api/find-nft-with-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const alchemySettings = {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    //* TODO: Get from .env file.
+    network: Network.MATIC_MUMBAI,
+  };
+  const alchemy = new Alchemy(alchemySettings);
 
-  //* TODO: Get from json data.
+  //* Get from json data.
   const collectionUrl =
     // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
+    // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
     "https://clothes-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
-  // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
   const [avatarUrl, setAvatarUrl] = React.useState();
   const [attributes, setAttributes] = React.useState({});
   const selectedTraitRef = React.useRef();
@@ -62,6 +69,9 @@ function AvatarSelect() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
+  const [currentCollectionAddress, setCurrentCollectionAddress] =
+    React.useState();
+  const [collectionList, setCollectionList] = React.useState([]);
   const selectedTraitListRef = React.useRef({});
   const [rentNftList, setRentNftList] = React.useState([]);
   const [collectionMetadataList, setCollectionMetadataList] = React.useState(
@@ -82,6 +92,44 @@ function AvatarSelect() {
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
     cacheOnBlock: true,
+    // watch: true,
+    onSuccess(data) {
+      console.log("call onSuccess()");
+      console.log("data: ", data);
+
+      setCollectionList([]);
+      data.map((e) => {
+        alchemy.nft.getNftsForContract(e.collectionAddress).then((result) => {
+          setCollectionList({
+            collectionAddress: e.collectionAddress,
+            nfts: result.nfts,
+          });
+        });
+      });
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* Get all register data array.
+  const {
+    data: dataRegisterData,
+    isError: isErrorRegisterData,
+    isLoading: isLoadingRegisterData,
+    isValidating: isValidatingRegisterData,
+    status: statusRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllRegisterData",
+    // cacheOnBlock: true,
     // watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
@@ -181,6 +229,8 @@ function AvatarSelect() {
         const promises = dataGetAllCollection.map(async (element) => {
           let collectionMetadataResponse;
           try {
+            console.log("element: ", element);
+            console.log("element[uri]: ", element["uri"]);
             collectionMetadataResponse = await axios.get(element["uri"]);
 
             //* Check empty data.
@@ -202,6 +252,7 @@ function AvatarSelect() {
 
         //* Set collection list.
         if (dataList[0]) {
+          console.log("dataList[0]: ", dataList[0]);
           setImageAndAttributes({ collectionMetadata: dataList[0] });
         }
       }
@@ -267,8 +318,9 @@ function AvatarSelect() {
   }
 
   async function findNftWithMetadata() {
-    // console.log("call findNftWithMetadata()");
-    // console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
+    console.log("call findNftWithMetadata()");
+    // console.log("dataRegisterData: ", dataRegisterData);
+    console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
 
     let result;
     try {
@@ -609,7 +661,9 @@ function AvatarSelect() {
             <ImageListItem
               key={idx}
               onClick={() => {
+                console.log("element: ", element);
                 setImageAndAttributes({ collectionMetadata: element });
+                setCurrentCollectionAddress(element.address);
               }}
             >
               <Image src={element.image} alt={element.name} width={100} />
@@ -674,14 +728,19 @@ function AvatarSelect() {
           sx={{ m: 1 }}
         >
           <LightTooltip title="Select Cloth" placement="left">
-            <PersonIcon color="secondary" />
+            <CheckroomIcon color="secondary" />
           </LightTooltip>
         </Fab>
         <Fab
           color="primary"
           onClick={async () => {
-            const result = await findNftWithMetadata();
+            console.log("call onClick()");
+            // const result = await findNftWithMetadata();
             // console.log("result: ", result);
+            console.log(
+              "selectedTraitListRef.current: ",
+              selectedTraitListRef.current
+            );
 
             //* Show rent dialog.
             setRentNftList(result);
