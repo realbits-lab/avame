@@ -224,7 +224,7 @@ function AvatarSelect() {
       async function initialize() {
         // console.log("call initialize()");
 
-        //* Set all collection metadata list.
+        //* Get json metadata per each collection.
         let dataList = [];
         const promises = dataAllCollection.map(async (element) => {
           let collectionMetadataResponse;
@@ -259,9 +259,11 @@ function AvatarSelect() {
           return dataList.push(collectionMetadataResponse.data);
         });
         await Promise.all(promises);
+
+        //* Set all collection metadata.
         setCollectionMetadataList(dataList);
 
-        //* Set collection list.
+        //* Set the first collection metadata to screen.
         if (dataList[0]) {
           console.log("dataList[0]: ", dataList[0]);
           setImageAndAttributes({ collectionMetadata: dataList[0] });
@@ -756,9 +758,7 @@ function AvatarSelect() {
             //* Get the current collection list.
             dataAllRegisterData.map(async (registerData) => {
               if (registerData.nftAddress === currentCollectionAddress) {
-                nfts.map(async (nft) => {
-
-                });
+                nfts.map(async (nft) => {});
               }
             });
 
