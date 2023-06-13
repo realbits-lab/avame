@@ -29,7 +29,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckroomIcon from "@mui/icons-material/Checkroom";
-import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
+import StoreIcon from "@mui/icons-material/Store";
 import { RBSnackbar, AlertSeverity } from "rent-market";
 import AvatarView from "@/components/AvatarView";
 import RentNft from "@/components/RentNft";
@@ -749,7 +749,7 @@ function AvatarSelect() {
           sx={{ m: 1 }}
         >
           <LightTooltip title="Rent Avatar" placement="left">
-            <LocalGroceryStoreIcon color="secondary" />
+            <StoreIcon color="secondary" />
           </LightTooltip>
         </Fab>
       </Box>
