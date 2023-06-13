@@ -69,8 +69,7 @@ function AvatarSelect() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
-  const [currentCollectionAddress, setCurrentCollectionAddress] =
-    React.useState();
+  const [currentCollection, setCurrentCollection] = React.useState();
   const [collectionList, setCollectionList] = React.useState([]);
   const selectedTraitListRef = React.useRef({});
   const [rentNftList, setRentNftList] = React.useState([]);
@@ -218,11 +217,11 @@ function AvatarSelect() {
 
   React.useEffect(
     function () {
-      // console.log("call useEffect()");
-      // console.log("dataAllCollection: ", dataAllCollection);
+      console.log("call useEffect()");
+      console.log("dataAllCollection: ", dataAllCollection);
 
       async function initialize() {
-        // console.log("call initialize()");
+        console.log("call initialize()");
 
         //* Get json metadata per each collection.
         let dataList = [];
@@ -263,22 +262,10 @@ function AvatarSelect() {
         //* Set all collection metadata.
         setCollectionMetadataList(dataList);
 
-        //* Set the first collection metadata to screen.
-        if (dataList[0]) {
-          console.log("dataList[0]: ", dataList[0]);
-          setImageAndAttributes({ collectionMetadata: dataList[0] });
-
-          //* Set the first trait of each attributes as selected.
-          Object.entries(dataList[0].attributes).map(
-            ([trait, traitList], idx) => {
-              console.log("trait: ", trait);
-              console.log("traitList: ", traitList);
-              setTrait({
-                traitKey: trait,
-                traitValue: traitList[0],
-              });
-            }
-          );
+        //* Set the first collection.
+        const firstCollectionData = dataList[0];
+        if (firstCollectionData) {
+          setImageAndAttributes({ collectionMetadata: firstCollectionData });
         }
       }
 
@@ -288,6 +275,35 @@ function AvatarSelect() {
     },
     [dataAllCollection]
   );
+
+  //* v3dCore instance is made lately, so we use callback for initializing the first attributes.
+  function v3dCoreLoadedCallback() {
+    console.log("call v3dCoreLoadedCallback()");
+
+    let firstCollectionData;
+    if (currentCollection) {
+      firstCollectionData = currentCollection;
+    } else {
+      firstCollectionData = collectionMetadataList[0];
+    }
+
+    if (firstCollectionData) {
+      console.log("firstCollectionData: ", firstCollectionData);
+      setImageAndAttributes({ collectionMetadata: firstCollectionData });
+
+      //* Set the first trait of each attributes as selected.
+      Object.entries(firstCollectionData.attributes).map(
+        ([trait, traitList], idx) => {
+          console.log("trait: ", trait);
+          console.log("traitList: ", traitList);
+          setTrait({
+            traitKey: trait,
+            traitValue: traitList[0],
+          });
+        }
+      );
+    }
+  }
 
   function setImageAndAttributes({ collectionMetadata }) {
     //* Get avatar base model url.
@@ -415,6 +431,9 @@ function AvatarSelect() {
 
     const glbUrl = traitValue.glb_url;
     const v3dCore = getV3dCoreFuncRef.current();
+    console.log("v3dCore: ", v3dCore);
+
+    if (!v3dCore) return;
 
     //* Import mesh from glb.
     SceneLoader.ImportMesh(
@@ -691,7 +710,20 @@ function AvatarSelect() {
               onClick={() => {
                 console.log("element: ", element);
                 setImageAndAttributes({ collectionMetadata: element });
-                setCurrentCollectionAddress(element.address);
+                setCurrentCollection(element);
+
+                //* Set the first trait of each attributes as selected.
+                Object.entries(element.attributes).map(
+                  ([trait, traitList], idx) => {
+                    console.log("trait: ", trait);
+                    console.log("traitList: ", traitList);
+                    console.log("traitList[0]: ", traitList[0]);
+                    setTrait({
+                      traitKey: trait,
+                      traitValue: traitList[0],
+                    });
+                  }
+                );
               }}
             >
               <Image src={element.image} alt={element.name} width={100} />
@@ -719,6 +751,7 @@ function AvatarSelect() {
           <AvatarView
             inputGltfDataUrl={avatarUrl}
             getV3dCoreFuncRef={getV3dCoreFuncRef}
+            v3dCoreLoadedCallback={v3dCoreLoadedCallback}
             getImageDataUrlFunc={getImageDataUrl}
             // VideoChat -> AvatarView call for new Remon.
             // TakeVideo -> AvatarView call for recording video.
@@ -772,7 +805,8 @@ function AvatarSelect() {
 
             //* Get the current collection list.
             dataAllRegisterData.map(async (registerData) => {
-              if (registerData.nftAddress === currentCollectionAddress) {
+              //* TODO: Use ethereum checksum compare.
+              if (registerData.nftAddress === currentCollection.address) {
                 nfts.map(async (nft) => {});
               }
             });
