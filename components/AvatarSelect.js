@@ -82,11 +82,11 @@ function AvatarSelect() {
   //* Wagmi hook functions.
   //* Get all collection list.
   const {
-    data: dataGetAllCollection,
-    isError: isErrorGetAllCollection,
-    isLoading: isLoadingGetAllCollection,
-    isValidating: isValidatingGetAllCollection,
-    status: statusGetAllCollection,
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    isValidating: isValidatingAllCollection,
+    status: statusAllCollection,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
@@ -120,11 +120,11 @@ function AvatarSelect() {
 
   //* Get all register data array.
   const {
-    data: dataRegisterData,
-    isError: isErrorRegisterData,
-    isLoading: isLoadingRegisterData,
-    isValidating: isValidatingRegisterData,
-    status: statusRegisterData,
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    isValidating: isValidatingAllRegisterData,
+    status: statusAllRegisterData,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
@@ -219,14 +219,14 @@ function AvatarSelect() {
   React.useEffect(
     function () {
       // console.log("call useEffect()");
-      // console.log("dataGetAllCollection: ", dataGetAllCollection);
+      // console.log("dataAllCollection: ", dataAllCollection);
 
       async function initialize() {
         // console.log("call initialize()");
 
         //* Set all collection metadata list.
         let dataList = [];
-        const promises = dataGetAllCollection.map(async (element) => {
+        const promises = dataAllCollection.map(async (element) => {
           let collectionMetadataResponse;
           try {
             console.log("element: ", element);
@@ -257,11 +257,11 @@ function AvatarSelect() {
         }
       }
 
-      if (dataGetAllCollection) {
+      if (dataAllCollection) {
         initialize();
       }
     },
-    [dataGetAllCollection]
+    [dataAllCollection]
   );
 
   function setImageAndAttributes({ collectionMetadata }) {
