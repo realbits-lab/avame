@@ -265,8 +265,20 @@ function AvatarSelect() {
 
         //* Set the first collection metadata to screen.
         if (dataList[0]) {
-          // console.log("dataList[0]: ", dataList[0]);
+          console.log("dataList[0]: ", dataList[0]);
           setImageAndAttributes({ collectionMetadata: dataList[0] });
+
+          //* Set the first trait of each attributes as selected.
+          Object.entries(dataList[0].attributes).map(
+            ([trait, traitList], idx) => {
+              console.log("trait: ", trait);
+              console.log("traitList: ", traitList);
+              setTrait({
+                traitKey: trait,
+                traitValue: traitList[0],
+              });
+            }
+          );
         }
       }
 
