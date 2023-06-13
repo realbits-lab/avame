@@ -265,7 +265,7 @@ function AvatarSelect() {
 
         //* Set the first collection metadata to screen.
         if (dataList[0]) {
-          console.log("dataList[0]: ", dataList[0]);
+          // console.log("dataList[0]: ", dataList[0]);
           setImageAndAttributes({ collectionMetadata: dataList[0] });
         }
       }
@@ -393,6 +393,106 @@ function AvatarSelect() {
     );
   }
 
+  function setTrait({ traitKey, traitValue }) {
+    console.log("call setTrait()");
+    console.log("traitKey: ", traitKey);
+    console.log("traitValue: ", traitValue);
+
+    //* Add selected trait type and value.
+    selectedTraitListRef.current[traitKey] = traitValue.name;
+
+    const glbUrl = traitValue.glb_url;
+    const v3dCore = getV3dCoreFuncRef.current();
+
+    //* Import mesh from glb.
+    SceneLoader.ImportMesh(
+      null,
+      glbUrl,
+      "",
+      v3dCore.scene,
+      async function (meshes, particleSystems, skeletons) {
+        // console.log(
+        //   "v3dCore.scene.meshes: ",
+        //   v3dCore.scene.meshes
+        // );
+        // console.log("meshes: ", meshes);
+        // console.log("skeletons: ", skeletons);
+
+        //* If there're already pre-added meshes, remove them all.
+        if (traitMeshListRef.current[traitKey]) {
+          traitMeshListRef.current[traitKey].map((mesh) => {
+            mesh.dispose();
+            mesh = null;
+          });
+        }
+
+        //* Initialize  mesh list.
+        traitMeshListRef.current[traitKey] = [];
+
+        //* Find the head bone.
+        let parentBone;
+        v3dCore.scene.skeletons.map((skeleton) => {
+          // console.log("skeleton: ", skeleton);
+
+          skeleton.bones.map((bone) => {
+            // console.log("bone.name: ", bone.name);
+            //* TODO: Use head bone for accessory and hips bone for clothes.
+            if (
+              traitKey !== "body_top" &&
+              traitKey !== "body_bottom" &&
+              bone.name === "J_Bip_C_Head"
+            ) {
+              parentBone = bone;
+            }
+
+            if (
+              (traitKey === "body_top" || traitKey === "body_bottom") &&
+              bone.name === "J_Bip_C_Hips"
+            ) {
+              // console.log("bone: ", bone);
+              parentBone = bone;
+            }
+          });
+        });
+
+        meshes.map((mesh) => {
+          traitMeshListRef.current[traitKey].push(mesh);
+
+          //* Calculate the difference between mesh absolute position and head bone absolute position.
+          const meshAbsolutePosition = mesh.getAbsolutePosition();
+          const headBoneAbsolutePosition = parentBone.getAbsolutePosition();
+          const diffAbsolutePosition = meshAbsolutePosition.subtract(
+            headBoneAbsolutePosition
+          );
+          // console.log(
+          //   "meshAbsolutePosition: ",
+          //   meshAbsolutePosition
+          // );
+          // console.log(
+          //   "headBoneAbsolutePosition: ",
+          //   headBoneAbsolutePosition
+          // );
+          // console.log(
+          //   "diffAbsolutePosition: ",
+          //   diffAbsolutePosition
+          // );
+
+          //* Set the position of mesh by difference between mesh and head bone.
+          // mesh.setAbsolutePosition(diffAbsolutePosition);
+
+          //* Set the parent of mesh to head bone in case of accessory.
+          // mesh.parent = parentBone;
+
+          // const result = BABYLON.Mesh.MergeMeshes([
+          //   ...v3dCore.scene.meshes,
+          //   mesh,
+          // ]);
+          // console.log("result: ", result);
+        });
+      }
+    );
+  }
+
   function SelectTraitPage({ inputTrait, inputTraitList }) {
     // console.log("call SelectTraitPage()");
     // console.log("inputTrait: ", inputTrait);
@@ -411,9 +511,9 @@ function AvatarSelect() {
     return (
       <>
         <Grid container>
-          {inputTraitList.map(function (traitValue, idx) {
+          {inputTraitList.map(function (traitName, idx) {
             // console.log("inputTrait: ", inputTrait);
-            // console.log("traitValue: ", traitValue);
+            // console.log("traitName: ", traitName);
             // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
 
             if (Math.floor(idx / 4) === activeStep) {
@@ -421,106 +521,9 @@ function AvatarSelect() {
                 <Grid item xs={3} key={idx}>
                   <CardMedia
                     component="img"
-                    image={traitValue.image_url}
-                    onClick={function () {
-                      //* Add selected trait type and value.
-                      selectedTraitListRef.current[inputTrait] =
-                        traitValue.name;
-
-                      const glbUrl = traitValue.glb_url;
-                      const v3dCore = getV3dCoreFuncRef.current();
-
-                      //* Import mesh from glb.
-                      SceneLoader.ImportMesh(
-                        null,
-                        glbUrl,
-                        "",
-                        v3dCore.scene,
-                        async function (meshes, particleSystems, skeletons) {
-                          // console.log(
-                          //   "v3dCore.scene.meshes: ",
-                          //   v3dCore.scene.meshes
-                          // );
-                          // console.log("meshes: ", meshes);
-                          // console.log("skeletons: ", skeletons);
-
-                          //* If there're already pre-added meshes, remove them all.
-                          if (traitMeshListRef.current[inputTrait]) {
-                            traitMeshListRef.current[inputTrait].map((mesh) => {
-                              mesh.dispose();
-                              mesh = null;
-                            });
-                          }
-
-                          //* Initialize  mesh list.
-                          traitMeshListRef.current[inputTrait] = [];
-
-                          //* Find the head bone.
-                          let parentBone;
-                          v3dCore.scene.skeletons.map((skeleton) => {
-                            // console.log("skeleton: ", skeleton);
-
-                            skeleton.bones.map((bone) => {
-                              // console.log("bone.name: ", bone.name);
-                              //* TODO: Use head bone for accessory and hips bone for clothes.
-                              if (
-                                inputTrait !== "body_top" &&
-                                inputTrait !== "body_bottom" &&
-                                bone.name === "J_Bip_C_Head"
-                              ) {
-                                parentBone = bone;
-                              }
-
-                              if (
-                                (inputTrait === "body_top" ||
-                                  inputTrait === "body_bottom") &&
-                                bone.name === "J_Bip_C_Hips"
-                              ) {
-                                // console.log("bone: ", bone);
-                                parentBone = bone;
-                              }
-                            });
-                          });
-
-                          meshes.map((mesh) => {
-                            traitMeshListRef.current[inputTrait].push(mesh);
-
-                            //* Calculate the difference between mesh absolute position and head bone absolute position.
-                            const meshAbsolutePosition =
-                              mesh.getAbsolutePosition();
-                            const headBoneAbsolutePosition =
-                              parentBone.getAbsolutePosition();
-                            const diffAbsolutePosition =
-                              meshAbsolutePosition.subtract(
-                                headBoneAbsolutePosition
-                              );
-                            // console.log(
-                            //   "meshAbsolutePosition: ",
-                            //   meshAbsolutePosition
-                            // );
-                            // console.log(
-                            //   "headBoneAbsolutePosition: ",
-                            //   headBoneAbsolutePosition
-                            // );
-                            // console.log(
-                            //   "diffAbsolutePosition: ",
-                            //   diffAbsolutePosition
-                            // );
-
-                            //* Set the position of mesh by difference between mesh and head bone.
-                            // mesh.setAbsolutePosition(diffAbsolutePosition);
-
-                            //* Set the parent of mesh to head bone in case of accessory.
-                            // mesh.parent = parentBone;
-
-                            // const result = BABYLON.Mesh.MergeMeshes([
-                            //   ...v3dCore.scene.meshes,
-                            //   mesh,
-                            // ]);
-                            // console.log("result: ", result);
-                          });
-                        }
-                      );
+                    image={traitName.image_url}
+                    onClick={() => {
+                      setTrait({ traitKey: inputTrait, traitValue: traitName });
                     }}
                     sx={{ width: "80%", height: "80%" }}
                   />
