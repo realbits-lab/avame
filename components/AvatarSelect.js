@@ -229,9 +229,16 @@ function AvatarSelect() {
         const promises = dataAllCollection.map(async (element) => {
           let collectionMetadataResponse;
           try {
-            console.log("element: ", element);
-            console.log("element[uri]: ", element["uri"]);
-            collectionMetadataResponse = await axios.get(element["uri"]);
+            // console.log("element: ", element);
+            // console.log("element[uri]: ", element["uri"]);
+            collectionMetadataResponse = await axios.get(element["uri"], {
+              //* Query URL without using browser cache.
+              headers: {
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+                Expires: "0",
+              },
+            });
 
             //* Check empty data.
             if (
@@ -244,6 +251,10 @@ function AvatarSelect() {
           } catch (error) {
             console.error(error);
           }
+          // console.log(
+          //   "collectionMetadataResponse: ",
+          //   collectionMetadataResponse
+          // );
 
           return dataList.push(collectionMetadataResponse.data);
         });
@@ -742,6 +753,21 @@ function AvatarSelect() {
               selectedTraitListRef.current
             );
 
+            //* Get the current collection list.
+            dataAllRegisterData.map(async (registerData) => {
+              if (registerData.nftAddress === currentCollectionAddress) {
+                nfts.map(async (nft) => {
+
+                });
+              }
+            });
+
+            //* Filter attributes.
+
+            //* Filter registered data in rent market.
+
+            //* Set result data.
+
             //* Show rent dialog.
             setRentNftList(result);
             setOpenRentDialog(true);
@@ -777,7 +803,7 @@ function AvatarSelect() {
           alignItems="flex-start"
         >
           {rentNftList.map((element, idx) => {
-            // console.log("element: ", element);
+            console.log("element: ", element);
 
             return (
               <RentNft
