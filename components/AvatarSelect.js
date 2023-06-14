@@ -69,8 +69,8 @@ function AvatarSelect() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
-  const [currentCollection, setCurrentCollection] = React.useState();
-  const [collectionList, setCollectionList] = React.useState([]);
+  const currentCollection = React.useRef();
+  const collectionList = React.useRef([]);
   const selectedTraitListRef = React.useRef({});
   const [rentNftList, setRentNftList] = React.useState([]);
   const [collectionMetadataList, setCollectionMetadataList] = React.useState(
@@ -96,10 +96,11 @@ function AvatarSelect() {
       console.log("call onSuccess()");
       console.log("data: ", data);
 
-      setCollectionList([]);
+      collectionList.current = [];
       data.map((e) => {
         alchemy.nft.getNftsForContract(e.collectionAddress).then((result) => {
-          setCollectionList({
+          console.log("result: ", result);
+          collectionList.current.push({
             collectionAddress: e.collectionAddress,
             nfts: result.nfts,
           });
@@ -266,6 +267,7 @@ function AvatarSelect() {
         const firstCollectionData = dataList[0];
         if (firstCollectionData) {
           setImageAndAttributes({ collectionMetadata: firstCollectionData });
+          currentCollection.current = firstCollectionData;
         }
       }
 
@@ -281,8 +283,8 @@ function AvatarSelect() {
     console.log("call v3dCoreLoadedCallback()");
 
     let firstCollectionData;
-    if (currentCollection) {
-      firstCollectionData = currentCollection;
+    if (currentCollection.current) {
+      firstCollectionData = currentCollection.current;
     } else {
       firstCollectionData = collectionMetadataList[0];
     }
@@ -290,6 +292,7 @@ function AvatarSelect() {
     if (firstCollectionData) {
       console.log("firstCollectionData: ", firstCollectionData);
       setImageAndAttributes({ collectionMetadata: firstCollectionData });
+      currentCollection.current = firstCollectionData;
 
       //* Set the first trait of each attributes as selected.
       Object.entries(firstCollectionData.attributes).map(
@@ -710,7 +713,11 @@ function AvatarSelect() {
               onClick={() => {
                 console.log("element: ", element);
                 setImageAndAttributes({ collectionMetadata: element });
-                setCurrentCollection(element);
+                currentCollection.current = element;
+                console.log(
+                  "currentCollection.current: ",
+                  currentCollection.current
+                );
 
                 //* Set the first trait of each attributes as selected.
                 Object.entries(element.attributes).map(
@@ -804,22 +811,89 @@ function AvatarSelect() {
             );
 
             //* Get the current collection list.
-            dataAllRegisterData.map(async (registerData) => {
-              //* TODO: Use ethereum checksum compare.
-              if (registerData.nftAddress === currentCollection.address) {
-                nfts.map(async (nft) => {});
-              }
-            });
-
             //* Filter attributes.
+            const result = collectionList.current
+              .filter(
+                (collection) =>
+                  collection.collectionAddress.toLowerCase() ===
+                  currentCollection.current.address.toLowerCase()
+              )
+              .flatMap(({ collectionAddress, nfts }) => {
+                return nfts;
+              })
+              .map((nft) => {
+                console.log("nft: ", nft);
+                return {
+                  attributes: nft.rawMetadata.attributes,
+                  address: nft.contract.address,
+                  tokenId: nft.tokenId,
+                };
+              })
+              .filter(async ({ attributes, address, tokenId }) => {
+                console.log("attributes: ", attributes);
+                let found = true;
+                const promises = attributes.map((attribute) => {
+                  Object.entries(selectedTraitListRef.current).map(
+                    ([traitKey, traitValue]) => {
+                      console.log("traitKey: ", traitKey);
+                      console.log("traitValue: ", traitValue);
+                      if (
+                        attribute.trait_type == traitKey &&
+                        attribute.value !== traitValue
+                      ) {
+                        found = false;
+                      }
+                    }
+                  );
+                });
+                await Promise.all(promises);
+                if (found === true) {
+                  return { address, tokenId };
+                }
+              });
+            await Promise.all(result);
+            console.log("result: ", result);
+
+            // collectionList.current.map(async (collection) => {
+            //   console.log("collection: ", collection);
+            //   if (
+            //     collection.collectionAddress.toLowerCase() ===
+            //     currentCollection.current.address.toLowerCase()
+            //   ) {
+            //     collection.nfts.map(async (nft) => {
+            //       console.log("nft: ", nft);
+
+            //       const promises = nft.rawMetadata.attributes.map(
+            //         async (attribute) => {
+            //           // trait_type : value
+            //           const found = true;
+            //           const promises = Object.entries(
+            //             selectedTraitListRef.current
+            //           ).map(([traitKey, traitValue]) => {
+            //             console.log("traitKey: ", traitKey);
+            //             console.log("traitValue: ", traitValue);
+            //             if (
+            //               attribute.trait_type == traitKey &&
+            //               attribute.value !== traitValue
+            //             ) {
+            //               found = false;
+            //             }
+            //           });
+            //           await Promise.all(promises);
+            //         }
+            //       );
+            //       await Promise.all(promises);
+            //     });
+            //   }
+            // });
 
             //* Filter registered data in rent market.
 
             //* Set result data.
 
             //* Show rent dialog.
-            setRentNftList(result);
-            setOpenRentDialog(true);
+            // setRentNftList(result);
+            // setOpenRentDialog(true);
           }}
           sx={{ m: 1 }}
         >
