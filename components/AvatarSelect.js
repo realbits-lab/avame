@@ -93,13 +93,13 @@ function AvatarSelect() {
     cacheOnBlock: true,
     // watch: true,
     onSuccess(data) {
-      console.log("call onSuccess()");
-      console.log("data: ", data);
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
 
       collectionList.current = [];
       data.map((e) => {
         alchemy.nft.getNftsForContract(e.collectionAddress).then((result) => {
-          console.log("result: ", result);
+          // console.log("result: ", result);
           collectionList.current.push({
             collectionAddress: e.collectionAddress,
             nfts: result.nfts,
@@ -218,11 +218,11 @@ function AvatarSelect() {
 
   React.useEffect(
     function () {
-      console.log("call useEffect()");
-      console.log("dataAllCollection: ", dataAllCollection);
+      // console.log("call useEffect()");
+      // console.log("dataAllCollection: ", dataAllCollection);
 
       async function initialize() {
-        console.log("call initialize()");
+        // console.log("call initialize()");
 
         //* Get json metadata per each collection.
         let dataList = [];
@@ -280,7 +280,7 @@ function AvatarSelect() {
 
   //* v3dCore instance is made lately, so we use callback for initializing the first attributes.
   function v3dCoreLoadedCallback() {
-    console.log("call v3dCoreLoadedCallback()");
+    // console.log("call v3dCoreLoadedCallback()");
 
     let firstCollectionData;
     if (currentCollection.current) {
@@ -290,15 +290,16 @@ function AvatarSelect() {
     }
 
     if (firstCollectionData) {
-      console.log("firstCollectionData: ", firstCollectionData);
+      // console.log("firstCollectionData: ", firstCollectionData);
       setImageAndAttributes({ collectionMetadata: firstCollectionData });
       currentCollection.current = firstCollectionData;
 
       //* Set the first trait of each attributes as selected.
+      selectedTraitListRef.current = {};
       Object.entries(firstCollectionData.attributes).map(
         ([trait, traitList], idx) => {
-          console.log("trait: ", trait);
-          console.log("traitList: ", traitList);
+          // console.log("trait: ", trait);
+          // console.log("traitList: ", traitList);
           setTrait({
             traitKey: trait,
             traitValue: traitList[0],
@@ -362,9 +363,9 @@ function AvatarSelect() {
   }
 
   async function findNftWithMetadata() {
-    console.log("call findNftWithMetadata()");
+    // console.log("call findNftWithMetadata()");
     // console.log("dataRegisterData: ", dataRegisterData);
-    console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
+    // console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
 
     let result;
     try {
@@ -425,16 +426,16 @@ function AvatarSelect() {
   }
 
   function setTrait({ traitKey, traitValue }) {
-    console.log("call setTrait()");
-    console.log("traitKey: ", traitKey);
-    console.log("traitValue: ", traitValue);
+    // console.log("call setTrait()");
+    // console.log("traitKey: ", traitKey);
+    // console.log("traitValue: ", traitValue);
 
     //* Add selected trait type and value.
     selectedTraitListRef.current[traitKey] = traitValue.name;
 
     const glbUrl = traitValue.glb_url;
     const v3dCore = getV3dCoreFuncRef.current();
-    console.log("v3dCore: ", v3dCore);
+    // console.log("v3dCore: ", v3dCore);
 
     if (!v3dCore) return;
 
@@ -711,20 +712,23 @@ function AvatarSelect() {
             <ImageListItem
               key={idx}
               onClick={() => {
-                console.log("element: ", element);
+                // console.log("call onClick()");
+                // console.log("element: ", element);
+
                 setImageAndAttributes({ collectionMetadata: element });
                 currentCollection.current = element;
-                console.log(
-                  "currentCollection.current: ",
-                  currentCollection.current
-                );
+                // console.log(
+                //   "currentCollection.current: ",
+                //   currentCollection.current
+                // );
 
                 //* Set the first trait of each attributes as selected.
+                selectedTraitListRef.current = {};
                 Object.entries(element.attributes).map(
                   ([trait, traitList], idx) => {
-                    console.log("trait: ", trait);
-                    console.log("traitList: ", traitList);
-                    console.log("traitList[0]: ", traitList[0]);
+                    // console.log("trait: ", trait);
+                    // console.log("traitList: ", traitList);
+                    // console.log("traitList[0]: ", traitList[0]);
                     setTrait({
                       traitKey: trait,
                       traitValue: traitList[0],
@@ -802,13 +806,13 @@ function AvatarSelect() {
         <Fab
           color="primary"
           onClick={async () => {
-            console.log("call onClick()");
+            // console.log("call onClick()");
             // const result = await findNftWithMetadata();
             // console.log("result: ", result);
-            console.log(
-              "selectedTraitListRef.current: ",
-              selectedTraitListRef.current
-            );
+            // console.log(
+            //   "selectedTraitListRef.current: ",
+            //   selectedTraitListRef.current
+            // );
 
             //* Get the current collection list.
             //* Filter attributes.
@@ -822,78 +826,41 @@ function AvatarSelect() {
                 return nfts;
               })
               .map((nft) => {
-                console.log("nft: ", nft);
+                // console.log("nft: ", nft);
                 return {
                   attributes: nft.rawMetadata.attributes,
                   address: nft.contract.address,
                   tokenId: nft.tokenId,
+                  imageUrl: nft.rawMetadata.image,
                 };
               })
-              .filter(async ({ attributes, address, tokenId }) => {
-                console.log("attributes: ", attributes);
+              .filter(({ attributes, address, tokenId, imageUrl }) => {
+                // console.log("attributes: ", attributes);
                 let found = true;
-                const promises = attributes.map((attribute) => {
-                  Object.entries(selectedTraitListRef.current).map(
-                    ([traitKey, traitValue]) => {
-                      console.log("traitKey: ", traitKey);
-                      console.log("traitValue: ", traitValue);
-                      if (
-                        attribute.trait_type == traitKey &&
-                        attribute.value !== traitValue
-                      ) {
-                        found = false;
-                      }
+                Object.entries(selectedTraitListRef.current).map(
+                  ([traitKey, traitValue]) => {
+                    // console.log("traitKey: ", traitKey);
+                    // console.log("traitValue: ", traitValue);
+                    const result = attributes.find(
+                      (attribute) =>
+                        attribute.trait_type === traitKey &&
+                        attribute.value === traitValue
+                    );
+                    if (result === undefined) {
+                      found = false;
                     }
-                  );
-                });
-                await Promise.all(promises);
+                  }
+                );
+
                 if (found === true) {
-                  return { address, tokenId };
+                  return { nftAddress: address, tokenId, imageUrl };
                 }
               });
-            await Promise.all(result);
-            console.log("result: ", result);
-
-            // collectionList.current.map(async (collection) => {
-            //   console.log("collection: ", collection);
-            //   if (
-            //     collection.collectionAddress.toLowerCase() ===
-            //     currentCollection.current.address.toLowerCase()
-            //   ) {
-            //     collection.nfts.map(async (nft) => {
-            //       console.log("nft: ", nft);
-
-            //       const promises = nft.rawMetadata.attributes.map(
-            //         async (attribute) => {
-            //           // trait_type : value
-            //           const found = true;
-            //           const promises = Object.entries(
-            //             selectedTraitListRef.current
-            //           ).map(([traitKey, traitValue]) => {
-            //             console.log("traitKey: ", traitKey);
-            //             console.log("traitValue: ", traitValue);
-            //             if (
-            //               attribute.trait_type == traitKey &&
-            //               attribute.value !== traitValue
-            //             ) {
-            //               found = false;
-            //             }
-            //           });
-            //           await Promise.all(promises);
-            //         }
-            //       );
-            //       await Promise.all(promises);
-            //     });
-            //   }
-            // });
-
-            //* Filter registered data in rent market.
-
-            //* Set result data.
+            // console.log("result: ", result);
 
             //* Show rent dialog.
-            // setRentNftList(result);
-            // setOpenRentDialog(true);
+            setRentNftList(result);
+            setOpenRentDialog(true);
           }}
           sx={{ m: 1 }}
         >
@@ -926,7 +893,7 @@ function AvatarSelect() {
           alignItems="flex-start"
         >
           {rentNftList.map((element, idx) => {
-            console.log("element: ", element);
+            // console.log("element: ", element);
 
             return (
               <RentNft
@@ -936,23 +903,6 @@ function AvatarSelect() {
                 tokenId={element.tokenId}
               />
             );
-            // return (
-            //   <Card key={idx}>
-            //     <CardMedia
-            //       component="img"
-            //       image={element.imageUrl}
-            //       alt="Preview image"
-            //     />
-            //     <CardContent>
-            //       <Typography variant="caption" color="text.secondary">
-            //         {element.name}
-            //       </Typography>
-            //     </CardContent>
-            //     <CardActions sx={{ justifyContent: "space-around" }}>
-            //       <Button>Rent</Button>
-            //     </CardActions>
-            //   </Card>
-            // );
           })}
         </Box>
       </RBDialog>
