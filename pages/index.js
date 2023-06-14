@@ -1,5 +1,11 @@
 import React from "react";
+import { useRouter } from "next/router";
+import { styled } from "@mui/system";
 import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import HomeIcon from "@mui/icons-material/Home";
+import AvatarSelect from "@/components/AvatarSelect";
 import AvatarView from "@/components/AvatarView";
 import TakePicture from "@/components/TakePicture";
 import RentContent from "@/components/RentContent";
@@ -44,6 +50,18 @@ export default function Service() {
   const stopScreenEventFuncRef = React.useRef();
   const setAvatarExpressionFuncRef = React.useRef();
 
+  const router = useRouter();
+  const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.white,
+      color: "rgba(0, 0, 0, 0.87)",
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }));
+
   function selectAvatarFunc(element) {
     // console.log("call selectAvatarFunc()");
     // console.log("element.metadata: ", element.metadata);
@@ -61,7 +79,7 @@ export default function Service() {
         {/* //*----------------------------------------------------------------*/}
         {/* //* ChatMessage component.                                         */}
         {/* //*----------------------------------------------------------------*/}
-        <ChatMessage setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}/>
+        <ChatMessage setAvatarExpressionFuncRef={setAvatarExpressionFuncRef} />
 
         {/* //*----------------------------------------------------------------*/}
         {/* //* RentContent component.                                         */}
@@ -199,10 +217,20 @@ export default function Service() {
     );
   }
 
+  function buildAvaCloService() {
+    return (
+      <>
+        <AvatarSelect />
+      </>
+    );
+  }
+
   switch (SERVICE_MODE) {
     case "avame":
-      console.log("call buildAvaMeService()");
       return buildAvaMeService();
+
+    case "avaclo":
+      return buildAvaCloService();
 
     case "avachat":
     default:

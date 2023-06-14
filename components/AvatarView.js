@@ -21,6 +21,7 @@ const StatsWithNoSSR = loadable.lib(
 function AvatarView({
   inputGltfDataUrl,
   getV3dCoreFuncRef,
+  v3dCoreLoadedCallback,
   getImageDataUrlFunc,
   getMediaStreamFunc,
   setAvatarPositionFunc,
@@ -106,8 +107,8 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
-    // console.log("call useEffect()");
-    // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+    console.log("call useEffect()");
+    console.log("inputGltfDataUrl: ", inputGltfDataUrl);
 
     async function initialize() {
       await initializeAvatarContent({
@@ -139,7 +140,9 @@ function AvatarView({
     getMediaStreamFunc.current = getMediaStream;
     setAvatarPositionFunc.current = setAvatarPosition;
     getV3dCoreFuncRef.current = getV3dCoreFunc;
-    setAvatarExpressionFuncRef.current = setAvatarExpression;
+    if (setAvatarExpressionFuncRef) {
+      setAvatarExpressionFuncRef.current = setAvatarExpression;
+    }
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
@@ -380,9 +383,9 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url, useMotionUpdate }) {
-    // console.log("call initializeAvatarContent()");
-    // console.log("v3dWebRef.current: ", v3dWebRef.current);
-    // console.log("url: ", url);
+    console.log("call initializeAvatarContent()");
+    console.log("v3dWebRef.current: ", v3dWebRef.current);
+    console.log("url: ", url);
 
     //* TODO: Block the usage of Three.js library.
     // makeScene();
@@ -421,6 +424,9 @@ function AvatarView({
       isMobile,
       () => {
         v3dCoreRef.current = v3dWebRef.current.v3DCore;
+        if (v3dCoreLoadedCallback) {
+          v3dCoreLoadedCallback();
+        }
 
         //* Add window resize event function.
         window.addEventListener("resize", () => {

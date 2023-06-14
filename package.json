@@ -40,6 +40,7 @@
     "@walletconnect/web3-provider": "^1.8.0",
     "@web3modal/ethereum": "^2.2.2",
     "@web3modal/react": "^2.2.2",
+    "alchemy-sdk": "^2.9.0",
     "axios": "^1.2.1",
     "bufferutil": "^4.0.7",
     "chroma-js": "^2.4.2",
@@ -89,7 +90,6 @@
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/face_mesh": "^0.4.1633559619",
     "@mediapipe/holistic": "0.5.1635989137",
-    "alchemy-sdk": "^2.7.0",
     "babylonjs-gltf2interface": "5.0.0",
     "keccak256": "^1.0.6"
   },

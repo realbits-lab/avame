@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { useContractRead } from "wagmi";
+import { Network, Alchemy } from "alchemy-sdk";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import Image from "mui-image";
@@ -26,29 +27,35 @@ import MobileStepper from "@mui/material/MobileStepper";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import PersonIcon from "@mui/icons-material/Person";
 import CloseIcon from "@mui/icons-material/Close";
-import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
+import CheckroomIcon from "@mui/icons-material/Checkroom";
+import StoreIcon from "@mui/icons-material/Store";
 import { RBSnackbar, AlertSeverity } from "rent-market";
-import AvatarView from "../components/AvatarView";
-import RentNft from "../components/RentNft";
-import rentmarketABI from "../contracts/rentMarket.json";
+import AvatarView from "@/components/AvatarView";
+import RentNft from "@/components/RentNft";
 import {
   RBDialog,
   writeToastMessageState,
   readToastMessageState,
-} from "./RealBitsUtil";
+} from "@/components/RealBitsUtil";
+import rentmarketABI from "@/contracts/rentMarket.json";
 
 function AvatarSelect() {
   const FIND_NFT_WITH_METADATA_API_URL = "/api/find-nft-with-metadata";
   const RENT_MARKET_CONTRACT_ADDRES =
     process.env.NEXT_PUBLIC_RENT_MARKET_CONTRACT_ADDRESS;
+  const alchemySettings = {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    //* TODO: Get from .env file.
+    network: Network.MATIC_MUMBAI,
+  };
+  const alchemy = new Alchemy(alchemySettings);
 
-  //* TODO: Get from json data.
+  //* Get from json data.
   const collectionUrl =
     // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
+    // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
     "https://clothes-nft.s3.ap-northeast-2.amazonaws.com/collection/collection.json";
-  // "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/collection/base/base.vrm"
   const [avatarUrl, setAvatarUrl] = React.useState();
   const [attributes, setAttributes] = React.useState({});
   const selectedTraitRef = React.useRef();
@@ -62,6 +69,8 @@ function AvatarSelect() {
   const traitMeshListRef = React.useRef({});
   const bodyMeshListRef = React.useRef([]);
   const bodyMaterialListRef = React.useRef([]);
+  const currentCollection = React.useRef();
+  const collectionList = React.useRef([]);
   const selectedTraitListRef = React.useRef({});
   const [rentNftList, setRentNftList] = React.useState([]);
   const [collectionMetadataList, setCollectionMetadataList] = React.useState(
@@ -72,16 +81,55 @@ function AvatarSelect() {
   //* Wagmi hook functions.
   //* Get all collection list.
   const {
-    data: dataGetAllCollection,
-    isError: isErrorGetAllCollection,
-    isLoading: isLoadingGetAllCollection,
-    isValidating: isValidatingGetAllCollection,
-    status: statusGetAllCollection,
+    data: dataAllCollection,
+    isError: isErrorAllCollection,
+    isLoading: isLoadingAllCollection,
+    isValidating: isValidatingAllCollection,
+    status: statusAllCollection,
   } = useContractRead({
     address: RENT_MARKET_CONTRACT_ADDRES,
     abi: rentmarketABI.abi,
     functionName: "getAllCollection",
     cacheOnBlock: true,
+    // watch: true,
+    onSuccess(data) {
+      // console.log("call onSuccess()");
+      // console.log("data: ", data);
+
+      collectionList.current = [];
+      data.map((e) => {
+        alchemy.nft.getNftsForContract(e.collectionAddress).then((result) => {
+          // console.log("result: ", result);
+          collectionList.current.push({
+            collectionAddress: e.collectionAddress,
+            nfts: result.nfts,
+          });
+        });
+      });
+    },
+    onError(error) {
+      // console.log("call onError()");
+      // console.log("error: ", error);
+    },
+    onSettled(data, error) {
+      // console.log("call onSettled()");
+      // console.log("data: ", data);
+      // console.log("error: ", error);
+    },
+  });
+
+  //* Get all register data array.
+  const {
+    data: dataAllRegisterData,
+    isError: isErrorAllRegisterData,
+    isLoading: isLoadingAllRegisterData,
+    isValidating: isValidatingAllRegisterData,
+    status: statusAllRegisterData,
+  } = useContractRead({
+    address: RENT_MARKET_CONTRACT_ADDRES,
+    abi: rentmarketABI.abi,
+    functionName: "getAllRegisterData",
+    // cacheOnBlock: true,
     // watch: true,
     onSuccess(data) {
       // console.log("call onSuccess()");
@@ -171,17 +219,26 @@ function AvatarSelect() {
   React.useEffect(
     function () {
       // console.log("call useEffect()");
-      // console.log("dataGetAllCollection: ", dataGetAllCollection);
+      // console.log("dataAllCollection: ", dataAllCollection);
 
       async function initialize() {
         // console.log("call initialize()");
 
-        //* Set all collection metadata list.
+        //* Get json metadata per each collection.
         let dataList = [];
-        const promises = dataGetAllCollection.map(async (element) => {
+        const promises = dataAllCollection.map(async (element) => {
           let collectionMetadataResponse;
           try {
-            collectionMetadataResponse = await axios.get(element["uri"]);
+            // console.log("element: ", element);
+            // console.log("element[uri]: ", element["uri"]);
+            collectionMetadataResponse = await axios.get(element["uri"], {
+              //* Query URL without using browser cache.
+              headers: {
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+                Expires: "0",
+              },
+            });
 
             //* Check empty data.
             if (
@@ -194,24 +251,63 @@ function AvatarSelect() {
           } catch (error) {
             console.error(error);
           }
+          // console.log(
+          //   "collectionMetadataResponse: ",
+          //   collectionMetadataResponse
+          // );
 
           return dataList.push(collectionMetadataResponse.data);
         });
         await Promise.all(promises);
+
+        //* Set all collection metadata.
         setCollectionMetadataList(dataList);
 
-        //* Set collection list.
-        if (dataList[0]) {
-          setImageAndAttributes({ collectionMetadata: dataList[0] });
+        //* Set the first collection.
+        const firstCollectionData = dataList[0];
+        if (firstCollectionData) {
+          setImageAndAttributes({ collectionMetadata: firstCollectionData });
+          currentCollection.current = firstCollectionData;
         }
       }
 
-      if (dataGetAllCollection) {
+      if (dataAllCollection) {
         initialize();
       }
     },
-    [dataGetAllCollection]
+    [dataAllCollection]
   );
+
+  //* v3dCore instance is made lately, so we use callback for initializing the first attributes.
+  function v3dCoreLoadedCallback() {
+    // console.log("call v3dCoreLoadedCallback()");
+
+    let firstCollectionData;
+    if (currentCollection.current) {
+      firstCollectionData = currentCollection.current;
+    } else {
+      firstCollectionData = collectionMetadataList[0];
+    }
+
+    if (firstCollectionData) {
+      // console.log("firstCollectionData: ", firstCollectionData);
+      setImageAndAttributes({ collectionMetadata: firstCollectionData });
+      currentCollection.current = firstCollectionData;
+
+      //* Set the first trait of each attributes as selected.
+      selectedTraitListRef.current = {};
+      Object.entries(firstCollectionData.attributes).map(
+        ([trait, traitList], idx) => {
+          // console.log("trait: ", trait);
+          // console.log("traitList: ", traitList);
+          setTrait({
+            traitKey: trait,
+            traitValue: traitList[0],
+          });
+        }
+      );
+    }
+  }
 
   function setImageAndAttributes({ collectionMetadata }) {
     //* Get avatar base model url.
@@ -268,6 +364,7 @@ function AvatarSelect() {
 
   async function findNftWithMetadata() {
     // console.log("call findNftWithMetadata()");
+    // console.log("dataRegisterData: ", dataRegisterData);
     // console.log("selectedTraitListRef.current: ", selectedTraitListRef.current);
 
     let result;
@@ -328,6 +425,109 @@ function AvatarSelect() {
     );
   }
 
+  function setTrait({ traitKey, traitValue }) {
+    // console.log("call setTrait()");
+    // console.log("traitKey: ", traitKey);
+    // console.log("traitValue: ", traitValue);
+
+    //* Add selected trait type and value.
+    selectedTraitListRef.current[traitKey] = traitValue.name;
+
+    const glbUrl = traitValue.glb_url;
+    const v3dCore = getV3dCoreFuncRef.current();
+    // console.log("v3dCore: ", v3dCore);
+
+    if (!v3dCore) return;
+
+    //* Import mesh from glb.
+    SceneLoader.ImportMesh(
+      null,
+      glbUrl,
+      "",
+      v3dCore.scene,
+      async function (meshes, particleSystems, skeletons) {
+        // console.log(
+        //   "v3dCore.scene.meshes: ",
+        //   v3dCore.scene.meshes
+        // );
+        // console.log("meshes: ", meshes);
+        // console.log("skeletons: ", skeletons);
+
+        //* If there're already pre-added meshes, remove them all.
+        if (traitMeshListRef.current[traitKey]) {
+          traitMeshListRef.current[traitKey].map((mesh) => {
+            mesh.dispose();
+            mesh = null;
+          });
+        }
+
+        //* Initialize  mesh list.
+        traitMeshListRef.current[traitKey] = [];
+
+        //* Find the head bone.
+        let parentBone;
+        v3dCore.scene.skeletons.map((skeleton) => {
+          // console.log("skeleton: ", skeleton);
+
+          skeleton.bones.map((bone) => {
+            // console.log("bone.name: ", bone.name);
+            //* TODO: Use head bone for accessory and hips bone for clothes.
+            if (
+              traitKey !== "body_top" &&
+              traitKey !== "body_bottom" &&
+              bone.name === "J_Bip_C_Head"
+            ) {
+              parentBone = bone;
+            }
+
+            if (
+              (traitKey === "body_top" || traitKey === "body_bottom") &&
+              bone.name === "J_Bip_C_Hips"
+            ) {
+              // console.log("bone: ", bone);
+              parentBone = bone;
+            }
+          });
+        });
+
+        meshes.map((mesh) => {
+          traitMeshListRef.current[traitKey].push(mesh);
+
+          //* Calculate the difference between mesh absolute position and head bone absolute position.
+          const meshAbsolutePosition = mesh.getAbsolutePosition();
+          const headBoneAbsolutePosition = parentBone.getAbsolutePosition();
+          const diffAbsolutePosition = meshAbsolutePosition.subtract(
+            headBoneAbsolutePosition
+          );
+          // console.log(
+          //   "meshAbsolutePosition: ",
+          //   meshAbsolutePosition
+          // );
+          // console.log(
+          //   "headBoneAbsolutePosition: ",
+          //   headBoneAbsolutePosition
+          // );
+          // console.log(
+          //   "diffAbsolutePosition: ",
+          //   diffAbsolutePosition
+          // );
+
+          //* Set the position of mesh by difference between mesh and head bone.
+          // mesh.setAbsolutePosition(diffAbsolutePosition);
+
+          //* Set the parent of mesh to head bone in case of accessory.
+          // mesh.parent = parentBone;
+
+          // const result = BABYLON.Mesh.MergeMeshes([
+          //   ...v3dCore.scene.meshes,
+          //   mesh,
+          // ]);
+          // console.log("result: ", result);
+        });
+      }
+    );
+  }
+
   function SelectTraitPage({ inputTrait, inputTraitList }) {
     // console.log("call SelectTraitPage()");
     // console.log("inputTrait: ", inputTrait);
@@ -346,9 +546,9 @@ function AvatarSelect() {
     return (
       <>
         <Grid container>
-          {inputTraitList.map(function (traitValue, idx) {
+          {inputTraitList.map(function (traitName, idx) {
             // console.log("inputTrait: ", inputTrait);
-            // console.log("traitValue: ", traitValue);
+            // console.log("traitName: ", traitName);
             // console.log("Math.floor(idx / 4): ", Math.floor(idx / 4));
 
             if (Math.floor(idx / 4) === activeStep) {
@@ -356,106 +556,9 @@ function AvatarSelect() {
                 <Grid item xs={3} key={idx}>
                   <CardMedia
                     component="img"
-                    image={traitValue.image_url}
-                    onClick={function () {
-                      //* Add selected trait type and value.
-                      selectedTraitListRef.current[inputTrait] =
-                        traitValue.name;
-
-                      const glbUrl = traitValue.glb_url;
-                      const v3dCore = getV3dCoreFuncRef.current();
-
-                      //* Import mesh from glb.
-                      SceneLoader.ImportMesh(
-                        null,
-                        glbUrl,
-                        "",
-                        v3dCore.scene,
-                        async function (meshes, particleSystems, skeletons) {
-                          // console.log(
-                          //   "v3dCore.scene.meshes: ",
-                          //   v3dCore.scene.meshes
-                          // );
-                          // console.log("meshes: ", meshes);
-                          // console.log("skeletons: ", skeletons);
-
-                          //* If there're already pre-added meshes, remove them all.
-                          if (traitMeshListRef.current[inputTrait]) {
-                            traitMeshListRef.current[inputTrait].map((mesh) => {
-                              mesh.dispose();
-                              mesh = null;
-                            });
-                          }
-
-                          //* Initialize  mesh list.
-                          traitMeshListRef.current[inputTrait] = [];
-
-                          //* Find the head bone.
-                          let parentBone;
-                          v3dCore.scene.skeletons.map((skeleton) => {
-                            // console.log("skeleton: ", skeleton);
-
-                            skeleton.bones.map((bone) => {
-                              // console.log("bone.name: ", bone.name);
-                              //* TODO: Use head bone for accessory and hips bone for clothes.
-                              if (
-                                inputTrait !== "body_top" &&
-                                inputTrait !== "body_bottom" &&
-                                bone.name === "J_Bip_C_Head"
-                              ) {
-                                parentBone = bone;
-                              }
-
-                              if (
-                                (inputTrait === "body_top" ||
-                                  inputTrait === "body_bottom") &&
-                                bone.name === "J_Bip_C_Hips"
-                              ) {
-                                // console.log("bone: ", bone);
-                                parentBone = bone;
-                              }
-                            });
-                          });
-
-                          meshes.map((mesh) => {
-                            traitMeshListRef.current[inputTrait].push(mesh);
-
-                            //* Calculate the difference between mesh absolute position and head bone absolute position.
-                            const meshAbsolutePosition =
-                              mesh.getAbsolutePosition();
-                            const headBoneAbsolutePosition =
-                              parentBone.getAbsolutePosition();
-                            const diffAbsolutePosition =
-                              meshAbsolutePosition.subtract(
-                                headBoneAbsolutePosition
-                              );
-                            // console.log(
-                            //   "meshAbsolutePosition: ",
-                            //   meshAbsolutePosition
-                            // );
-                            // console.log(
-                            //   "headBoneAbsolutePosition: ",
-                            //   headBoneAbsolutePosition
-                            // );
-                            // console.log(
-                            //   "diffAbsolutePosition: ",
-                            //   diffAbsolutePosition
-                            // );
-
-                            //* Set the position of mesh by difference between mesh and head bone.
-                            // mesh.setAbsolutePosition(diffAbsolutePosition);
-
-                            //* Set the parent of mesh to head bone in case of accessory.
-                            // mesh.parent = parentBone;
-
-                            // const result = BABYLON.Mesh.MergeMeshes([
-                            //   ...v3dCore.scene.meshes,
-                            //   mesh,
-                            // ]);
-                            // console.log("result: ", result);
-                          });
-                        }
-                      );
+                    image={traitName.image_url}
+                    onClick={() => {
+                      setTrait({ traitKey: inputTrait, traitValue: traitName });
                     }}
                     sx={{ width: "80%", height: "80%" }}
                   />
@@ -609,7 +712,29 @@ function AvatarSelect() {
             <ImageListItem
               key={idx}
               onClick={() => {
+                // console.log("call onClick()");
+                // console.log("element: ", element);
+
                 setImageAndAttributes({ collectionMetadata: element });
+                currentCollection.current = element;
+                // console.log(
+                //   "currentCollection.current: ",
+                //   currentCollection.current
+                // );
+
+                //* Set the first trait of each attributes as selected.
+                selectedTraitListRef.current = {};
+                Object.entries(element.attributes).map(
+                  ([trait, traitList], idx) => {
+                    // console.log("trait: ", trait);
+                    // console.log("traitList: ", traitList);
+                    // console.log("traitList[0]: ", traitList[0]);
+                    setTrait({
+                      traitKey: trait,
+                      traitValue: traitList[0],
+                    });
+                  }
+                );
               }}
             >
               <Image src={element.image} alt={element.name} width={100} />
@@ -637,6 +762,7 @@ function AvatarSelect() {
           <AvatarView
             inputGltfDataUrl={avatarUrl}
             getV3dCoreFuncRef={getV3dCoreFuncRef}
+            v3dCoreLoadedCallback={v3dCoreLoadedCallback}
             getImageDataUrlFunc={getImageDataUrl}
             // VideoChat -> AvatarView call for new Remon.
             // TakeVideo -> AvatarView call for recording video.
@@ -674,13 +800,62 @@ function AvatarSelect() {
           sx={{ m: 1 }}
         >
           <LightTooltip title="Select Cloth" placement="left">
-            <PersonIcon color="secondary" />
+            <CheckroomIcon color="secondary" />
           </LightTooltip>
         </Fab>
         <Fab
           color="primary"
           onClick={async () => {
-            const result = await findNftWithMetadata();
+            // console.log("call onClick()");
+            // const result = await findNftWithMetadata();
+            // console.log("result: ", result);
+            // console.log(
+            //   "selectedTraitListRef.current: ",
+            //   selectedTraitListRef.current
+            // );
+
+            //* Get the current collection list.
+            //* Filter attributes.
+            const result = collectionList.current
+              .filter(
+                (collection) =>
+                  collection.collectionAddress.toLowerCase() ===
+                  currentCollection.current.address.toLowerCase()
+              )
+              .flatMap(({ collectionAddress, nfts }) => {
+                return nfts;
+              })
+              .map((nft) => {
+                // console.log("nft: ", nft);
+                return {
+                  attributes: nft.rawMetadata.attributes,
+                  address: nft.contract.address,
+                  tokenId: nft.tokenId,
+                  imageUrl: nft.rawMetadata.image,
+                };
+              })
+              .filter(({ attributes, address, tokenId, imageUrl }) => {
+                // console.log("attributes: ", attributes);
+                let found = true;
+                Object.entries(selectedTraitListRef.current).map(
+                  ([traitKey, traitValue]) => {
+                    // console.log("traitKey: ", traitKey);
+                    // console.log("traitValue: ", traitValue);
+                    const result = attributes.find(
+                      (attribute) =>
+                        attribute.trait_type === traitKey &&
+                        attribute.value === traitValue
+                    );
+                    if (result === undefined) {
+                      found = false;
+                    }
+                  }
+                );
+
+                if (found === true) {
+                  return { nftAddress: address, tokenId, imageUrl };
+                }
+              });
             // console.log("result: ", result);
 
             //* Show rent dialog.
@@ -690,7 +865,7 @@ function AvatarSelect() {
           sx={{ m: 1 }}
         >
           <LightTooltip title="Rent Avatar" placement="left">
-            <LocalGroceryStoreIcon color="secondary" />
+            <StoreIcon color="secondary" />
           </LightTooltip>
         </Fab>
       </Box>
@@ -728,23 +903,6 @@ function AvatarSelect() {
                 tokenId={element.tokenId}
               />
             );
-            // return (
-            //   <Card key={idx}>
-            //     <CardMedia
-            //       component="img"
-            //       image={element.imageUrl}
-            //       alt="Preview image"
-            //     />
-            //     <CardContent>
-            //       <Typography variant="caption" color="text.secondary">
-            //         {element.name}
-            //       </Typography>
-            //     </CardContent>
-            //     <CardActions sx={{ justifyContent: "space-around" }}>
-            //       <Button>Rent</Button>
-            //     </CardActions>
-            //   </Card>
-            // );
           })}
         </Box>
       </RBDialog>

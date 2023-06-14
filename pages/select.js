@@ -5,7 +5,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from "@mui/system";
 import HomeIcon from "@mui/icons-material/Home";
-import AvatarSelect from "../components/AvatarSelect";
+import AvatarSelect from "@/components/AvatarSelect";
 
 export default function Select() {
   const router = useRouter();
