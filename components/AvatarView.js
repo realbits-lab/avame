@@ -8,9 +8,12 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Backdrop from "@mui/material/Backdrop";
-import { ScreenPosition, Z_INDEX } from "./RealBitsUtil";
-import { humanFileSize } from "rent-market";
-import HolisticData from "./HolisticData";
+import {
+  ScreenPosition,
+  Z_INDEX,
+  humanFileSize,
+} from "@/components/RealBitsUtil";
+import HolisticData from "@/components/HolisticData";
 const StatsWithNoSSR = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
   {

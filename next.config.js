@@ -4,12 +4,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: false,
-  transpilePackages: [
-    "kalidokit",
-    "rent-market",
-    "v3d-web-realbits",
-    "v3d-core-realbits",
-  ],
+  transpilePackages: ["kalidokit", "v3d-web-realbits", "v3d-core-realbits"],
   webpack: (config, options) => {
     config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,

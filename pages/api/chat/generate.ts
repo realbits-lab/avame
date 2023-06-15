@@ -14,7 +14,7 @@ export default function handler(
 ) {
   // console.log("call /api/chat/validate");
 
-  //* TODO: Check this is user is ok to isOwnerOrRenter in rent-market contract.
+  //* TODO: Check this is user is ok to isOwnerOrRenter in rentMarket contract.
   const isAdmin = req?.query?.admin === "true";
   const payload = {
     uuid: uuidv4(),

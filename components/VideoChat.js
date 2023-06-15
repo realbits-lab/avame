@@ -19,15 +19,16 @@ import PhoneInTalkIcon from "@mui/icons-material/PhoneInTalk";
 import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
 import Remon from "@remotemonster/sdk/remon.min";
 import ConnectLive from "@connectlive/connectlive-web-sdk";
-import { AlertSeverity, isUserAllowed } from "rent-market";
 import {
+  AlertSeverity,
+  isUserAllowed,
   PaperComponent,
   ScreenPosition,
   RBSnackbar,
   BootstrapDialogTitle,
   Transition,
-} from "./RealBitsUtil";
-import RoomList from "./RoomList";
+} from "@/components/RealBitsUtil";
+import RoomList from "@/components/RoomList";
 
 function VideoChat({
   inputGetMediaStreamFuncRef,

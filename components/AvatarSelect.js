@@ -30,10 +30,11 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckroomIcon from "@mui/icons-material/Checkroom";
 import StoreIcon from "@mui/icons-material/Store";
-import { RBSnackbar, AlertSeverity } from "rent-market";
 import AvatarView from "@/components/AvatarView";
 import RentNft from "@/components/RentNft";
 import {
+  RBSnackbar,
+  AlertSeverity,
   RBDialog,
   writeToastMessageState,
   readToastMessageState,

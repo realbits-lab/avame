@@ -24,7 +24,7 @@ import {
   RBSnackbar,
   AlertSeverity,
   isUserAllowed,
-} from "rent-market";
+} from "@/components/RealBitsUtil";
 
 const LightTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />

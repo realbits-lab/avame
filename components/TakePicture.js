@@ -15,13 +15,13 @@ import Typography from "@mui/material/Typography";
 import DownloadIcon from "@mui/icons-material/Download";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import {
+  RBDialog,
   AlertSeverity,
   RBSnackbar,
   isUserAllowed,
   signMessage,
-} from "rent-market";
-import { RBDialog } from "./RealBitsUtil";
-import Twitter from "./Twitter";
+} from "@/components/RealBitsUtil";
+import Twitter from "@/components/Twitter";
 
 const TakePicture = ({
   getImageDataUrlFunc,

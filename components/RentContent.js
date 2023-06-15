@@ -4,13 +4,17 @@ import Grid from "@mui/material/Grid";
 import { styled } from "@mui/system";
 import { useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 import { useAccount, useNetwork } from "wagmi";
-import { RentMarket, RBSnackbar, AlertSeverity, Market, My } from "rent-market";
+import AvatarSelect from "@/components/AvatarSelect";
+import RentMarket from "@/components/RentMarket";
+import Market from "@/components/Market";
+import My from "@/components/My";
 import {
   RBDialog,
   writeToastMessageState,
   readToastMessageState,
-} from "./RealBitsUtil";
-import AvatarSelect from "./AvatarSelect";
+  AlertSeverity,
+  RBSnackbar,
+} from "@/components/RealBitsUtil";
 
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
