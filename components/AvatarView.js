@@ -52,7 +52,7 @@ function AvatarView({
   // visibility: hidden or visible
   const [showGltfLoadingProgress, setShowGltfLoadingProgress] =
     React.useState("hidden");
-  const [isTalking, setIsTalking] = React.useState(false);
+  const isTalkingRef = React.useRef(false);
 
   //*---------------------------------------------------------------------------
   //* Mesh transfomation data.
@@ -160,7 +160,7 @@ function AvatarView({
   function handleIsTalking(talking) {
     console.log("call handleIsTalking()");
     console.log("talking: ", talking);
-    setIsTalking(talking);
+    isTalkingRef.current = talking;
   }
 
   function getV3dCoreFunc() {
@@ -799,6 +799,19 @@ function AvatarView({
   //*---------------------------------------------------------------------------
   function renderAvatar() {
     // console.log("call renderAvatar()");
+
+    //* TODO: Make animation.
+    if (isTalkingRef.current) {
+      currentVrmRef.current.expressionManager.setValue(
+        ThreeVrm.VRMExpressionPresetName.Aa,
+        1
+      );
+    } else {
+      currentVrmRef.current.expressionManager.setValue(
+        ThreeVrm.VRMExpressionPresetName.Aa,
+        0
+      );
+    }
 
     //* Update vrm.
     if (currentVrmRef.current) {
