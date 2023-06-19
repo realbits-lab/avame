@@ -391,8 +391,11 @@ function AvatarView({
     // console.log("url: ", url);
 
     //* TODO: Block the usage of Three.js library.
-    // makeScene();
-    // await loadGltf({ url });
+    if (process.env.NEXT_PUBLIC_SERVICE_MODE === "avame") {
+      makeScene();
+      await loadGltf({ url });
+      return;
+    }
 
     //* If we already drew model, just change the model url.
     if (v3dWebRef.current) {

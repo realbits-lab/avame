@@ -22,7 +22,7 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
   const [isMicRecording, setIsMicRecording] = React.useState(false);
 
   const captureKeyDown = React.useCallback((event) => {
-    console.log("event.key: ", event.key);
+    // console.log("event.key: ", event.key);
     // console.log("document.activeElement: ", document.activeElement);
     if (event.key === "Tab") {
       if (isMessageInputFocusedRef.current === false) {
@@ -40,7 +40,7 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
   }, []);
 
   const handleClickMicButton = React.useCallback(() => {
-    console.log("call handleClickMicButton()");
+    // console.log("call handleClickMicButton()");
 
     if (isMicRecording) {
       speechRecognition?.abort();
@@ -55,9 +55,9 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
 
   const handleSendChat = React.useCallback(
     async function (message) {
-      console.log("call handleSendChat()");
+      // console.log("call handleSendChat()");
       // console.log("openAiKey: ", openAiKey);
-      console.log("message: ", message);
+      // console.log("message: ", message);
 
       const SYSTEM_PROMPT = `From now on, you will behave and talk as a person who is on good terms with the user.
 There are five types of emotions: "neutral" indicating normal, "happy" indicating joy, "angry" indicating anger, "sad" indicating sadness, and "relaxed" indicating peace.
@@ -191,9 +191,9 @@ Let's start the conversation.`;
             setAvatarExpressionFuncRef.current({ expression: expression });
             //* After utterance speaking finished, make an expression neutral.
             utterance.onend = (event) => {
-              console.log(
-                `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
-              );
+              // console.log(
+              //   `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
+              // );
               sleep(3000).then(() =>
                 setAvatarExpressionFuncRef.current({ expression: "Neutral" })
               );
