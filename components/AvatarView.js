@@ -42,6 +42,7 @@ function AvatarView({
   };
   const IMAGE_SNAPSHOT_WIDTH = 1024;
   const IMAGE_SNAPSHOT_HEIGHT = 1024;
+  const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -391,7 +392,7 @@ function AvatarView({
     // console.log("url: ", url);
 
     //* TODO: Block the usage of Three.js library.
-    if (process.env.NEXT_PUBLIC_SERVICE_MODE === "avame") {
+    if (SERVICE_MODE === "avame") {
       makeScene();
       await loadGltf({ url });
       return;
@@ -624,7 +625,7 @@ function AvatarView({
     gltfLoader.load(
       url,
       function (gltf) {
-        // console.log("gltf.userData.vrm: ", gltf.userData.vrm);
+        console.log("gltf.userData.vrm: ", gltf.userData.vrm);
 
         if (gltf.userData.vrm) {
           currentVrmRef.current = gltf.userData.vrm;
@@ -681,7 +682,7 @@ function AvatarView({
         //* Set camera setting.
         adjustCamera({ gltf: currentGltfData.current });
 
-        // console.log("Loading hidden when gltf loaidng finished.");
+        console.log("Loading hidden when gltf loaidng finished.");
         setShowGltfLoadingProgress("hidden");
       },
       function (xhr) {
@@ -818,11 +819,13 @@ function AvatarView({
         ref={avatarCanvasRef}
       />
       <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
-      <div ref={backdropRef}>
-        <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      </div>
+      {SERVICE_MODE !== "avame" && (
+        <div ref={backdropRef}>
+          <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </div>
+      )}
 
       {showGuideCanvas ? (
         <Box
