@@ -32,6 +32,7 @@ function AvatarView({
   showFrameStats = false,
   useMotionUpdate = true,
   setAvatarExpressionFuncRef,
+  setTalkFuncRef,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -51,6 +52,7 @@ function AvatarView({
   // visibility: hidden or visible
   const [showGltfLoadingProgress, setShowGltfLoadingProgress] =
     React.useState("hidden");
+  const [isTalking, setIsTalking] = React.useState(false);
 
   //*---------------------------------------------------------------------------
   //* Mesh transfomation data.
@@ -147,12 +149,19 @@ function AvatarView({
     if (setAvatarExpressionFuncRef) {
       setAvatarExpressionFuncRef.current = setAvatarExpression;
     }
+    setTalkFuncRef.current = handleIsTalking;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
     setAvatarPositionFunc,
   ]);
+
+  function handleIsTalking(talking) {
+    console.log("call handleIsTalking()");
+    console.log("talking: ", talking);
+    setIsTalking(talking);
+  }
 
   function getV3dCoreFunc() {
     return v3dCoreRef.current;
@@ -574,7 +583,7 @@ function AvatarView({
     sceneRef.current.environment =
       pmremGenerator.fromScene(environment).texture;
 
-    //* Make control instance.
+    //* TODO: Make control instance.
     // orbitControlsRef.current = new STDLIB.OrbitControls(
     //   orbitCameraRef.current,
     //   rendererRef.current.domElement
@@ -630,7 +639,7 @@ function AvatarView({
         if (gltf.userData.vrm) {
           currentVrmRef.current = gltf.userData.vrm;
           // console.log("currentVrmRef.current: ", currentVrmRef.current);
-          // ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
+          ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
           //* Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
@@ -656,6 +665,23 @@ function AvatarView({
           // );
           // console.log("expressionName: ", expressionName);
           // console.log("expressions: ", expressionManager.expressions);
+
+          //* Cancel T-pose.
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["RightUpperArm"]
+          ).rotation.z = 250;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["RightLowerArm"]
+          ).rotation.z = -0.2;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["LeftUpperArm"]
+          ).rotation.z = -250;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["LeftLowerArm"]
+          ).rotation.z = 0.2;
         }
 
         //* Keep gltf data to loadedGltfData variable.

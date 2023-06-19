@@ -11,7 +11,10 @@ import SendIcon from "@mui/icons-material/Send";
 import { Z_INDEX } from "@/components/RealBitsUtil";
 import { Typography } from "@mui/material";
 
-export default function ChatMessage({ setAvatarExpressionFuncRef }) {
+export default function ChatMessage({
+  setAvatarExpressionFuncRef,
+  setTalkFuncRef,
+}) {
   const [chatProcessing, setChatProcessing] = React.useState(false);
   const [chatMessage, setChatMessage] = React.useState("");
   const [assistantMessage, setAssistantMessage] = React.useState("");
@@ -190,10 +193,20 @@ Let's start the conversation.`;
             // console.log("expression: ", expression);
             setAvatarExpressionFuncRef.current({ expression: expression });
             //* After utterance speaking finished, make an expression neutral.
+            utterance.onstart = (event) => {
+              if (setTalkFuncRef.current) {
+                setTalkFuncRef.current(true);
+              }
+            };
             utterance.onend = (event) => {
               // console.log(
               //   `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
               // );
+
+              if (setTalkFuncRef.current) {
+                setTalkFuncRef.current(false);
+              }
+
               sleep(3000).then(() =>
                 setAvatarExpressionFuncRef.current({ expression: "Neutral" })
               );
