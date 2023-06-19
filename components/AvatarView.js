@@ -110,8 +110,8 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
-    console.log("call useEffect()");
-    console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+    // console.log("call useEffect()");
+    // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
 
     async function initialize() {
       await initializeAvatarContent({
@@ -281,7 +281,7 @@ function AvatarView({
   }
 
   function getImageDataUrl() {
-    console.log("call getImageDataUrl()");
+    // console.log("call getImageDataUrl()");
 
     return avatarCanvasRef.current.toDataURL();
 
@@ -296,7 +296,7 @@ function AvatarView({
 
     //* Get an original canvas.
     const avatarCanvasElement = document.getElementById("avatarCanvas");
-    console.log("avatarCanvasElement: ", avatarCanvasElement);
+    // console.log("avatarCanvasElement: ", avatarCanvasElement);
 
     resizedContext.drawImage(
       // avatarCanvasElement,
@@ -307,7 +307,7 @@ function AvatarView({
       resizedCanvas.height
     );
     const myResizedData = resizedCanvas.toDataURL();
-    console.log("myResizedData: ", myResizedData);
+    // console.log("myResizedData: ", myResizedData);
 
     // return avatarCanvasElement.toDataURL();
     return myResizedData;
@@ -327,14 +327,14 @@ function AvatarView({
   }
 
   function setAvatarExpression({ expression }) {
-    console.log("call setAvatarExpression()");
-    console.log("expression: ", expression);
-    console.log("typeof expression: ", typeof expression);
+    // console.log("call setAvatarExpression()");
+    // console.log("expression: ", expression);
+    // console.log("typeof expression: ", typeof expression);
 
     if (v3dCoreRef.current) {
-      console.log("v3dCoreRef.current: ", v3dCoreRef.current);
+      // console.log("v3dCoreRef.current: ", v3dCoreRef.current);
       const vrmManager = v3dCoreRef.current.getVRMManagerByURI("default.vrm");
-      console.log("vrmManager: ", vrmManager);
+      // console.log("vrmManager: ", vrmManager);
 
       // Update expression
       resetExpressions();
@@ -386,9 +386,9 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url, useMotionUpdate }) {
-    console.log("call initializeAvatarContent()");
-    console.log("v3dWebRef.current: ", v3dWebRef.current);
-    console.log("url: ", url);
+    // console.log("call initializeAvatarContent()");
+    // console.log("v3dWebRef.current: ", v3dWebRef.current);
+    // console.log("url: ", url);
 
     //* TODO: Block the usage of Three.js library.
     // makeScene();
