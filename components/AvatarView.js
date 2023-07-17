@@ -53,6 +53,7 @@ function AvatarView({
   const [showGltfLoadingProgress, setShowGltfLoadingProgress] =
     React.useState("hidden");
   const isTalkingRef = React.useRef(false);
+  const mouthLevelRef = React.useRef(0);
 
   //*---------------------------------------------------------------------------
   //* Mesh transfomation data.
@@ -112,9 +113,86 @@ function AvatarView({
   const WHITE_COLOR_HEX = 0xffffff;
   const CIRCULAR_PROGRESS_SIZE = 112;
 
+  async function initializeAudio() {
+    let talktime = true;
+    let mouththreshold = 10;
+    let mouthboost = 10;
+
+    // mic listener - get a value
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+      })
+      .then(function (stream) {
+        let audioContext = new AudioContext();
+        let analyser = audioContext.createAnalyser();
+        let microphone = audioContext.createMediaStreamSource(stream);
+        let javascriptNode = audioContext.createScriptProcessor(256, 1, 1);
+
+        analyser.smoothingTimeConstant = 0.5;
+        analyser.fftSize = 1024;
+
+        microphone.connect(analyser);
+        analyser.connect(javascriptNode);
+        javascriptNode.connect(audioContext.destination);
+
+        javascriptNode.onaudioprocess = function () {
+          let array = new Uint8Array(analyser.frequencyBinCount);
+          analyser.getByteFrequencyData(array);
+          let values = 0;
+
+          let length = array.length;
+          for (let i = 0; i < length; i++) {
+            values += array[i];
+          }
+
+          // audio in expressed as one number
+          let average = values / length;
+          let inputvolume = average;
+
+          // audio in spectrum expressed as array
+          // console.log(array.toString());
+          // useful for mouth shape variance
+
+          // move the interface slider
+          document.getElementById("inputlevel").value = inputvolume;
+
+          // mic based / endless animations (do stuff)
+
+          if (currentVrmRef.current != undefined) {
+            //best to be sure
+
+            // talk
+
+            if (talktime == true) {
+              // todo: more vowelshapes
+              let voweldamp = 53;
+              let vowelmin = 12;
+              const mouthValue =
+                ((average - vowelmin) / voweldamp) * (mouthboost / 10);
+              mouthLevelRef.current = mouthValue;
+              if (inputvolume > mouththreshold * 2) {
+                currentVrmRef.current?.expressionManager?.setValue(
+                  ThreeVrm.VRMExpressionPresetName.Aa,
+                  mouthValue
+                );
+              } else {
+                currentVrmRef.current?.expressionManager?.setValue(
+                  ThreeVrm.VRMExpressionPresetName.Aa,
+                  0
+                );
+              }
+            }
+          }
+        };
+      });
+  }
+
   React.useEffect(() => {
     // console.log("call useEffect()");
     // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+
+    initializeAudio();
 
     async function initialize() {
       await initializeAvatarContent({
@@ -812,6 +890,10 @@ function AvatarView({
         0
       );
     }
+    currentVrmRef.current.expressionManager.setValue(
+      ThreeVrm.VRMExpressionPresetName.Aa,
+      mouthLevelRef.current
+    );
 
     //* Update vrm.
     if (currentVrmRef.current) {
@@ -884,6 +966,15 @@ function AvatarView({
           <canvas id="guideCanvas" ref={guideCanvasRef} />
         </Box>
       ) : null}
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value="10"
+        class="slider"
+        id="inputlevel"
+      />
 
       {/* <HolisticData currentVrmRef={currentVrmRef} /> */}
 
