@@ -2,57 +2,74 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-## Install package
+Chat with avatar with motion capture technology. Rent avatar with web3 nft rent market.
 
-- npm install --legacy-peer-deps
-- Add "legacy-peer-deps=true" to .npmrc
+## Getting Started
 
-## Build in heroku
+## Goal
 
-### Login
+- We will let every programmar build avatar service with motion capture and web3 rent payment technology.
 
-- heroku login
+## Installing
 
-### Set heroku remote
+```
+npm install --legacy-peer-deps
+```
 
-- heroku git:remote --app [app_name]
+## Deployment
 
-### Push heroku
+### Login heroku cloud
 
-- git push heroku [branch_name]:master
+```
+heroku login
+```
 
-### Log heroku
+### Set app to heroku cloud
 
-- heroku logs --tail --app [app_name]
-
-## Setting in heorku
+```
+heroku git:remote --app [app_name]
+```
 
 ### List config heroku
 
-- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
+heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
 
 ### Set config heroku
 
-- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
+heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
 
 ### Set build with cache in heroku
 
-- heroku config:set NODE_MODULES_CACHE=true --app [app_name]
+```
+heroku config:set NODE_MODULES_CACHE=true --app [app_name]
+```
 
-### Shell in heroku
+### Push source code to heroku cloud
 
-- heroku ps:exec
+```
+git push heroku [branch_name]:master
+```
 
-### App in heroku
+### Watch heroku log
 
-- heroku apps
-- heroku apps:info (--app [app_name])
+```
+heroku logs --tail --app [app_name]
+```
 
-### SSL in heroku
+## Contributing
 
-- https://www.whynopadlock.com/
-- [Force SSL/HTTPS on Next.js with Heroku](https://medium.com/@tpae/enabling-ssl-https-on-next-js-with-heroku-55d0c6ce8516)
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## v3d compatibility
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+### v3d compatibility
 
 - Install @babylongjs 5.0.0 version package
