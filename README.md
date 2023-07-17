@@ -4,15 +4,15 @@
 
 Chat with avatar with motion capture technology. Rent avatar with web3 nft rent market.
 
-## Getting Started
-
 ## Goal
 
 - We will let every programmar build avatar service with motion capture and web3 rent payment technology.
 
+## Getting Started
+
 ## Installing
 
-```
+```bash
 npm install --legacy-peer-deps
 ```
 
@@ -20,43 +20,43 @@ npm install --legacy-peer-deps
 
 ### Login heroku cloud
 
-```
+```bash
 heroku login
 ```
 
 ### Set app to heroku cloud
 
-```
+```bash
 heroku git:remote --app [app_name]
 ```
 
 ### List config heroku
 
-```
+```bash
 heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
 ```
 
 ### Set config heroku
 
-```
+```bash
 heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
 ```
 
 ### Set build with cache in heroku
 
-```
+```bash
 heroku config:set NODE_MODULES_CACHE=true --app [app_name]
 ```
 
 ### Push source code to heroku cloud
 
-```
+```bash
 git push heroku [branch_name]:master
 ```
 
 ### Watch heroku log
 
-```
+```bash
 heroku logs --tail --app [app_name]
 ```
 
