@@ -14,6 +14,7 @@ import {
   humanFileSize,
 } from "@/components/RealBitsUtil";
 import { loadVRMAnimation } from "@/lib/VRMAnimation/loadVRMAnimation";
+import { VRMLookAtSmootherLoaderPlugin } from "@/lib/VRMLookAtSmootherLoaderPlugin/VRMLookAtSmootherLoaderPlugin";
 import HolisticData from "@/components/HolisticData";
 const StatsWithNoSSR = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
@@ -634,6 +635,13 @@ function AvatarView({
     gltfLoader.register((parser) => {
       return new ThreeVrm.VRMLoaderPlugin(parser);
     });
+
+    gltfLoader.register(
+      (parser) =>
+        new ThreeVrm.VRMLoaderPlugin(parser, {
+          lookAtPlugin: new VRMLookAtSmootherLoaderPlugin(parser),
+        })
+    );
 
     //* Load gltf data.
     gltfLoader.load(
