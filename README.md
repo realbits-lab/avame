@@ -1,54 +1,76 @@
-# Install package
+# Avame
 
-- npm install --legacy-peer-deps
-- Add "legacy-peer-deps=true" to .npmrc
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+<a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" /></a>
 
-# Build in heroku
+Chat with avatar with motion capture technology. Rent avatar with web3 nft rent market.
 
-## Login
+## Goal
 
-- heroku login
+- We will let every programmar build avatar service with motion capture and web3 rent payment technology.
 
-## Set heroku remote
+## Getting Started
 
-- heroku git:remote --app [app_name]
+## Installing
 
-## Push heroku
+```bash
+npm install --legacy-peer-deps
+```
 
-- git push heroku [branch_name]:master
+## Deployment
 
-## Log heroku
+### Login heroku cloud
 
-- heroku logs --tail --app [app_name]
+```bash
+heroku login
+```
 
-# Setting in heorku
+### Set app to heroku cloud
 
-## List config heroku
+```bash
+heroku git:remote --app [app_name]
+```
 
-- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+### List config heroku
 
-## Set config heroku
+```bash
+heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
 
-- heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+### Set config heroku
 
-## Set build with cache in heroku
+```bash
+heroku config:set GITHUB_USERNAME=joesmith --app [app_name]
+```
 
-- heroku config:set NODE_MODULES_CACHE=true --app [app_name]
+### Set build with cache in heroku
 
-## Shell in heroku
+```bash
+heroku config:set NODE_MODULES_CACHE=true --app [app_name]
+```
 
-- heroku ps:exec
+### Push source code to heroku cloud
 
-## App in heroku
+```bash
+git push heroku [branch_name]:master
+```
 
-- heroku apps
-- heroku apps:info (--app [app_name])
+### Watch heroku log
 
-## SSL in heroku
+```bash
+heroku logs --tail --app [app_name]
+```
 
-- https://www.whynopadlock.com/
-- [Force SSL/HTTPS on Next.js with Heroku](https://medium.com/@tpae/enabling-ssl-https-on-next-js-with-heroku-55d0c6ce8516)
+## Contributing
 
-# v3d compatibility
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+### v3d compatibility
 
 - Install @babylongjs 5.0.0 version package

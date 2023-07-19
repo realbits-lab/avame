@@ -28,6 +28,7 @@ export default function Service() {
   //* Variable references.
   //*---------------------------------------------------------------------------
   const rentMarketRef = React.useRef();
+  const setTalkFuncRef = React.useRef();
 
   //*---------------------------------------------------------------------------
   //* Function references.
@@ -79,7 +80,10 @@ export default function Service() {
         {/* //*----------------------------------------------------------------*/}
         {/* //* ChatMessage component.                                         */}
         {/* //*----------------------------------------------------------------*/}
-        <ChatMessage setAvatarExpressionFuncRef={setAvatarExpressionFuncRef} />
+        <ChatMessage
+          setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}
+          setTalkFuncRef={setTalkFuncRef}
+        />
 
         {/* //*----------------------------------------------------------------*/}
         {/* //* RentContent component.                                         */}
@@ -114,6 +118,7 @@ export default function Service() {
           // ScreenView -> AvatarView call for changing avatar canvas position.
           setAvatarPositionFunc={setAvatarPositionFuncRef}
           setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}
+          setTalkFuncRef={setTalkFuncRef}
         />
 
         {/*//*-----------------------------------------------------------------*/}

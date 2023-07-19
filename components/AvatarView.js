@@ -32,6 +32,7 @@ function AvatarView({
   showFrameStats = false,
   useMotionUpdate = true,
   setAvatarExpressionFuncRef,
+  setTalkFuncRef,
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -42,6 +43,7 @@ function AvatarView({
   };
   const IMAGE_SNAPSHOT_WIDTH = 1024;
   const IMAGE_SNAPSHOT_HEIGHT = 1024;
+  const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -50,6 +52,8 @@ function AvatarView({
   // visibility: hidden or visible
   const [showGltfLoadingProgress, setShowGltfLoadingProgress] =
     React.useState("hidden");
+  const isTalkingRef = React.useRef(false);
+  const mouthLevelRef = React.useRef(0);
 
   //*---------------------------------------------------------------------------
   //* Mesh transfomation data.
@@ -76,6 +80,7 @@ function AvatarView({
   const currentCanvasPositionRef = React.useRef(ScreenPosition.center);
   const currentAvatarPositionRef = React.useRef(ScreenPosition.center);
   const currentScreenVideoStreamRef = React.useRef();
+  const volumeRef = React.useRef(0);
 
   //* type: ThreeVrm.VRM
   const currentVrmRef = React.useRef();
@@ -110,8 +115,8 @@ function AvatarView({
   const CIRCULAR_PROGRESS_SIZE = 112;
 
   React.useEffect(() => {
-    console.log("call useEffect()");
-    console.log("inputGltfDataUrl: ", inputGltfDataUrl);
+    // console.log("call useEffect()");
+    // console.log("inputGltfDataUrl: ", inputGltfDataUrl);
 
     async function initialize() {
       await initializeAvatarContent({
@@ -146,12 +151,20 @@ function AvatarView({
     if (setAvatarExpressionFuncRef) {
       setAvatarExpressionFuncRef.current = setAvatarExpression;
     }
+    setTalkFuncRef.current = handleIsTalking;
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
     getMediaStreamFunc,
     setAvatarPositionFunc,
   ]);
+
+  function handleIsTalking({ talking, volume = 0 }) {
+    // console.log("call handleIsTalking()");
+    // console.log("talking: ", talking);
+    isTalkingRef.current = talking;
+    volumeRef.current = volume;
+  }
 
   function getV3dCoreFunc() {
     return v3dCoreRef.current;
@@ -281,7 +294,7 @@ function AvatarView({
   }
 
   function getImageDataUrl() {
-    console.log("call getImageDataUrl()");
+    // console.log("call getImageDataUrl()");
 
     return avatarCanvasRef.current.toDataURL();
 
@@ -296,7 +309,7 @@ function AvatarView({
 
     //* Get an original canvas.
     const avatarCanvasElement = document.getElementById("avatarCanvas");
-    console.log("avatarCanvasElement: ", avatarCanvasElement);
+    // console.log("avatarCanvasElement: ", avatarCanvasElement);
 
     resizedContext.drawImage(
       // avatarCanvasElement,
@@ -307,7 +320,7 @@ function AvatarView({
       resizedCanvas.height
     );
     const myResizedData = resizedCanvas.toDataURL();
-    console.log("myResizedData: ", myResizedData);
+    // console.log("myResizedData: ", myResizedData);
 
     // return avatarCanvasElement.toDataURL();
     return myResizedData;
@@ -327,14 +340,14 @@ function AvatarView({
   }
 
   function setAvatarExpression({ expression }) {
-    console.log("call setAvatarExpression()");
-    console.log("expression: ", expression);
-    console.log("typeof expression: ", typeof expression);
+    // console.log("call setAvatarExpression()");
+    // console.log("expression: ", expression);
+    // console.log("typeof expression: ", typeof expression);
 
     if (v3dCoreRef.current) {
-      console.log("v3dCoreRef.current: ", v3dCoreRef.current);
+      // console.log("v3dCoreRef.current: ", v3dCoreRef.current);
       const vrmManager = v3dCoreRef.current.getVRMManagerByURI("default.vrm");
-      console.log("vrmManager: ", vrmManager);
+      // console.log("vrmManager: ", vrmManager);
 
       // Update expression
       resetExpressions();
@@ -386,13 +399,16 @@ function AvatarView({
   //* Initialize data.
   //*---------------------------------------------------------------------------
   async function initializeAvatarContent({ url, useMotionUpdate }) {
-    console.log("call initializeAvatarContent()");
-    console.log("v3dWebRef.current: ", v3dWebRef.current);
-    console.log("url: ", url);
+    // console.log("call initializeAvatarContent()");
+    // console.log("v3dWebRef.current: ", v3dWebRef.current);
+    // console.log("url: ", url);
 
     //* TODO: Block the usage of Three.js library.
-    // makeScene();
-    // await loadGltf({ url });
+    if (SERVICE_MODE === "avame") {
+      makeScene();
+      await loadGltf({ url });
+      return;
+    }
 
     //* If we already drew model, just change the model url.
     if (v3dWebRef.current) {
@@ -570,7 +586,7 @@ function AvatarView({
     sceneRef.current.environment =
       pmremGenerator.fromScene(environment).texture;
 
-    //* Make control instance.
+    //* TODO: Make control instance.
     // orbitControlsRef.current = new STDLIB.OrbitControls(
     //   orbitCameraRef.current,
     //   rendererRef.current.domElement
@@ -621,12 +637,12 @@ function AvatarView({
     gltfLoader.load(
       url,
       function (gltf) {
-        // console.log("gltf.userData.vrm: ", gltf.userData.vrm);
+        console.log("gltf.userData.vrm: ", gltf.userData.vrm);
 
         if (gltf.userData.vrm) {
           currentVrmRef.current = gltf.userData.vrm;
           // console.log("currentVrmRef.current: ", currentVrmRef.current);
-          // ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
+          ThreeVrm.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
           //* Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
@@ -652,6 +668,23 @@ function AvatarView({
           // );
           // console.log("expressionName: ", expressionName);
           // console.log("expressions: ", expressionManager.expressions);
+
+          //* Cancel T-pose.
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["RightUpperArm"]
+          ).rotation.z = 250;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["RightLowerArm"]
+          ).rotation.z = -0.2;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["LeftUpperArm"]
+          ).rotation.z = -250;
+
+          currentVrmRef.current.humanoid.getNormalizedBoneNode(
+            ThreeVrm.VRMHumanBoneName["LeftLowerArm"]
+          ).rotation.z = 0.2;
         }
 
         //* Keep gltf data to loadedGltfData variable.
@@ -678,7 +711,7 @@ function AvatarView({
         //* Set camera setting.
         adjustCamera({ gltf: currentGltfData.current });
 
-        // console.log("Loading hidden when gltf loaidng finished.");
+        console.log("Loading hidden when gltf loaidng finished.");
         setShowGltfLoadingProgress("hidden");
       },
       function (xhr) {
@@ -770,6 +803,32 @@ function AvatarView({
   function renderAvatar() {
     // console.log("call renderAvatar()");
 
+    //* Calculate mouth openness value.
+    if (isTalkingRef.current == true) {
+      // todo: more vowelshapes
+      const mouththreshold = 10;
+      const mouthboost = 10;
+      let voweldamp = 53;
+      let vowelmin = 12;
+
+      const mouthValue =
+        ((volumeRef.current - vowelmin) / voweldamp) * (mouthboost / 10);
+
+      mouthLevelRef.current = mouthValue;
+
+      if (volumeRef.current > mouththreshold * 2) {
+        currentVrmRef.current?.expressionManager?.setValue(
+          ThreeVrm.VRMExpressionPresetName.Aa,
+          mouthValue
+        );
+      } else {
+        currentVrmRef.current?.expressionManager?.setValue(
+          ThreeVrm.VRMExpressionPresetName.Aa,
+          0
+        );
+      }
+    }
+
     //* Update vrm.
     if (currentVrmRef.current) {
       currentVrmRef.current.update(deltaRef.current);
@@ -815,11 +874,13 @@ function AvatarView({
         ref={avatarCanvasRef}
       />
       <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
-      <div ref={backdropRef}>
-        <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      </div>
+      {SERVICE_MODE !== "avame" && (
+        <div ref={backdropRef}>
+          <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </div>
+      )}
 
       {showGuideCanvas ? (
         <Box

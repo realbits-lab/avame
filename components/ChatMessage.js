@@ -11,7 +11,10 @@ import SendIcon from "@mui/icons-material/Send";
 import { Z_INDEX } from "@/components/RealBitsUtil";
 import { Typography } from "@mui/material";
 
-export default function ChatMessage({ setAvatarExpressionFuncRef }) {
+export default function ChatMessage({
+  setAvatarExpressionFuncRef,
+  setTalkFuncRef,
+}) {
   const [chatProcessing, setChatProcessing] = React.useState(false);
   const [chatMessage, setChatMessage] = React.useState("");
   const [assistantMessage, setAssistantMessage] = React.useState("");
@@ -22,7 +25,7 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
   const [isMicRecording, setIsMicRecording] = React.useState(false);
 
   const captureKeyDown = React.useCallback((event) => {
-    console.log("event.key: ", event.key);
+    // console.log("event.key: ", event.key);
     // console.log("document.activeElement: ", document.activeElement);
     if (event.key === "Tab") {
       if (isMessageInputFocusedRef.current === false) {
@@ -40,7 +43,7 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
   }, []);
 
   const handleClickMicButton = React.useCallback(() => {
-    console.log("call handleClickMicButton()");
+    // console.log("call handleClickMicButton()");
 
     if (isMicRecording) {
       speechRecognition?.abort();
@@ -55,9 +58,9 @@ export default function ChatMessage({ setAvatarExpressionFuncRef }) {
 
   const handleSendChat = React.useCallback(
     async function (message) {
-      console.log("call handleSendChat()");
+      // console.log("call handleSendChat()");
       // console.log("openAiKey: ", openAiKey);
-      console.log("message: ", message);
+      // console.log("message: ", message);
 
       const SYSTEM_PROMPT = `From now on, you will behave and talk as a person who is on good terms with the user.
 There are five types of emotions: "neutral" indicating normal, "happy" indicating joy, "angry" indicating anger, "sad" indicating sadness, and "relaxed" indicating peace.
@@ -175,11 +178,6 @@ Let's start the conversation.`;
             aiTextLog += aiText;
             // console.log("aiTextLog: ", aiTextLog);
 
-            //* Generate & play audio for each sentence.
-            let utterance = new SpeechSynthesisUtterance(sentence);
-            utterance.rate = 0.9;
-            // console.log("utterance: ", utterance);
-
             const expressionMatch = tag.match(/^\[(.*?)\]$/);
             let expression = "Neutral";
             // console.log("expressionMatch: ", expressionMatch);
@@ -189,16 +187,9 @@ Let's start the conversation.`;
 
             // console.log("expression: ", expression);
             setAvatarExpressionFuncRef.current({ expression: expression });
-            //* After utterance speaking finished, make an expression neutral.
-            utterance.onend = (event) => {
-              console.log(
-                `Utterance has finished being spoken after ${event.elapsedTime} seconds.`
-              );
-              sleep(3000).then(() =>
-                setAvatarExpressionFuncRef.current({ expression: "Neutral" })
-              );
-            };
-            window.speechSynthesis.speak(utterance);
+
+            //* Start voice speaking.
+            startUtterance({ sentence: sentence });
           }
         }
       } catch (e) {
@@ -268,6 +259,105 @@ Let's start the conversation.`;
     },
     [captureKeyDown]
   );
+
+  async function startUtterance({ sentence = "" }) {
+    if (sentence === "") throw new Error("no words to synthesize");
+
+    //* Get audio ouput stream.
+    const audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const audioOutput = devices.find((device) => device.kind == "audiooutput");
+    // console.log("audioOutput: ", audioOutput);
+
+    audioStream.getTracks().forEach((track) => track.stop());
+
+    let audioOutputStream;
+    if (audioOutput) {
+      const constraints = {
+        deviceId: {
+          exact: audioOutput.deviceId,
+        },
+      };
+      audioOutputStream = await navigator.mediaDevices.getUserMedia({
+        audio: constraints,
+      });
+    } else {
+      audioOutputStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+    }
+
+    //* Set audio context event.
+    let audioContext = new AudioContext();
+    let analyser = audioContext.createAnalyser();
+    let recoderSource = audioContext.createMediaStreamSource(audioOutputStream);
+
+    let javascriptNode = audioContext.createScriptProcessor(256, 1, 1);
+
+    analyser.smoothingTimeConstant = 0.5;
+    analyser.fftSize = 1024;
+
+    recoderSource.connect(analyser);
+    analyser.connect(javascriptNode);
+    javascriptNode.connect(audioContext.destination);
+
+    javascriptNode.onaudioprocess = function () {
+      let array = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(array);
+      let values = 0;
+
+      let length = array.length;
+      for (let i = 0; i < length; i++) {
+        values += array[i];
+      }
+
+      // audio in expressed as one number
+      let average = values / length;
+      let outputVolume = average;
+      // console.log("outputVolume: ", outputVolume);
+
+      if (setTalkFuncRef.current) {
+        setTalkFuncRef.current({ talking: true, volume: outputVolume });
+      }
+    };
+
+    const utterance = new SpeechSynthesisUtterance(sentence);
+    const speechSynthesis = window.speechSynthesis;
+
+		utterance.rate = 0.9;
+    utterance.onstart = () => {
+      if (setTalkFuncRef.current) {
+        setTalkFuncRef.current({ talking: true });
+      }
+
+      // console.log(
+      //   `Starting recording SpeechSynthesisUtterance ${utterance.text}`
+      // );
+    };
+
+    utterance.onend = () => {
+      audioContext.close();
+
+      if (setTalkFuncRef.current) {
+        setTalkFuncRef.current({ talking: false });
+      }
+
+      sleep(3000).then(() =>
+        setAvatarExpressionFuncRef.current({ expression: "Neutral" })
+      );
+
+      // console.log(
+      //   `Ending recording SpeechSynthesisUtterance ${utterance.text}`
+      // );
+    };
+
+    speechSynthesis.speak(utterance);
+
+    return;
+  }
 
   async function getChatResponseStream(messages) {
     const OPENAI_KEY = process.env.NEXT_PUBLIC_OPENAI_KEY;
