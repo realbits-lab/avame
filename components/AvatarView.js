@@ -13,6 +13,7 @@ import {
   Z_INDEX,
   humanFileSize,
 } from "@/components/RealBitsUtil";
+import { loadVRMAnimation } from "@/lib/VRMAnimation/loadVRMAnimation";
 import HolisticData from "@/components/HolisticData";
 const StatsWithNoSSR = loadable.lib(
   () => import("three/examples/jsm/libs/stats.module.js"),
@@ -81,6 +82,7 @@ function AvatarView({
   const currentAvatarPositionRef = React.useRef(ScreenPosition.center);
   const currentScreenVideoStreamRef = React.useRef();
   const volumeRef = React.useRef(0);
+  const mixerRef = React.useRef();
 
   //* type: ThreeVrm.VRM
   const currentVrmRef = React.useRef();
@@ -587,27 +589,27 @@ function AvatarView({
       pmremGenerator.fromScene(environment).texture;
 
     //* TODO: Make control instance.
-    // orbitControlsRef.current = new STDLIB.OrbitControls(
-    //   orbitCameraRef.current,
-    //   rendererRef.current.domElement
-    // );
-    // orbitControlsRef.current.mouseButtons = {
-    //   LEFT: THREE.MOUSE.RIGHT,
-    //   MIDDLE: THREE.MOUSE.PAN,
-    //   RIGHT: THREE.MOUSE.ROTATE,
-    // };
-    // orbitControlsRef.current.enableDamping = ORBIT_CONTROL_ENABLE_DUMPING;
-    // orbitControlsRef.current.minDistance = ORBIT_CONTROL_MIN_DISTANCE;
-    // orbitControlsRef.current.maxDistance = ORBIT_CONTROL_MAX_DISTANCE;
-    // orbitControlsRef.current.minAzimuthAngle = ORBIT_CONTROL_MIN_AZIMUTH_ANGLE;
-    // orbitControlsRef.current.maxAzimuthAngle = ORBIT_CONTROL_MAX_AZIMUTH_ANGLE;
-    // orbitControlsRef.current.maxPolarAngle = ORBIT_CONTROL_MAX_POLAR_ANGLE;
+    orbitControlsRef.current = new STDLIB.OrbitControls(
+      orbitCameraRef.current,
+      rendererRef.current.domElement
+    );
+    orbitControlsRef.current.mouseButtons = {
+      LEFT: THREE.MOUSE.RIGHT,
+      MIDDLE: THREE.MOUSE.PAN,
+      RIGHT: THREE.MOUSE.ROTATE,
+    };
+    orbitControlsRef.current.enableDamping = ORBIT_CONTROL_ENABLE_DUMPING;
+    orbitControlsRef.current.minDistance = ORBIT_CONTROL_MIN_DISTANCE;
+    orbitControlsRef.current.maxDistance = ORBIT_CONTROL_MAX_DISTANCE;
+    orbitControlsRef.current.minAzimuthAngle = ORBIT_CONTROL_MIN_AZIMUTH_ANGLE;
+    orbitControlsRef.current.maxAzimuthAngle = ORBIT_CONTROL_MAX_AZIMUTH_ANGLE;
+    orbitControlsRef.current.maxPolarAngle = ORBIT_CONTROL_MAX_POLAR_ANGLE;
 
-    // orbitControlsRef.current.target.set(
-    //   currentOrbitCameraPositionXRef.current,
-    //   currentOrbitCameraPositionYRef.current,
-    //   currentOrbitCameraPositionZRef.current
-    // );
+    orbitControlsRef.current.target.set(
+      currentOrbitCameraPositionXRef.current,
+      currentOrbitCameraPositionYRef.current,
+      currentOrbitCameraPositionZRef.current
+    );
   }
 
   async function loadGltf({ url }) {
@@ -636,7 +638,7 @@ function AvatarView({
     //* Load gltf data.
     gltfLoader.load(
       url,
-      function (gltf) {
+      async function (gltf) {
         console.log("gltf.userData.vrm: ", gltf.userData.vrm);
 
         if (gltf.userData.vrm) {
@@ -646,7 +648,7 @@ function AvatarView({
 
           //* Rotate model 180deg to face camera
           // https://github.com/pixiv/three-vrm/blob/dev/docs/migration-guide-1.0.md
-          // ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
+          ThreeVrm.VRMUtils.rotateVRM0(currentVrmRef.current);
 
           //* Add vrm model to scene.
           // currentVrmRef.current.humanoid.autoUpdateHumanBones = false;
@@ -685,6 +687,15 @@ function AvatarView({
           currentVrmRef.current.humanoid.getNormalizedBoneNode(
             ThreeVrm.VRMHumanBoneName["LeftLowerArm"]
           ).rotation.z = 0.2;
+
+          //* Add VRM idle animation.
+          const vrmAnimation = await loadVRMAnimation("/idle_loop.vrma");
+          const clip = vrmAnimation.createAnimationClip(currentVrmRef.current);
+          mixerRef.current = new THREE.AnimationMixer(
+            currentVrmRef.current.scene
+          );
+          const action = mixerRef.current.clipAction(clip);
+          action.play();
         }
 
         //* Keep gltf data to loadedGltfData variable.
@@ -735,6 +746,28 @@ function AvatarView({
     // console.log("call adjustCamera()");
     // console.log("gltf: ", gltf);
 
+    //* Set camera and orbit control position as to model head position.
+    const headNode =
+      currentVrmRef.current?.humanoid.getNormalizedBoneNode("head");
+
+    if (headNode) {
+      const headWPos = headNode.getWorldPosition(new THREE.Vector3());
+      // console.log("headWPos: ", headWPos);
+      // console.log(
+      //   "orbitCameraRef.current.position: ",
+      //   orbitCameraRef.current?.position
+      // );
+
+      orbitCameraRef.current?.position.set(
+        orbitCameraRef.current.position.x,
+        headWPos.y,
+        orbitCameraRef.current.position.z + 10
+      );
+
+      orbitControlsRef.current?.target.set(headWPos.x, headWPos.y, headWPos.z);
+      orbitControlsRef.current?.update();
+    }
+
     if (gltf.cameras.length > 0) {
       const camera = gltf.cameras[0];
       // console.log("camera: ", camera);
@@ -744,11 +777,6 @@ function AvatarView({
       orbitCameraRef.current.fov = camera.fov;
       orbitCameraRef.current.near = camera.near;
       orbitCameraRef.current.far = camera.far;
-      orbitCameraRef.current.position.set(
-        camera.position.x,
-        camera.position.y,
-        camera.position.z
-      );
       orbitCameraRef.current.setRotationFromQuaternion(camera.quaternion);
 
       // console.log("orbitCameraRef.current: ", orbitCameraRef.current);
@@ -838,7 +866,10 @@ function AvatarView({
     rendererRef.current.render(sceneRef.current, orbitCameraRef.current);
 
     //* Update control.
-    // orbitControlsRef.current.update();
+    orbitControlsRef.current.update(deltaRef.current);
+
+    //* Update mixer.
+    mixerRef.current.update(deltaRef.current);
   }
 
   // Z-index
