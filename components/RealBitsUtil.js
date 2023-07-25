@@ -588,6 +588,7 @@ export async function signMessage({ rentMarket, message }) {
   return response;
 }
 
+//* TODO: Change function using other functions.
 export async function isUserAllowed({ rentMarket, address }) {
   console.log("call isUserAllowed()");
   console.log("rentMarket: ", rentMarket);

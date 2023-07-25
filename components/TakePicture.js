@@ -167,6 +167,7 @@ const TakePicture = ({
                 aria-label="download"
                 onClick={async () => {
                   let response;
+                  //* TODO: Change function using other functions.
                   try {
                     response = await rentMarketRef.current.isOwnerOrRenter(
                       address
