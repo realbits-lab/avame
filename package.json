@@ -24,6 +24,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.5",
+    "@gltf-transform/core": "^3.6.0",
     "@loadable/component": "^5.15.2",
     "@metamask/detect-provider": "^2.0.0",
     "@metamask/onboarding": "^1.0.1",
@@ -89,6 +90,7 @@
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/face_mesh": "^0.4.1633559619",
     "@mediapipe/holistic": "0.5.1635989137",
+    "@types/three": "^0.155.1",
     "babylonjs-gltf2interface": "5.0.0",
     "keccak256": "^1.0.6"
   },
