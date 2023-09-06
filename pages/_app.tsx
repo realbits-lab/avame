@@ -1,20 +1,17 @@
 import type { AppProps } from "next/app";
 import { RecoilRoot } from "recoil";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider,
-} from "@web3modal/ethereum";
-import { Web3Modal } from "@web3modal/react";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 import { polygon, polygonMumbai, localhost } from "wagmi/chains";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import { getChainName } from "../components/RealBitsUtil";
-import { theme } from "../utils/theme";
-import createEmotionCache from "../utils/createEmotionCache";
-import "../styles/globals.css";
+import { getChainName } from "@/components/RealBitsUtil";
+import { theme } from "@/utils/theme";
+import createEmotionCache from "@/utils/createEmotionCache";
+import "@/styles/globals.css";
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -24,75 +21,55 @@ interface MyAppProps extends AppProps {
 const clientSideEmotionCache = createEmotionCache();
 
 const MyApp: React.FunctionComponent<MyAppProps> = (props) => {
+  const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
-  let wagmiBlockchainNetworks: any[] = [];
+  let chains: any[] = [];
   if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "matic"
   ) {
-    wagmiBlockchainNetworks = [polygon];
+    chains = [polygon];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "maticmum"
   ) {
-    wagmiBlockchainNetworks = [polygonMumbai];
+    chains = [polygonMumbai];
   } else if (
     getChainName({ chainId: process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK }) ===
     "localhost"
   ) {
-    wagmiBlockchainNetworks = [localhost];
+    chains = [localhost];
   } else {
-    wagmiBlockchainNetworks = [];
+    chains = [];
   }
 
   //* Wagmi client
   //* Use wallet connect configuration.
-  const { chains, provider, webSocketProvider } = configureChains(
-    wagmiBlockchainNetworks,
-    [
-      w3mProvider({
-        projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
-      }),
-    ]
-  );
+  const {
+    publicClient: wagmiPublicClient,
+    webSocketPublicClient: wagmiWebSocketPublicClient,
+  } = configureChains(chains, [
+    alchemyProvider({ apiKey: ALCHEMY_API_KEY }),
+    publicProvider(),
+  ]);
   //* Use alchemy configuration.
-  const wagmiClient = createClient({
+  const wagmiClient = createConfig({
     autoConnect: true,
-    connectors: w3mConnectors({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "",
-      version: 2,
-      chains: wagmiBlockchainNetworks,
-    }),
-    provider,
-    webSocketProvider,
+    connectors: [new MetaMaskConnector({ chains })],
+    publicClient: wagmiPublicClient,
+    webSocketPublicClient: wagmiWebSocketPublicClient,
   });
-
-  //* Web3Modal ethereum client.
-  const ethereumClient = new EthereumClient(
-    wagmiClient,
-    wagmiBlockchainNetworks
-  );
 
   return (
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <WagmiConfig client={wagmiClient}>
+        <WagmiConfig config={wagmiClient}>
           <RecoilRoot>
             <Component {...pageProps} />
           </RecoilRoot>
         </WagmiConfig>
-
-        <Web3Modal
-          projectId={process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!}
-          ethereumClient={ethereumClient}
-          themeVariables={{
-            "--w3m-font-family": "Roboto, sans-serif",
-            "--w3m-accent-color": "#F5841F",
-            "--w3m-z-index": "20000",
-          }}
-        />
       </ThemeProvider>
     </CacheProvider>
   );

@@ -82,7 +82,8 @@
     "utf-8-validate": "^5.0.10",
     "uuid": "^9.0.0",
     "v3d-web-realbits": "^0.0.23",
-    "wagmi": "^0.12.7"
+    "viem": "^1.10.3",
+    "wagmi": "^1.4.1"
   },
   "devDependencies": {
     "@babylonjs/core": "5.19.0",
