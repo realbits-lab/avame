@@ -1,6 +1,13 @@
 {
   "name": "avame",
   "version": "0.0.1",
+  "cacheDirectories": [
+    ".next/cache"
+  ],
+  "engines": {
+    "npm": ">=9.5.0 <9.6.0",
+    "node": ">=18.0.0 <19.0.0"
+  },
   "description": "Avatar motion capture service.",
   "license": "Apache-2.0",
   "author": {
@@ -16,7 +23,7 @@
     "dev": "next dev",
     "build": "next build",
     "start_port": "next start -p $PORT",
-    "start": "node server.js",
+    "start": "node --max-old-space-size=2048 server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -24,6 +31,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.5",
+    "@gltf-transform/core": "^3.6.0",
     "@loadable/component": "^5.15.2",
     "@metamask/detect-provider": "^2.0.0",
     "@metamask/onboarding": "^1.0.1",
@@ -74,7 +82,8 @@
     "utf-8-validate": "^5.0.10",
     "uuid": "^9.0.0",
     "v3d-web-realbits": "^0.0.23",
-    "wagmi": "^0.12.7"
+    "viem": "^1.10.3",
+    "wagmi": "^1.4.1"
   },
   "devDependencies": {
     "@babylonjs/core": "5.19.0",
@@ -89,10 +98,8 @@
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/face_mesh": "^0.4.1633559619",
     "@mediapipe/holistic": "0.5.1635989137",
+    "@types/three": "^0.155.1",
     "babylonjs-gltf2interface": "5.0.0",
     "keccak256": "^1.0.6"
-  },
-  "cacheDirectories": [
-    ".next/cache"
-  ]
+  }
 }

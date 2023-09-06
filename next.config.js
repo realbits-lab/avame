@@ -3,6 +3,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    //* Because of viem package build error.
+    ignoreBuildErrors: true,
+  },
   reactStrictMode: false,
   transpilePackages: ["kalidokit", "v3d-web-realbits", "v3d-core-realbits"],
   webpack: (config, options) => {

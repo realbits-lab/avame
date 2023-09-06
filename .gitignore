@@ -2,6 +2,9 @@
 public/upload_image
 public/upload_video
 
+# Lock files
+package-lock.json
+
 # Logs
 logs
 *.log
