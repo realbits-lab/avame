@@ -19,7 +19,9 @@ export default function Service() {
   //*---------------------------------------------------------------------------
   const AVAME_MODE = "avame";
   const AVACHAT_MODE = "avachat";
+  const AVACLO_MODE = "avaclo";
   const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
+  console.log("SERVICE_MODE: ", SERVICE_MODE);
   //* TODO: Change later.
   const DEFAULT_MODEL_PATH = "dulls.vrm";
   // const DEFAULT_MODEL_PATH =
@@ -77,6 +79,8 @@ export default function Service() {
   }
 
   function buildAvaChatService() {
+    console.log("call buildAvaChatService()");
+
     return (
       <>
         {/* //*----------------------------------------------------------------*/}
@@ -146,6 +150,8 @@ export default function Service() {
   }
 
   function buildAvaMeService() {
+    console.log("call buildAvaMeService()");
+
     return (
       <>
         {/* //*----------------------------------------------------------------*/}
@@ -227,6 +233,8 @@ export default function Service() {
   }
 
   function buildAvaCloService() {
+    console.log("call buildAvaCloService()");
+
     return (
       <>
         <AvatarSelect />
@@ -235,13 +243,13 @@ export default function Service() {
   }
 
   switch (SERVICE_MODE) {
-    case "avame":
+    case AVAME_MODE:
       return buildAvaMeService();
 
-    case "avaclo":
+    case AVACLO_MODE:
       return buildAvaCloService();
 
-    case "avachat":
+    case AVACHAT_MODE:
     default:
       return buildAvaChatService();
   }
