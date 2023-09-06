@@ -155,7 +155,9 @@ function AvatarView({
     if (setAvatarExpressionFuncRef) {
       setAvatarExpressionFuncRef.current = setAvatarExpression;
     }
-    setTalkFuncRef.current = handleIsTalking;
+    if (setTalkFuncRef) {
+      setTalkFuncRef.current = handleIsTalking;
+    }
   }, [
     inputGltfDataUrl,
     getImageDataUrlFunc,
