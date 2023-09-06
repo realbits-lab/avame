@@ -17,9 +17,11 @@ export default function Service() {
   //*---------------------------------------------------------------------------
   //* Constant variables.
   //*---------------------------------------------------------------------------
+  const AVAME_MODE = "avame";
+  const AVACHAT_MODE = "avachat";
   const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
   //* TODO: Change later.
-  const DEFAULT_MODEL_PATH = "default.vrm";
+  const DEFAULT_MODEL_PATH = "dulls.vrm";
   // const DEFAULT_MODEL_PATH =
   //   "https://dulls-nft.s3.ap-northeast-2.amazonaws.com/vrm/1.vrm";
   const [avatarUrl, setAvatarUrl] = React.useState(DEFAULT_MODEL_PATH);
@@ -74,7 +76,7 @@ export default function Service() {
     setAvatarUrl(element.metadata.realbits.vrm_url);
   }
 
-  function buildAvaMeService() {
+  function buildAvaChatService() {
     return (
       <>
         {/* //*----------------------------------------------------------------*/}
@@ -119,6 +121,7 @@ export default function Service() {
           setAvatarPositionFunc={setAvatarPositionFuncRef}
           setAvatarExpressionFuncRef={setAvatarExpressionFuncRef}
           setTalkFuncRef={setTalkFuncRef}
+          serviceMode={AVACHAT_MODE}
         />
 
         {/*//*-----------------------------------------------------------------*/}
@@ -142,7 +145,7 @@ export default function Service() {
     );
   }
 
-  function buildAvaChatService() {
+  function buildAvaMeService() {
     return (
       <>
         {/* //*----------------------------------------------------------------*/}
@@ -177,6 +180,7 @@ export default function Service() {
           showGuideCanvas={true}
           showFrameStats={false}
           useMotionUpdate={true}
+          serviceMode={AVAME_MODE}
         />
 
         {/*//*-----------------------------------------------------------------*/}

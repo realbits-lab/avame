@@ -35,6 +35,7 @@ function AvatarView({
   useMotionUpdate = true,
   setAvatarExpressionFuncRef,
   setTalkFuncRef,
+  serviceMode = "avachat",
 }) {
   //*---------------------------------------------------------------------------
   //* Constant variables.
@@ -45,7 +46,7 @@ function AvatarView({
   };
   const IMAGE_SNAPSHOT_WIDTH = 1024;
   const IMAGE_SNAPSHOT_HEIGHT = 1024;
-  const SERVICE_MODE = process.env.NEXT_PUBLIC_SERVICE_MODE;
+  const AVACHAT_MODE = "avachat";
 
   //*---------------------------------------------------------------------------
   //* GLTF loading variable.
@@ -406,8 +407,8 @@ function AvatarView({
     // console.log("v3dWebRef.current: ", v3dWebRef.current);
     // console.log("url: ", url);
 
-    //* TODO: Block the usage of Three.js library.
-    if (SERVICE_MODE === "avame") {
+    //* Use Three.js library for avachat service mode.
+    if (serviceMode === AVACHAT_MODE) {
       makeScene();
       await loadGltf({ url });
       return;
@@ -913,7 +914,7 @@ function AvatarView({
         ref={avatarCanvasRef}
       />
       <StatsWithNoSSR ref={initializeStats}></StatsWithNoSSR>
-      {SERVICE_MODE !== "avame" && (
+      {serviceMode !== AVACHAT_MODE && (
         <div ref={backdropRef}>
           <Backdrop open={true} sx={{ color: "#fff", zIndex: 20 }}>
             <CircularProgress color="inherit" />
