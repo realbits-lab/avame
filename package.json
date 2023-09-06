@@ -23,7 +23,7 @@
     "dev": "next dev",
     "build": "next build",
     "start_port": "next start -p $PORT",
-    "start": "node --max-old-space-size=12000 server.js",
+    "start": "node server.js",
     "lint": "next lint"
   },
   "dependencies": {
